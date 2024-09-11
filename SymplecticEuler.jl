@@ -48,13 +48,13 @@ function symplecticEuler!(spaceData::Vector{Body})
     
     # Updates the entries in each isntance of the class
     for (i,p) in enumerate(spaceData)
-        p.t += p.dt
-        p.dx += p.dt * α[i,1]
-        p.dy += p.dt * α[i,2]
-        p.dz += p.dt * α[i,3]
-        p.x += p.dt * p.dx
-        p.y += p.dt * p.dy
-        p.z += p.dt * p.dz
+        p.t += p.dt             # Time update
+        p.dx += p.dt * α[i,1]   # x-velocity 
+        p.dy += p.dt * α[i,2]   # y-velocity
+        p.dz += p.dt * α[i,3]   # z-velocity
+        p.x += p.dt * p.dx      # x-position
+        p.y += p.dt * p.dy      # y-position
+        p.z += p.dt * p.dz      # z-position
     end
 end
 
@@ -67,9 +67,9 @@ function simulation(spaceData::Vector{Body}, simLength::Int64)
     nBodies = length(spaceData)
     simulation = zeros(Float64, (simLength, 3, nBodies))  # Simulation length by axes by number of bodies
     for i=1:simLength
-        symplecticEuler!(spaceData)
+        symplecticEuler!(spaceData) # Updates each instance of the class
         for p=1:nBodies
-            simulation[i,:,p] = [spaceData[p].x, spaceData[p].y, spaceData[p].z]
+            simulation[i,:,p] = [spaceData[p].x, spaceData[p].y, spaceData[p].z]    # Fills relevent timestep and body in the array with the position data
         end
     end
     return simulation
@@ -77,17 +77,34 @@ end
 
 # Defining the model space
 
-p1 = Body()
-p2 = Body()
+moon = Body()
+earth = Body()
 p3 = Body()
 
-p1.x = -3.93e8
-p1.dy = 1e3
-p1.mass = 7.34767309e22
-p2.dz = 0.00001
-spaceData = [p1, p2]
+moon.x = -3.93e8
+moon.dy = 0.8e3
+moon.mass = 7.34767309e22
+earth.dz = 0.00001
+spaceData = [moon, earth]
+simLength = 1200
 
-model = simulation(spaceData, 5)
+model = simulation(spaceData, simLength)
+
+@userplot ModelPlot
+@recipe function f(cp::ModelPlot)
+    x, y, i = cp.args
+    n = length(x)
+    inds = circshift(1:n, 1 - i)
+    linewidth --> range(0, 10, length = n)
+    seriesalpha --> range(0, 1, length = n)
+    aspect_ratio --> 1
+    label --> false
+    x[inds], y[inds]
+end
+
+anim = @animate for i ∈ 1:5:simLength
+    modelplot(model[:,1,1], model[:,2,1], i)
+end
 
 # initialize a 3D plot with 1 empty series
 plt = plot3d(
@@ -100,19 +117,6 @@ plt = plot3d(
     linecolor = "white"
 )
 
-# build an animated gif by pushing new points to the plot, saving every 10th frame
-@btime @gif for i=1:200
-    symplecticEuler!(spaceData)
-    push!(plt, spaceData[1].x, spaceData[1].y, spaceData[1].z)
-    push!(plt, spaceData[2].x, spaceData[2].y, spaceData[2].z)
-end every 10
 
-# Animation code
-@btime anim = @animate for i=1:200
-    nBodies = (size(spaceData))[1]
-    symplecticEuler!(spaceData)
-    push!(plt, spaceData[1].x, spaceData[1].y, spaceData[1].z)
-    push!(plt, spaceData[2].x, spaceData[2].y, spaceData[2].z)
-end every 10
 
-gif(anim, "Plot.gif", fps = 30)
+gif(anim, fps = 30)
