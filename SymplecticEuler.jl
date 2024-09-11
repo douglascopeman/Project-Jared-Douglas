@@ -1,5 +1,7 @@
 using Plots
-using CalculusWithJulia
+gr()
+using LinearAlgebra
+using BenchmarkTools
 
 # Constants
 G = 6.67430e-11
@@ -23,7 +25,7 @@ end
 Compute the acceleration between n bodies in the x,y and z axes. The output will be a nx3 array.
 """
 function accelerationCalc(spaceData::Vector{Body})
-    n = size(spaceData)[1]
+    n = length(spaceData)
     acceleration = zeros(Float64, (n,3))
     # This is an inneficient way to do this, will have to fix this at somepoint
     for body=1:n
@@ -35,21 +37,16 @@ function accelerationCalc(spaceData::Vector{Body})
     return acceleration
 end
 
+"""
+    symplecticEuler!(spaceData::Vector{Body})
 
-
-# function symplecticEuler!(spaceData)
-#     p.t += p.dt
-#     dx(t) = sin.(t)
-#     dy(t) = cos.(t)
-#     dz(t) = 0.2
-#     p.x += p.dt * (dx(p.t) + (p.dt * dx'(p.t)))
-#     p.y += p.dt * (dy(p.t) + (p.dt * dy'(p.t)))
-#     p.z += p.dt * (dz(p.t) + (p.dt * dz'(p.t)))
-# end
-
+The symplectic euler numerical method, calculates the velocity at timestep n+1 using it along with the n position step
+to calculate the position at n+1
+"""
 function symplecticEuler!(spaceData::Vector{Body})
-    α = accelerationCalc(spaceData)
+    α = accelerationCalc(spaceData)     # Gives acceleration values at timestep n for all bodies and all axes
     
+    # Updates the entries in each isntance of the class
     for (i,p) in enumerate(spaceData)
         p.t += p.dt
         p.dx += p.dt * α[i,1]
@@ -58,11 +55,27 @@ function symplecticEuler!(spaceData::Vector{Body})
         p.x += p.dt * p.dx
         p.y += p.dt * p.dy
         p.z += p.dt * p.dz
-        print(α[i,1])
     end
 end
 
-# Defining the model space, currently working with 2 bodies
+"""
+    simulation(spaceData::Vector{Body}, simLength::Int64)
+
+Builds a 3 dimensional array filled with the 3 axes position data of every body for the length of the simulaiton
+"""
+function simulation(spaceData::Vector{Body}, simLength::Int64)
+    nBodies = length(spaceData)
+    simulation = zeros(Float64, (simLength, 3, nBodies))  # Simulation length by axes by number of bodies
+    for i=1:simLength
+        symplecticEuler!(spaceData)
+        for p=1:nBodies
+            simulation[i,:,p] = [spaceData[p].x, spaceData[p].y, spaceData[p].z]
+        end
+    end
+    return simulation
+end
+
+# Defining the model space
 
 p1 = Body()
 p2 = Body()
@@ -74,8 +87,7 @@ p1.mass = 7.34767309e22
 p2.dz = 0.00001
 spaceData = [p1, p2]
 
-
-
+model = simulation(spaceData, 5)
 
 # initialize a 3D plot with 1 empty series
 plt = plot3d(
@@ -89,9 +101,18 @@ plt = plot3d(
 )
 
 # build an animated gif by pushing new points to the plot, saving every 10th frame
-@gif for i=1:2000
+@btime @gif for i=1:200
     symplecticEuler!(spaceData)
     push!(plt, spaceData[1].x, spaceData[1].y, spaceData[1].z)
     push!(plt, spaceData[2].x, spaceData[2].y, spaceData[2].z)
 end every 10
 
+# Animation code
+@btime anim = @animate for i=1:200
+    nBodies = (size(spaceData))[1]
+    symplecticEuler!(spaceData)
+    push!(plt, spaceData[1].x, spaceData[1].y, spaceData[1].z)
+    push!(plt, spaceData[2].x, spaceData[2].y, spaceData[2].z)
+end every 10
+
+gif(anim, "Plot.gif", fps = 30)
