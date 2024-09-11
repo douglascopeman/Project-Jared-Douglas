@@ -2,6 +2,7 @@ using Plots
 gr()
 using LinearAlgebra
 using BenchmarkTools
+using Combinatorics
 
 # Constants
 G = 6.67430e-11
@@ -38,6 +39,27 @@ function accelerationCalc(spaceData::Vector{Body})
 end
 
 """
+    Hamiltonian(spaceData::Vector{Body})
+
+The Hamiltonian is the total amount of energy in the system, gravitational plus kinetic.
+The function takes the spaceData and outputs both the value of the Hamiltonian, H, for all 
+timesteps and the change in the Hamiltonian value over time, ΔH
+"""
+function Hamiltonian(spaceData::Vector{Body})
+    nBodies = length(spaceData)
+    Ω = collect(combinations(1:nBodies, 2))     # nBodies choose 2
+    hamiltonian = sum(                                                              # gravitational part of the hamiltonian
+        -G * spaceData[Ω[i][1]].mass * spaceData[Ω[i][2]].mass / (norm(
+            [spaceData[Ω[i][1]].x, spaceData[Ω[i][1]].y, spaceData[Ω[i][1]].z] -
+            [spaceData[Ω[i][2]].x, spaceData[Ω[i][2]].y, spaceData[Ω[i][2]].z])) 
+            for i in length(Ω)) +
+            sum((1/2) * spaceData[i].mass * norm(                                   # kinetic part of the hamiltonian
+                [spaceData[i].dx, spaceData[i].dy, spaceData[i].dz])^2 for i in 1:nBodies)  
+    return hamiltonian
+end
+
+
+"""
     symplecticEuler!(spaceData::Vector{Body})
 
 The symplectic euler numerical method, calculates the velocity at timestep n+1 using it along with the n position step
@@ -66,17 +88,19 @@ Builds a 3 dimensional array filled with the 3 axes position data of every body 
 function simulation(spaceData::Vector{Body}, simLength::Int64)
     nBodies = length(spaceData)
     simulation = zeros(Float64, (simLength, 3, nBodies))  # Simulation length by axes by number of bodies
+    modelHamiltonian = zeros(Float64, simLength)
     for i=1:simLength
         symplecticEuler!(spaceData) # Updates each instance of the class
         for p=1:nBodies
             simulation[i,:,p] = [spaceData[p].x, spaceData[p].y, spaceData[p].z]    # Fills relevent timestep and body in the array with the position data
         end
+
+        modelHamiltonian[i] = Hamiltonian(spaceData)    # Current velocity data used to calculate the current hamiltonian
     end
-    return simulation
+    return simulation, modelHamiltonian
 end
 
 # Defining the model space
-
 moon = Body()
 earth = Body()
 p3 = Body()
@@ -87,36 +111,32 @@ moon.mass = 7.34767309e22
 earth.dz = 0.00001
 spaceData = [moon, earth]
 simLength = 1200
+@assert simLength > 250
 
-model = simulation(spaceData, simLength)
+model, modelHamiltonian = simulation(spaceData, simLength)
+
+
+# Plotting
 
 @userplot ModelPlot
 @recipe function f(mp::ModelPlot)
     x, y, i = mp.args
-    n = length(x)
-    halfn = n÷2
+    n = length(x) 
     inds = circshift(1:n, 1-i)
-    seriesalpha --> range(0, 1, length = n-halfn)
+    seriesalpha --> [zeros(n-250); range(0, 1, length = 250)]
     aspect_ratio --> 1
+    linewidth --> [ones(n-25); (range(1, 10, length = 25))]
     label --> false
     x[inds], y[inds]
 end
 
 anim = @animate for i ∈ 1:5:simLength
     modelplot(model[:,1,1], model[:,2,1], i, c=:thermal)
+    for p = 2:length(spaceData)
+        modelplot!(model[:,1,p], model[:,2,p], i, c=:thermal, markersize = 5)
+    end
+    #annotate!("time= $(rpad(round(i/3; digits=2),4,"0")) s")
+    #annotate!("Hamiltonian= $(rpad(round(modelHamiltonian[i]; digits=2),4,"0"))")
 end
-
-# initialize a 3D plot with 1 empty series
-plt = plot3d(
-    1,
-    xlim = (-6e8, 6e8),
-    ylim = (-6e8, 6e8),
-    zlim = (0, 40),
-    legend = false,
-    marker = 5,
-    linecolor = "white"
-)
-
-
 
 gif(anim, fps = 30)
