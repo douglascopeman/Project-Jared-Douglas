@@ -91,19 +91,19 @@ simLength = 1200
 model = simulation(spaceData, simLength)
 
 @userplot ModelPlot
-@recipe function f(cp::ModelPlot)
-    x, y, i = cp.args
+@recipe function f(mp::ModelPlot)
+    x, y, i = mp.args
     n = length(x)
-    inds = circshift(1:n, 1 - i)
-    linewidth --> range(0, 10, length = n)
-    seriesalpha --> range(0, 1, length = n)
+    halfn = n÷2
+    inds = circshift(1:n, 1-i)
+    seriesalpha --> range(0, 1, length = n-halfn)
     aspect_ratio --> 1
     label --> false
     x[inds], y[inds]
 end
 
 anim = @animate for i ∈ 1:5:simLength
-    modelplot(model[:,1,1], model[:,2,1], i)
+    modelplot(model[:,1,1], model[:,2,1], i, c=:thermal)
 end
 
 # initialize a 3D plot with 1 empty series
