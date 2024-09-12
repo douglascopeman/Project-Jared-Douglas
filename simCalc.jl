@@ -1,20 +1,24 @@
+include("numericalMethods.jl")
 include("modelSpace.jl")
 using LinearAlgebra
 using BenchmarkTools
 using Combinatorics
-using .ModelSpace
+import .NumericalMethods
+import .ModelSpace
 
 
 module SimCalc
 
-export simulation
+export simulation, accelerationCalc
+
+G = Main.ModelSpace.G
 
 """
     accelerationCalc(spaceData)
 
 Compute the acceleration between n bodies in the x,y and z axes. The output will be a nx3 array.
 """
-function accelerationCalc(spaceData::Vector{Main.ModelSpace.Body})
+function accelerationCalc(spaceData)
     n = length(spaceData)
     acceleration = zeros(Float64, (n,3))
     # This is an inneficient way to do this, will have to fix this at somepoint
@@ -34,7 +38,7 @@ The Hamiltonian is the total amount of energy in the system, gravitational plus 
 The function takes the spaceData and outputs both the value of the Hamiltonian, H, for all 
 timesteps and the change in the Hamiltonian value over time, ΔH
 """
-function Hamiltonian(spaceData::Vector{Main.ModelSpace.Body})
+function Hamiltonian(spaceData)
     nBodies = length(spaceData)
     Ω = collect(combinations(1:nBodies, 2))     # nBodies choose 2
     hamiltonian = sum(                                                              # gravitational part of the hamiltonian
@@ -52,12 +56,13 @@ end
 
 Builds a 3 dimensional array filled with the 3 axes position data of every body for the length of the simulaiton
 """
-function simulation(spaceData::Vector{Main.ModelSpace.Body}, simLength::Int64)
+function simulation(spaceData, simLength)
     nBodies = length(spaceData)
     simulation = zeros(Float64, (simLength, 3, nBodies))  # Simulation length by axes by number of bodies
     modelHamiltonian = zeros(Float64, simLength)
     for i=1:simLength
-        symplecticEuler!(spaceData) # Updates each instance of the class
+        α = accelerationCalc(spaceData)     # Gives acceleration values at timestep n for all bodies and all axes
+        Main.NumericalMethods.symplecticEuler(spaceData, α) # Updates each instance of the class
         for p=1:nBodies
             simulation[i,:,p] = [spaceData[p].x, spaceData[p].y, spaceData[p].z]    # Fills relevent timestep and body in the array with the position data
         end

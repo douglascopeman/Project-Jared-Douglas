@@ -1,14 +1,15 @@
-include("NumericalMethods.jl")
+include("numericalMethods.jl")
 include("modelSpace.jl")
 include("simCalc.jl")
 
 using Plots
 gr()
-using LinearAlgebra
 using BenchmarkTools
+using LinearAlgebra
 using Combinatorics
-using .NumericalMethods
-using .ModelSpace
+using .NumericalMethods: symplecticEuler
+using .ModelSpace: spaceData, simLength, Body
+using .SimCalc: simulation
 
 
 model, modelHamiltonian = simulation(spaceData, simLength)

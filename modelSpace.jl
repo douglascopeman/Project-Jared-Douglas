@@ -1,6 +1,6 @@
 module ModelSpace
 
-export Body, spaceData, simLength
+export Body, spaceData, simLength, G
 
 # Constants
 G = 6.67430e-11
