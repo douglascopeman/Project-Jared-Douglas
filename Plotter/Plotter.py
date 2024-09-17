@@ -16,13 +16,7 @@ class Plotter():
             self.timesteps = []
             self.bodies.append(Body())
             
-        
-        
-    def calculate_total_energy(self):
-        '''Calculates the total energy of the system at each timestep and returns the result as a numpy array'''
-        #TODO: check implimentation works with arrays and tweak if necessary
-        T = sum(body.kinetic_energies() for body in self.bodies)
-        
+    def calculate_potential_energies(self):
         twice_U = 0.0
         for body in self.bodies:
             for other_body in self.bodies:
@@ -32,5 +26,12 @@ class Plotter():
                         twice_U -= self.G * body.mass * \
                             other_body.mass / direction
                             
-        U = twice_U / 2
+        return twice_U / 2
+        
+    def calculate_total_energy(self):
+        '''Calculates the total energy of the system at each timestep and returns the result as a numpy array'''
+        #TODO: check implimentation works with arrays and tweak if necessary as with the above
+        T = sum(body.kinetic_energies() for body in self.bodies)
+        U = self.calculate_potential_energies()
+        
         return T + U
