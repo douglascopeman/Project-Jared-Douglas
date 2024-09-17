@@ -1,65 +1,66 @@
 import numpy as np
 from numpy import linalg as LA
+import Body
 
 G = 1
 
-class Body:
-    pos = np.zeros(3, dtype=float)
-    vel = np.zeros(3, dtype=float)
-    mass = 1000
+# class Body:
+#     position = np.zeros(3, dtype=float)
+#     velocity = np.zeros(3, dtype=float)
+#     mass = 1000
 
 earth = Body()
 moon =  Body()
-moon.pos = [0, 10, 0]
-moon.vel[0] = 10
+moon.position = [0, 10, 0]
+moon.velocity[0] = 10
 
-spaceData = [earth, moon]
+bodies = [earth, moon]
 
 ###################################################
 # Numerical Methods
 ###################################################
-def symplecticEuler(spaceData, acc, dt):
+def symplecticEuler(bodies, acceleration, dt):
     """
     The symplectic euler numerical method, calculates the velocity at timestep n+1 using it along with the n position step
     to calculate the position at n+1
     """
-    for (i,p) in enumerate(spaceData):
-        p.vel += dt * acc[i,:]   # x-velocity 
-        p.pos += dt * p.vel      # x-position
+    for (i,body) in enumerate(bodies):
+        body.velocity += dt * acceleration[i,:]   # x-velocity 
+        body.position += dt * body.velocity     # x-position
     
-    return spaceData
+    return bodies
 
 
 ###################################################
 # Simulation Calculations
 ###################################################
 
-def accelerationCalc(spaceData):
+def calculateAcceleration(bodies):
     """
     Compute the acceleration between n bodies in the x,y and z axes. The output will be a nx3 array.
     """
 
-    n = len(spaceData)
+    n = len(bodies)
     acceleration = np.zeros((n,3), dtype=float)
     for body in range(0,n):
         acceleration[body,:] = np.sum([
-            -G*spaceData[i].mass*(spaceData[body].pos - spaceData[i].pos)/((LA.norm(spaceData[body].pos - spaceData[i].pos))**3) for i in (set(range(0,n)))-set([body])])
+            -G*bodies[i].mass*(bodies[body].pos - bodies[i].pos)/((LA.norm(bodies[body].pos - bodies[i].pos))**3) for i in (set(range(0,n)))-set([body])])
     
     return acceleration
 
 
-def runSimulation(spaceData, simLength, dt):
+def runSimulation(bodies, T, dt):
     """
     Builds a 3 dimensional array filled with the 3 axes position data of every body for the length of the simulaiton
     """
-    nBodies = len(spaceData)
-    simulation = np.zeros((simLength, 6, nBodies))
+    n = len(bodies)
+    simulation = np.zeros((T, 6, n))
     # modelHamiltonian = np.zeros(simLength)
-    for i in range(0, simLength):
-        acc = accelerationCalc(spaceData)
-        spaceData = symplecticEuler(spaceData, acc, dt)
-        for p in range(0,nBodies):
-            simulation[i,:,p] = np.concatenate((spaceData[p].pos, spaceData[p].vel))
+    for i in range(0, T):
+        acceleration = calculateAcceleration(bodies)
+        bodies = symplecticEuler(bodies, acceleration, dt)
+        for p in range(0,n):
+            simulation[i,:,p] = np.concatenate((bodies[p].pos, bodies[p].vel))
     
     return simulation
 
@@ -67,9 +68,12 @@ def runSimulation(spaceData, simLength, dt):
 # Run Model
 ###################################################
 
-simLength = 1000    # Number of "frames" in simulation
+T = 1000    # Number of "frames" in simulation
 dt = 10             # Timestep between each frame
 
-model = runSimulation(spaceData, simLength, dt)
+model = runSimulation(bodies, T, dt)
+
+if __name__ == "__main__":
+    print(model)
         
         

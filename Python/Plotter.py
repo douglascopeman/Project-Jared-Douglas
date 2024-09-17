@@ -4,7 +4,7 @@ import Body
 
 class Plotter():
     def __init__(self, filename, **plot_kwargs):
-        self.G = 6.67408e-11
+        self.G = 1
         
         self.filename = filename
         defaultKwargs = {}

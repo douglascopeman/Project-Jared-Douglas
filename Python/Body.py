@@ -2,7 +2,7 @@ import numpy as np
 
 class Body():
     
-    def __init__(self, mass, dt, positions, velocities, plot_colour):
+    def __init__(self, mass=1, dt=1, positions=np.zeros(3, dtype=float), velocities=np.zeros(3, dtype=float), plot_colour='w'):
         self.mass = mass
         self.positions = positions
         self.velocities = velocities
