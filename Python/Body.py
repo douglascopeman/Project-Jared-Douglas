@@ -1,11 +1,11 @@
 import numpy as np
 
-class Body():
+class Body:
     
-    def __init__(self, mass=1, dt=1, positions=np.zeros(3, dtype=float), velocities=np.zeros(3, dtype=float), plot_colour='w'):
+    def __init__(self, position=np.zeros(3, dtype=float), velocity=np.zeros(3, dtype=float), mass=1, plot_colour='w'):
         self.mass = mass
-        self.positions = positions
-        self.velocities = velocities
+        self.position = position
+        self.velocity = velocity
         self.plot_colour = plot_colour
         
     def kinetic_energies(self):

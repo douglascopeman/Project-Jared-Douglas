@@ -1,6 +1,6 @@
 import numpy as np
 from numpy import linalg as LA
-import Body
+from Body import Body
 
 G = 1
 
@@ -10,9 +10,9 @@ G = 1
 #     mass = 1000
 
 earth = Body()
-moon =  Body()
-moon.position = [0, 10, 0]
-moon.velocity[0] = 10
+moon =  Body(np.array([0,10,0], dtype=float), np.array([10,0,0], dtype=float))
+# moon.position = [0, 10, 0]
+# moon.velocity[0] = 10
 
 bodies = [earth, moon]
 
@@ -44,7 +44,7 @@ def calculateAcceleration(bodies):
     acceleration = np.zeros((n,3), dtype=float)
     for body in range(0,n):
         acceleration[body,:] = np.sum([
-            -G*bodies[i].mass*(bodies[body].pos - bodies[i].pos)/((LA.norm(bodies[body].pos - bodies[i].pos))**3) for i in (set(range(0,n)))-set([body])])
+            -G*bodies[i].mass*(bodies[body].position - bodies[i].position)/((LA.norm(bodies[body].position - bodies[i].position))**3) for i in (set(range(0,n)))-set([body])])
     
     return acceleration
 
@@ -60,7 +60,7 @@ def runSimulation(bodies, T, dt):
         acceleration = calculateAcceleration(bodies)
         bodies = symplecticEuler(bodies, acceleration, dt)
         for p in range(0,n):
-            simulation[i,:,p] = np.concatenate((bodies[p].pos, bodies[p].vel))
+            simulation[i,:,p] = np.concatenate((bodies[p].position, bodies[p].velocity))
     
     return simulation
 
