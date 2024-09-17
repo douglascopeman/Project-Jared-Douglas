@@ -30,7 +30,9 @@ def symplecticEuler(spaceData, acc, dt):
     return spaceData
 
 
-
+###################################################
+# Simulation Calculations
+###################################################
 
 def accelerationCalc(spaceData):
     """
@@ -61,10 +63,13 @@ def runSimulation(spaceData, simLength, dt):
     
     return simulation
 
-simLength = 1000
-dt = 10
+###################################################
+# Run Model
+###################################################
+
+simLength = 1000    # Number of "frames" in simulation
+dt = 10             # Timestep between each frame
 
 model = runSimulation(spaceData, simLength, dt)
-print(model)
         
         
