@@ -10,6 +10,10 @@ class Plotter():
         defaultKwargs = {}
         self.plot_kwargs = defaultKwargs | plot_kwargs
         
+        self.total_energies = self.calculate_total_energy()
+        self.dt = 1 #to be read in at some point
+        self.nIter = 10 #as above
+        
     def read_data(self):
         self.bodies = []
         with open(self.filename, 'r') as f:
@@ -35,3 +39,11 @@ class Plotter():
         U = self.calculate_potential_energies()
         
         return T + U
+    
+    def plot_energy(self):
+        x = np.linspace(0, len(self.total_energies * self.dt, self.nIter))
+        plt.plot(x, self.total_energies)
+        plt.xlabel("Time")
+        plt.ylabel("Total Energy (J)")
+        plt.title("Total Energy of the System over Time")
+        plt.show()
