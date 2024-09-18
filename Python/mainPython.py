@@ -52,7 +52,7 @@ if __name__ == "__main__":
 
     model = runSimulation(bodies, T, dt)
     print(model)
-    f = open("Python/output.txt", "w")
-    f.write(str(model))
+    for i in range(len(bodies)):
+        np.savetxt("Outputs\\output" + str(i) + ".csv", model[:,:,i], delimiter=",")
         
         

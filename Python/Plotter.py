@@ -10,6 +10,12 @@ class Plotter():
         defaultKwargs = {}
         self.plot_kwargs = defaultKwargs | plot_kwargs
         
+        self.read_data()
+        
+        
+        
+        
+        
         self.total_energies = self.calculate_total_energy()
         self.dt = 1 #to be read in at some point
         self.nIter = 10 #as above
@@ -17,6 +23,8 @@ class Plotter():
     def read_data(self):
         self.bodies = []
         with open(self.filename, 'r') as f:
+            lines = f.readlines()
+            print(lines)
             self.timesteps = []
             self.bodies.append(Body())
             
