@@ -1,9 +1,6 @@
 import numpy as np
 from numpy import linalg as LA
 from Body import Body
-
-
-# fix integrators import 
 import Integrators
 
 G = 1
@@ -12,21 +9,6 @@ earth = Body()
 moon =  Body(np.array([0,10,0], dtype=float), np.array([10,0,0], dtype=float), 1000)
 
 bodies = [earth, moon]
-
-###################################################
-# Numerical Methods
-###################################################
-# def symplecticEuler(bodies, acceleration, dt):
-#     """
-#     The symplectic euler numerical method, calculates the velocity at timestep n+1 using it along with the n position step
-#     to calculate the position at n+1
-#     """
-#     for (i,body) in enumerate(bodies):
-#         body.velocity += dt * acceleration[i,:]   # x-velocity 
-#         body.position += dt * body.velocity     # x-position
-    
-#     return bodies
-
 
 ###################################################
 # Simulation Calculations
