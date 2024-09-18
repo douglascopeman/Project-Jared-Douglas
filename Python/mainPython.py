@@ -5,8 +5,8 @@ import Integrators
 
 G = 1
 
-earth = Body()
-moon =  Body(np.array([0,10,0], dtype=float), np.array([10,0,0], dtype=float), 1000)
+earth = Body(np.array([0,0,0], dtype=float), np.array([0,1,0], dtype=float), 1000)
+moon =  Body(np.array([0,10,0], dtype=float), np.array([10,0,0], dtype=float), 1)
 
 bodies = [earth, moon]
 
@@ -48,11 +48,13 @@ def runSimulation(bodies, T, dt, Integrator=Integrators.symplecticEuler):
 ###################################################
 if __name__ == "__main__":
     T = 1000    # Number of "frames" in simulation
-    dt = 10     # Timestep between each frame
+    dt = 1    # Timestep between each frame
+    n = len(bodies)
 
-    model = runSimulation(bodies, T, dt)
-    print(model)
+    simulationSettings = np.array([T, dt, n])
+    simulation = runSimulation(bodies, T, dt)
+    np.savetxt("Outputs\\simulationSettings.csv", simulationSettings, delimiter=",")
     for i in range(len(bodies)):
-        np.savetxt("Outputs\\output" + str(i) + ".csv", model[:,:,i], delimiter=",")
+        np.savetxt("Outputs\\output" + str(i) + ".csv", simulation[:,:,i], delimiter=",")
         
         
