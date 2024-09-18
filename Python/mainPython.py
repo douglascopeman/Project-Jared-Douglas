@@ -46,13 +46,13 @@ def runSimulation(bodies, T, dt, Integrator=Integrators.symplecticEuler):
 ###################################################
 # Run Model
 ###################################################
-
-T = 1000    # Number of "frames" in simulation
-dt = 10     # Timestep between each frame
-
-model = runSimulation(bodies, T, dt)
-
 if __name__ == "__main__":
+    T = 1000    # Number of "frames" in simulation
+    dt = 10     # Timestep between each frame
+
+    model = runSimulation(bodies, T, dt)
     print(model)
+    f = open("Python/output.txt", "w")
+    f.write(str(model))
         
         
