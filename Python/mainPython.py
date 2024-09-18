@@ -28,7 +28,7 @@ def calculateAcceleration(bodies):
     return acceleration
 
 
-def runSimulation(bodies, T, dt):
+def runSimulation(bodies, T, dt, Integrator=Integrators.symplecticEuler):
     """
     Builds a 3 dimensional array filled with the 3 axes position data of every body for the length of the simulaiton
     """
@@ -37,7 +37,7 @@ def runSimulation(bodies, T, dt):
     # modelHamiltonian = np.zeros(simLength)
     for i in range(0, T):
         acceleration = calculateAcceleration(bodies)
-        bodies = Integrators.symplecticEuler(bodies, acceleration, dt)
+        bodies = Integrator(bodies, acceleration, dt)
         for p in range(0,n):
             simulation[i,:,p] = np.concatenate((bodies[p].position, bodies[p].velocity))
     
@@ -48,7 +48,7 @@ def runSimulation(bodies, T, dt):
 ###################################################
 
 T = 1000    # Number of "frames" in simulation
-dt = 10             # Timestep between each frame
+dt = 10     # Timestep between each frame
 
 model = runSimulation(bodies, T, dt)
 
