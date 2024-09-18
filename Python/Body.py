@@ -1,6 +1,6 @@
 import numpy as np
 
-class Body:
+class Body():
     
     def __init__(self, position=np.zeros(3, dtype=float), velocity=np.zeros(3, dtype=float), mass=1, plot_colour='w'):
         self.mass = mass

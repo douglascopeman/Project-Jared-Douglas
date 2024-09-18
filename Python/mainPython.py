@@ -2,33 +2,30 @@ import numpy as np
 from numpy import linalg as LA
 from Body import Body
 
+
+# fix integrators import 
+import Integrators
+
 G = 1
 
-# class Body:
-#     position = np.zeros(3, dtype=float)
-#     velocity = np.zeros(3, dtype=float)
-#     mass = 1000
-
 earth = Body()
-moon =  Body(np.array([0,10,0], dtype=float), np.array([10,0,0], dtype=float))
-# moon.position = [0, 10, 0]
-# moon.velocity[0] = 10
+moon =  Body(np.array([0,10,0], dtype=float), np.array([10,0,0], dtype=float), 1000)
 
 bodies = [earth, moon]
 
 ###################################################
 # Numerical Methods
 ###################################################
-def symplecticEuler(bodies, acceleration, dt):
-    """
-    The symplectic euler numerical method, calculates the velocity at timestep n+1 using it along with the n position step
-    to calculate the position at n+1
-    """
-    for (i,body) in enumerate(bodies):
-        body.velocity += dt * acceleration[i,:]   # x-velocity 
-        body.position += dt * body.velocity     # x-position
+# def symplecticEuler(bodies, acceleration, dt):
+#     """
+#     The symplectic euler numerical method, calculates the velocity at timestep n+1 using it along with the n position step
+#     to calculate the position at n+1
+#     """
+#     for (i,body) in enumerate(bodies):
+#         body.velocity += dt * acceleration[i,:]   # x-velocity 
+#         body.position += dt * body.velocity     # x-position
     
-    return bodies
+#     return bodies
 
 
 ###################################################
@@ -58,7 +55,7 @@ def runSimulation(bodies, T, dt):
     # modelHamiltonian = np.zeros(simLength)
     for i in range(0, T):
         acceleration = calculateAcceleration(bodies)
-        bodies = symplecticEuler(bodies, acceleration, dt)
+        bodies = Integrators.symplecticEuler(bodies, acceleration, dt)
         for p in range(0,n):
             simulation[i,:,p] = np.concatenate((bodies[p].position, bodies[p].velocity))
     
