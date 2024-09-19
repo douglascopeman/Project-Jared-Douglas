@@ -2,11 +2,12 @@ import numpy as np
 from numpy import linalg as LA
 from Body import Body
 import Integrators
+from Plotter import Plotter
 
 G = 1
 
-earth = Body(np.array([0,0,0], dtype=float), np.array([0,1,0], dtype=float), 1000)
-moon =  Body(np.array([0,10,0], dtype=float), np.array([10,0,0], dtype=float), 1)
+earth = Body(np.array([0,0,0], dtype=float), np.array([0,0,0], dtype=float), 100)
+moon =  Body(np.array([0,5,0], dtype=float), np.array([5,0,0], dtype=float))
 
 bodies = [earth, moon]
 
@@ -23,9 +24,10 @@ def calculateAcceleration(bodies):
     acceleration = np.zeros((n,3), dtype=float)
     for body in range(0,n):
         acceleration[body,:] = np.sum([
-            -G*bodies[i].mass*(bodies[body].position - bodies[i].position)/((LA.norm(bodies[body].position - bodies[i].position))**3) for i in (set(range(0,n)))-set([body])])
+            ((-G*bodies[i].mass)/((LA.norm(bodies[body].position - bodies[i].position))**3))*(bodies[body].position - bodies[i].position) for i in (set(range(0,n)))-set([body])], axis = 0)
     
     return acceleration
+
 
 
 def runSimulation(bodies, T, dt, Integrator=Integrators.symplecticEuler):
@@ -39,7 +41,7 @@ def runSimulation(bodies, T, dt, Integrator=Integrators.symplecticEuler):
         acceleration = calculateAcceleration(bodies)
         bodies = Integrator(bodies, acceleration, dt)
         for p in range(0,n):
-            simulation[i,:,p] = np.concatenate((bodies[p].position, bodies[p].velocity))
+            simulation[i,:,p] = np.concatenate((bodies[p].position, bodies[p].velocity), axis=None)
     
     return simulation
 
@@ -47,7 +49,7 @@ def runSimulation(bodies, T, dt, Integrator=Integrators.symplecticEuler):
 # Run Model
 ###################################################
 if __name__ == "__main__":
-    T = 1000    # Number of "frames" in simulation
+    T = 400    # Number of "frames" in simulation
     dt = 1    # Timestep between each frame
     n = len(bodies)
 
@@ -56,5 +58,11 @@ if __name__ == "__main__":
     np.savetxt("Outputs\\simulationSettings.csv", simulationSettings, delimiter=",")
     for i in range(len(bodies)):
         np.savetxt("Outputs\\output" + str(i) + ".csv", simulation[:,:,i], delimiter=",")
-        
-        
+
+
+###################################################
+# Plotting
+###################################################
+
+plot = Plotter("Outputs\\")
+
