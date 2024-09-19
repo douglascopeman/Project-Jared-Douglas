@@ -75,6 +75,3 @@ class Plotter():
         plt.ylabel("Total Energy (J)")
         plt.title("Total Energy of the System over Time")
         plt.show()
-        
-if __name__ == "__main__":
-    plotter = Plotter("Outputs")

@@ -3,12 +3,18 @@ from numpy import linalg as LA
 from Body import Body
 import Integrators
 
-G = 1
+###################################################
+# Run Model
+###################################################
+def run(T, dt, bodies, G=1):
+    
+    n = len(bodies)
 
-earth = Body(np.array([0,0,0], dtype=float), np.array([0,1,0], dtype=float), 1000)
-moon =  Body(np.array([0,10,0], dtype=float), np.array([10,0,0], dtype=float), 1)
-
-bodies = [earth, moon]
+    simulationSettings = np.array([T, dt, n])
+    simulation = runSimulation(bodies, T, dt)
+    np.savetxt("Outputs\\simulationSettings.csv", simulationSettings, delimiter=",")
+    for i in range(len(bodies)):
+        np.savetxt("Outputs\\output" + str(i) + ".csv", simulation[:,:,i], delimiter=",")
 
 ###################################################
 # Simulation Calculations
@@ -47,18 +53,6 @@ def runSimulation(bodies, T, dt, Integrator=Integrators.symplecticEuler):
     
     return simulation
 
-###################################################
-# Run Model
-###################################################
-if __name__ == "__main__":
-    T = 1000    # Number of "frames" in simulation
-    dt = 1    # Timestep between each frame
-    n = len(bodies)
 
-    simulationSettings = np.array([T, dt, n])
-    simulation = runSimulation(bodies, T, dt)
-    np.savetxt("Outputs\\simulationSettings.csv", simulationSettings, delimiter=",")
-    for i in range(len(bodies)):
-        np.savetxt("Outputs\\output" + str(i) + ".csv", simulation[:,:,i], delimiter=",")
         
         
