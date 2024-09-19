@@ -14,18 +14,22 @@ bodies = [earth, moon]
 # Simulation Calculations
 ###################################################
 
-def calculateAcceleration(bodies):
+def calculateAccelerations(bodies):
     """
     Compute the acceleration between n bodies in the x,y and z axes. The output will be a nx3 array.
     """
+    for body in bodies:
+        other_bodies = list(set(bodies)-set([body]))
+        body.determine_acceleration(other_bodies)
 
-    n = len(bodies)
-    acceleration = np.zeros((n,3), dtype=float)
-    for body in range(0,n):
-        acceleration[body,:] = np.sum([
-            -G*bodies[i].mass*(bodies[body].position - bodies[i].position)/((LA.norm(bodies[body].position - bodies[i].position))**3) for i in (set(range(0,n)))-set([body])])
+
+    # n = len(bodies)
+    # acceleration = np.zeros((n,3), dtype=float)
+    # for body in range(0,n):
+    #     acceleration[body,:] = np.sum([
+    #         -G*bodies[i].mass*(bodies[body].position - bodies[i].position)/((LA.norm(bodies[body].position - bodies[i].position))**3) for i in (set(range(0,n)))-set([body])])
     
-    return acceleration
+    # return acceleration
 
 
 def runSimulation(bodies, T, dt, Integrator=Integrators.symplecticEuler):
@@ -36,8 +40,8 @@ def runSimulation(bodies, T, dt, Integrator=Integrators.symplecticEuler):
     simulation = np.zeros((T, 6, n))
     # modelHamiltonian = np.zeros(simLength)
     for i in range(0, T):
-        acceleration = calculateAcceleration(bodies)
-        bodies = Integrator(bodies, acceleration, dt)
+        calculateAccelerations(bodies)
+        bodies = Integrator(bodies, dt)
         for p in range(0,n):
             simulation[i,:,p] = np.concatenate((bodies[p].position, bodies[p].velocity))
     
