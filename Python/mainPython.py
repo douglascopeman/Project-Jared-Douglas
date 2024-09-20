@@ -4,18 +4,24 @@ from Body import Body
 import Integrators
 from Plotter import Plotter
 
-G = 1
+###################################################
+# Run Model
+###################################################
+def run(T, dt, bodies, G=1):
+    
+    n = len(bodies)
 
-earth = Body(np.array([0,0,0], dtype=float), np.array([0,0,0], dtype=float), 100)
-moon =  Body(np.array([0,5,0], dtype=float), np.array([5,0,0], dtype=float))
-
-bodies = [earth, moon]
+    simulationSettings = np.array([T, dt, n])
+    simulation = runSimulation(bodies, T, dt)
+    np.savetxt("Outputs\\simulationSettings.csv", simulationSettings, delimiter=",")
+    for i in range(len(bodies)):
+        np.savetxt("Outputs\\output" + str(i) + ".csv", simulation[:,:,i], delimiter=",")
 
 ###################################################
 # Simulation Calculations
 ###################################################
 
-def calculateAcceleration(bodies):
+def calculateAccelerations(bodies):
     """
     Compute the acceleration between n bodies in the x,y and z axes. The output will be a nx3 array.
     """
@@ -45,8 +51,8 @@ def runSimulation(bodies, T, dt, Integrator=Integrators.symplecticEuler):
     totalMass = np.sum([bodies[i].mass for i in range(0,n)])
     # modelHamiltonian = np.zeros(simLength)
     for i in range(0, T):
-        acceleration = calculateAcceleration(bodies)
-        bodies = Integrator(bodies, acceleration, dt)
+        calculateAccelerations(bodies)
+        bodies = Integrator(bodies, dt)
         for p in range(0,n):
             simulation[i,:,p] = np.concatenate((bodies[p].position, bodies[p].velocity), axis=None)
         centreOfMass[i,:] = centreOfMassCalc(bodies, totalMass)

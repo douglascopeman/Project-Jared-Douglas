@@ -43,8 +43,8 @@ class Plotter():
         ax = plt.axes(projection='3d')  
         for i in range(self.n):
             ax.plot(self.bodies[:,0,i], self.bodies[:,1,i], self.bodies[:,2,i])
-        for i in range(self.n):
-            ax.scatter(self.bodies[0,0,i], self.bodies[0,1,i], self.bodies[0,2,i])
+            ax.scatter(self.bodies[-1,0,i], self.bodies[-1,1,i], self.bodies[-1,2,i], label="Body " + str(i))
+        fig.legend()
         plt.show()
             
     def calculate_potential_energies(self):
@@ -75,6 +75,3 @@ class Plotter():
         plt.ylabel("Total Energy (J)")
         plt.title("Total Energy of the System over Time")
         plt.show()
-        
-if __name__ == "__main__":
-    plotter = Plotter("Outputs")
