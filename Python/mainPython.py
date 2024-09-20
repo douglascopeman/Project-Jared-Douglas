@@ -2,6 +2,7 @@ import numpy as np
 from numpy import linalg as LA
 from Body import Body
 import Integrators
+from Plotter import Plotter
 
 ###################################################
 # Run Model
@@ -35,7 +36,6 @@ def calculateAccelerations(bodies):
     #     acceleration[body,:] = np.sum([
     #         -G*bodies[i].mass*(bodies[body].position - bodies[i].position)/((LA.norm(bodies[body].position - bodies[i].position))**3) for i in (set(range(0,n)))-set([body])])
     
-    # return acceleration
 
 
 def runSimulation(bodies, T, dt, Integrator=Integrators.symplecticEuler):
@@ -49,7 +49,7 @@ def runSimulation(bodies, T, dt, Integrator=Integrators.symplecticEuler):
         calculateAccelerations(bodies)
         bodies = Integrator(bodies, dt)
         for p in range(0,n):
-            simulation[i,:,p] = np.concatenate((bodies[p].position, bodies[p].velocity))
+            simulation[i,:,p] = np.concatenate((bodies[p].position, bodies[p].velocity), axis=None)
     
     return simulation
 
