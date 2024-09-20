@@ -7,7 +7,7 @@ from Plotter import Plotter
 earth = Body(np.array([0,0,0], dtype=float), np.array([0,1,0], dtype=float), 1000)
 moon =  Body(np.array([0,10,0], dtype=float), np.array([10,0,0], dtype=float), 1)
 bodies = [earth, moon]
-T = 1000    # Number of "frames" in simulation
+T = 100    # Number of "frames" in simulation
 dt = 1    # Timestep between each frame
 
 G= 1
@@ -52,8 +52,8 @@ def runSimulation(bodies, T, dt, Integrator=integrators.symplecticEuler):
     simulation = np.zeros((T, 6, n))
     # modelHamiltonian = np.zeros(simLength)
     for i in range(0, T):
-        calculateAccelerations(bodies)
-        bodies = Integrator(bodies, dt)
+        accelerations = calculateAccelerations(bodies)
+        bodies = Integrator(bodies, accelerations, dt)
         for p in range(0,n):
             simulation[i,:,p] = np.concatenate((bodies[p].position, bodies[p].velocity), axis=None)
     
