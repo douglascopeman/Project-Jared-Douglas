@@ -6,8 +6,8 @@ import Simulation
 earth = Body(np.array([-5,5,0], dtype=float), np.array([-0.5,0,0], dtype=float), 10)
 moon =  Body(np.array([5,-5,0], dtype=float), np.array([0.5,0,0], dtype=float), 10)
 bodies = [earth, moon]
-T = 1000    # Number of "frames" in simulation
-dt = 0.1    # Timestep between each frame
+T = 1000
+dt = 0.1
 
 simulation = Simulation.Simulation(T, dt, bodies)
 simulation.run()

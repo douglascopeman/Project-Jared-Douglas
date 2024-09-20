@@ -64,22 +64,4 @@ class Simulation():
                 simulation[i,:,p] = np.concatenate((bodies[p].position, bodies[p].velocity), axis=None)
     
         return simulation, centreOfMass
-###################################################
-# Run Model
-###################################################
-# if __name__ == "__main__":
-#     T = 400    # Number of "frames" in simulation
-#     dt = 1    # Timestep between each frame
-#     n = len(bodies)
-
-#     simulationSettings = np.array([T, dt, n])
-#     simulation = runSimulation(bodies, T, dt)
-#     np.savetxt("Outputs\\simulationSettings.csv", simulationSettings, delimiter=",")
-#     for i in range(len(bodies)):
-#         np.savetxt("Outputs\\output" + str(i) + ".csv", simulation[:,:,i], delimiter=",")
-###################################################
-# Plotting
-###################################################
-# if __name__ == "__main__":
-#     plot = Plotter("Outputs\\")
 
