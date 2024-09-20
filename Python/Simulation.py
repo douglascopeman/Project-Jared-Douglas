@@ -1,7 +1,7 @@
 import numpy as np
 from numpy import linalg as LA
 from Body import Body
-import integrators
+import Integrators
 from Plotter import Plotter
 
 class Simulation():
@@ -40,7 +40,7 @@ class Simulation():
     
         return acceleration
 
-    def runTwo(self, bodies, Integrator=integrators.symplecticEuler):
+    def runTwo(self, bodies, Integrator=Integrators.symplecticEuler):
         """
         Builds a 3 dimensional array filled with the 3 axes position data of every body for the length of the simulaiton
         """
