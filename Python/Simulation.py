@@ -59,7 +59,7 @@ class Simulation():
         for i in range(0, self.T):
             accelerations = self.calculateAccelerations()
             bodies = Integrator(bodies, accelerations, self.dt)
-            centreOfMass = self.centreOfMassCalc(totalMass)
+            centreOfMass[i,:] = self.centreOfMassCalc(totalMass)
             for p in range(0,self.n):
                 simulation[i,:,p] = np.concatenate((bodies[p].position, bodies[p].velocity), axis=None)
     
