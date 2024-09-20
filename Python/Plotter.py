@@ -76,3 +76,6 @@ class Plotter():
         plt.ylabel("Total Energy (J)")
         plt.title("Total Energy of the System over Time")
         plt.show()
+        
+    def plot_centre_of_mass(self):
+        pass
