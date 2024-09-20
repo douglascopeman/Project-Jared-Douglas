@@ -28,6 +28,11 @@ def calculateAcceleration(bodies):
     
     return acceleration
 
+def centreOfMassCalc(bodies, totalMass):
+    summation = np.sum([bodies[b].mass*bodies[b].position for b in range(0,n)], axis = 0)
+    position = (1/totalMass)*summation
+    return position
+
 
 
 def runSimulation(bodies, T, dt, Integrator=Integrators.symplecticEuler):
@@ -36,14 +41,17 @@ def runSimulation(bodies, T, dt, Integrator=Integrators.symplecticEuler):
     """
     n = len(bodies)
     simulation = np.zeros((T, 6, n))
+    centreOfMass = np.zeros((T,3), dtype = float)
+    totalMass = np.sum([bodies[i].mass for i in range(0,n)])
     # modelHamiltonian = np.zeros(simLength)
     for i in range(0, T):
         acceleration = calculateAcceleration(bodies)
         bodies = Integrator(bodies, acceleration, dt)
         for p in range(0,n):
             simulation[i,:,p] = np.concatenate((bodies[p].position, bodies[p].velocity), axis=None)
+        centreOfMass[i,:] = centreOfMassCalc(bodies, totalMass)
     
-    return simulation
+    return simulation, centreOfMass
 
 ###################################################
 # Run Model
@@ -54,10 +62,11 @@ if __name__ == "__main__":
     n = len(bodies)
 
     simulationSettings = np.array([T, dt, n])
-    simulation = runSimulation(bodies, T, dt)
+    simulation, centreOfMass = runSimulation(bodies, T, dt)
     np.savetxt("Outputs\\simulationSettings.csv", simulationSettings, delimiter=",")
     for i in range(len(bodies)):
         np.savetxt("Outputs\\output" + str(i) + ".csv", simulation[:,:,i], delimiter=",")
+    np.savetxt("Outputs\\centreOfMass.csv", centreOfMass, delimiter=",")
 
 
 ###################################################
