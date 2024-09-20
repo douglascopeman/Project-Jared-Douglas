@@ -12,3 +12,4 @@ dt = 0.1    # Timestep between each frame
 simulation = Simulation.Simulation(T, dt, bodies)
 simulation.run()
 plotter = Plotter.Plotter("Outputs")
+plotter.plot()
