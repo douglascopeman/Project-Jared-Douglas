@@ -19,14 +19,22 @@ class Simulation():
 ###################################################
     def run(self):
         simulationSettings = np.array([self.T, self.dt, self.n])
-        simulation = self.runTwo(self.bodies)
+        simulation, centreOfMass = self.runTwo(self.bodies)
         np.savetxt("Outputs\\simulationSettings.csv", simulationSettings, delimiter=",")
+        np.savetxt("Outputs\\centreOfMass.csv", centreOfMass, delimiter=",")
         for i in range(self.n):
             np.savetxt("Outputs\\output" + str(i) + ".csv", simulation[:,:,i], delimiter=",")
+
 
 ###################################################
 # Simulation Calculations
 ###################################################
+
+    def centreOfMassCalc(self, totalMass):
+        summation = np.sum([self.bodies[b].mass*self.bodies[b].position for b in range(0,self.n)], axis = 0)
+        position = (1/totalMass)*summation
+        return position
+
 
     def calculateAccelerations(self):
         """
@@ -44,15 +52,18 @@ class Simulation():
         """
         Builds a 3 dimensional array filled with the 3 axes position data of every body for the length of the simulaiton
         """
-        simulation = np.zeros((self.T, 6, self.n))
+        simulation = np.zeros((self.T, 6, self.n), dtype=float)
+        totalMass = np.sum([self.bodies[i].mass for i in range(1, self.n)])
+        centreOfMass = np.zeros((self.T, 3), dtype=float)
         # modelHamiltonian = np.zeros(simLength)
         for i in range(0, self.T):
             accelerations = self.calculateAccelerations()
             bodies = Integrator(bodies, accelerations, self.dt)
+            centreOfMass = self.centreOfMassCalc(totalMass)
             for p in range(0,self.n):
                 simulation[i,:,p] = np.concatenate((bodies[p].position, bodies[p].velocity), axis=None)
     
-        return simulation
+        return simulation, centreOfMass
 ###################################################
 # Run Model
 ###################################################
