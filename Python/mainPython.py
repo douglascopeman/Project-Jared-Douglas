@@ -1,8 +1,16 @@
 import numpy as np
 from numpy import linalg as LA
 from Body import Body
-import Integrators
+import integrators
 from Plotter import Plotter
+
+earth = Body(np.array([0,0,0], dtype=float), np.array([0,1,0], dtype=float), 1000)
+moon =  Body(np.array([0,10,0], dtype=float), np.array([10,0,0], dtype=float), 1)
+bodies = [earth, moon]
+T = 1000    # Number of "frames" in simulation
+dt = 1    # Timestep between each frame
+
+G= 1
 
 ###################################################
 # Run Model
@@ -41,7 +49,7 @@ def centreOfMassCalc(bodies, totalMass):
 
 
 
-def runSimulation(bodies, T, dt, Integrator=Integrators.symplecticEuler):
+def runSimulation(bodies, T, dt, Integrator=integrators.symplecticEuler):
     """
     Builds a 3 dimensional array filled with the 3 axes position data of every body for the length of the simulaiton
     """
