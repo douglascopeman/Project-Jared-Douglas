@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
+from itertools import combinations
 import numpy as np
 import os
 import Body
@@ -38,7 +39,6 @@ class Plotter():
                 data = np.loadtxt(f, delimiter=",")
                 self.bodies[:,:,i] = data
                 
-        print(self.bodies)
 
         # Set an array to hold centreOfMass
         self.centreOfMass = np.zeros((self.T, 3), dtype=float)
@@ -57,18 +57,19 @@ class Plotter():
         fig.legend()
         plt.show()
             
-    def calculate_potential_energies(self):
-        #TODO: check this works with arrays and tweak if necessary
-        twice_U = 0.0
-        for body in self.bodies:
-            for other_body in self.bodies:
-                if body is not other_body:
-                    for position in body.positions:
-                        direction = np.linalg.norm(body.position - other_body.position)
-                        twice_U -= self.G * body.mass * \
-                            other_body.mass / direction
-                            
-        return twice_U / 2
+    # def calculate_potential_energies(self):
+    #     #TODO: check this works with arrays and tweak if necessary
+    #     # twice_U = 0.0
+    #     # for body in self.bodies:
+    #     #     for other_body in self.bodies:
+    #     #         if body is not other_body:
+    #     #             for position in body.positions:
+    #     #                 direction = np.linalg.norm(body.position - other_body.position)
+    #     #                 twice_U -= self.G * body.mass * \
+    #     #                     other_body.mass / direction           
+    #     # return twice_U / 2
+
+
         
     def calculate_total_energy(self):
         '''Calculates the total energy of the system at each timestep and returns the result as a numpy array'''
