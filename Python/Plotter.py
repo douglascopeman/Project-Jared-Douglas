@@ -15,6 +15,7 @@ class Plotter():
     def plot(self):
         self.read_data()
         self.plot_orbits()
+        #self.plot_centre_of_mass()
         #self.total_energies = self.calculate_total_energy()
         
     def read_data(self):
@@ -38,7 +39,15 @@ class Plotter():
                 self.bodies[:,:,i] = data
                 
         print(self.bodies)
+
+        # Set an array to hold centreOfMass
+        self.centreOfMass = np.zeros((self.T, 3), dtype=float)
+
+        # Load in centreOfMass data
+        with open(os.path.join(outputDirectory, "centreOfMass.csv"), 'r') as f:
+            self.centreOfMass[:,:] = np.loadtxt(f, delimiter=",")
         
+
     def plot_orbits(self):
         fig = plt.figure()
         ax = plt.axes(projection='3d')  
@@ -78,4 +87,9 @@ class Plotter():
         plt.show()
         
     def plot_centre_of_mass(self):
-        pass
+        fig = plt.figure()
+        ax = plt.axes(projection='3d')  
+        ax.plot(self.centreOfMass[0,:], self.centreOfMass[1,:], self.centreOfMass[2,:])
+        ax.scatter(self.centreOfMass[0, -1], self.centreOfMass[1,-1], self.centreOfMass[2,-1])
+        fig.legend()
+        plt.show()
