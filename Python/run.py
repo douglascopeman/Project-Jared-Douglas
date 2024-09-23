@@ -11,5 +11,5 @@ dt = 0.005
 
 simulation = Simulation.Simulation(T, dt, bodies)
 simulation.run()
-plotter = Plotter.Plotter("Outputs", centre_of_mass=True)
+plotter = Plotter.Plotter("Outputs", plot_centre_of_mass=True)
 plotter.plot()

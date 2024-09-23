@@ -94,7 +94,7 @@ class Plotter():
     def plot_centre_of_mass(self):
         fig = plt.figure()
         ax = plt.axes(projection='3d')  
-        ax.plot(self.centreOfMass[0,:], self.centreOfMass[1,:], self.centreOfMass[2,:])
-        ax.scatter(self.centreOfMass[0, -1], self.centreOfMass[1,-1], self.centreOfMass[2,-1])
+        ax.plot(self.centreOfMass[:,0], self.centreOfMass[:,1], self.centreOfMass[:,2])
+        ax.scatter(self.centreOfMass[-1, 0], self.centreOfMass[-1,1], self.centreOfMass[-1,2])
         fig.legend()
         plt.show()
