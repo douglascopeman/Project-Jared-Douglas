@@ -10,3 +10,7 @@ class orbit_examples:
     earth = Body(np.array([-5,5,0], dtype=float), np.array([-0.5,0,0], dtype=float), 10)
     moon =  Body(np.array([5,0,0], dtype=float), np.array([0.5,0,0], dtype=float), 10)
     offset_elliptical = [earth, moon]
+    
+if __name__ == "__main__":
+    import run
+    run.run()
