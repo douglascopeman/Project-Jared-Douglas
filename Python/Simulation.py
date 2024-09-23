@@ -18,14 +18,14 @@ class Simulation():
 ###################################################
 # Run Model
 ###################################################
-    def run(self):
-        simulationSettings = np.array([self.T, self.dt, self.n])
-        simulation, centreOfMass, potentialEnergy = self.runTwo(self.bodies)
-        np.savetxt("Outputs\\simulationSettings.csv", simulationSettings, delimiter=",")
-        np.savetxt("Outputs\\centreOfMass.csv", centreOfMass, delimiter=",")
-        np.savetxt("Outputs\\potentialEnergy.csv", potentialEnergy, delimiter=",")
-        for i in range(self.n):
-            np.savetxt("Outputs\\output" + str(i) + ".csv", simulation[:,:,i], delimiter=",")
+    # def run(self):
+    #     simulationSettings = np.array([self.T, self.dt, self.n])
+    #     simulation, centreOfMass, potentialEnergy = self.runTwo(self.bodies)
+    #     np.savetxt("Outputs\\simulationSettings.csv", simulationSettings, delimiter=",")
+    #     np.savetxt("Outputs\\centreOfMass.csv", centreOfMass, delimiter=",")
+    #     np.savetxt("Outputs\\potentialEnergy.csv", potentialEnergy, delimiter=",")
+    #     for i in range(self.n):
+    #         np.savetxt("Outputs\\output" + str(i) + ".csv", simulation[:,:,i], delimiter=",")
 
 
 ###################################################
@@ -60,30 +60,59 @@ class Simulation():
         """
         Compute the acceleration between n bodies in the x,y and z axes. The output will be a nx3 array.
         """
-
         acceleration = np.zeros((self.n,3), dtype=float)
         for body in range(0,self.n):
             acceleration[body,:] = np.sum([
                 ((-self.G * self.bodies[i].mass)/((LA.norm(self.bodies[body].position - self.bodies[i].position))**3))*(self.bodies[body].position - self.bodies[i].position) for i in (set(range(0,self.n)))-set([body])], axis = 0)
     
         return acceleration
+    
+###################################################
+# Run Model
+###################################################
 
-    def runTwo(self, bodies, Integrator=Integrators.symplecticEuler):
+    def run(self, Integrator=Integrators.symplecticEuler):
         """
         Builds a 3 dimensional array filled with the 3 axes position data of every body for the length of the simulaiton
         """
+        bodies = self.bodies
         simulation = np.zeros((self.T, 6, self.n), dtype=float)
         totalMass = np.sum([self.bodies[i].mass for i in range(1, self.n)])
         centreOfMass = np.zeros((self.T, 3), dtype=float)
-        potentialEnergy = np.ones((self.T), dtype=float)
-        # modelHamiltonian = np.zeros(simLength)
+        potentialEnergy = np.zeros((self.T), dtype=float)
+        kineticEnergy = np.zeros((self.T), dtype=float)
         for i in range(0, self.T):
             accelerations = self.calculateAccelerations()
             bodies = Integrator(bodies, accelerations, self.dt)
             centreOfMass[i,:] = self.centreOfMassCalc(totalMass)
             potentialEnergy[i] = self.calculatePotentialEnergy()
+            kineticEnergy[i] = self.kinetic_energies()
             for p in range(0,self.n):
                 simulation[i,:,p] = np.concatenate((bodies[p].position, bodies[p].velocity), axis=None)
-    
-        return simulation, centreOfMass, potentialEnergy
+
+        simulationSettings = np.array([self.T, self.dt, self.n])
+        np.savetxt("Outputs\\simulationSettings.csv", simulationSettings, delimiter=",")
+        np.savetxt("Outputs\\centreOfMass.csv", centreOfMass, delimiter=",")
+        np.savetxt("Outputs\\potentialEnergy.csv", potentialEnergy, delimiter=",")
+        np.savetxt("Outputs\\kineticEnergy.csv", kineticEnergy, delimiter=",")
+        for i in range(self.n):
+            np.savetxt("Outputs\\output" + str(i) + ".csv", simulation[:,:,i], delimiter=",")
+
+    def runFast(self, Integrator=Integrators.symplecticEuler):
+        """
+        A bare bons version of run(), only calculates body positions
+        """
+        bodies = self.bodies
+        simulation = np.zeros((self.T, 6, self.n), dtype=float)
+        for i in range(0, self.T):
+            accelerations = self.calculateAccelerations()
+            bodies = Integrator(bodies, accelerations, self.dt)
+            for p in range(0,self.n):
+                simulation[i,:,p] = np.concatenate((bodies[p].position, bodies[p].velocity), axis=None)
+
+        simulationSettings = np.array([self.T, self.dt, self.n])
+        np.savetxt("Outputs\\simulationSettings.csv", simulationSettings, delimiter=",")
+        for i in range(self.n):
+            np.savetxt("Outputs\\output" + str(i) + ".csv", simulation[:,:,i], delimiter=",")
+
 
