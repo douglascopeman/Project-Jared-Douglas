@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from matplotlib import animation
 from mpl_toolkits import mplot3d
 from itertools import combinations
 import numpy as np
@@ -13,7 +14,8 @@ class Plotter():
                         "plot_centre_of_mass":False,
                         "plot_energy":False,
                         "animate_orbits":False,
-                        "animate_frame_interval":1,
+                        "animate_save":False,
+                        "animate_fps":30,
                         }
         self.plot_kwargs = defaultKwargs | plot_kwargs
         
@@ -28,13 +30,14 @@ class Plotter():
             self.add_centre_of_mass(fig, ax)
         fig.legend()
         plt.show()
-        
-        if self.plot_kwargs["animate_orbits"]:
-            self.animate_orbits()
              
         #Other plots
         if self.plot_kwargs["plot_energy"]:
             self.plot_energy()
+        
+        #Animation
+        if self.plot_kwargs["animate_orbits"]:
+            self.animate_orbits()
         
     def read_data(self):
         outputDirectory = os.path.join(os.getcwd(), self.outputDirectory)
@@ -70,14 +73,14 @@ class Plotter():
             self.kineticEnergy = np.loadtxt(f, delimiter=",")
         
     def add_orbits(self, fig, ax):
-        colors = plt.cm.viridis(np.linspace(0, 1, self.n))
+        colors = plt.cm.hsv(np.linspace(0, 1, self.n))
         for i in range(self.n):
             ax.plot(self.bodies[:,0,i], self.bodies[:,1,i], self.bodies[:,2,i], color=colors[i], alpha=0.25)
             ax.plot(self.bodies[-1,0,i], self.bodies[-1,1,i], self.bodies[-1,2,i], 'o' ,label="Body " + str(i), color=colors[i])
     
     def add_centre_of_mass(self, fig, ax): 
-        ax.plot(self.centreOfMass[:,0], self.centreOfMass[:,1], self.centreOfMass[:,2], color='black', alpha=0.25)
-        ax.plot(self.centreOfMass[-1, 0], self.centreOfMass[-1,1], self.centreOfMass[-1,2], 'o', label="Centre of Mass", color='black')
+        ax.plot(self.centreOfMass[:,0], self.centreOfMass[:,1], self.centreOfMass[:,2], color='grey', alpha=0.25)
+        ax.plot(self.centreOfMass[-1, 0], self.centreOfMass[-1,1], self.centreOfMass[-1,2], 'o', label="Centre of Mass", color='grey')
     
     def plot_energy(self):
         total_energy = self.potentialEnergy + self.kineticEnergy
@@ -93,17 +96,18 @@ class Plotter():
     def animate_orbits(self):
         # Create a new figure for the animation
         fig = plt.figure()
+        fig.set_size_inches(10, 10)
         # Add 3D axes to the figure
         ax = plt.axes(projection='3d')
 
         # Create a list of line objects for each body with unique colors
-        colors = plt.cm.viridis(np.linspace(0, 1, self.n))
-        lines = [ax.plot([], [], [], color=colors[i], alpha=0.25)[0] for i in range(self.n)]
+        colors = plt.cm.hsv(np.linspace(0, 1, self.n))
+        lines = [ax.plot([], [], [], color=colors[i], alpha=0.5)[0] for i in range(self.n)]
         # Create a list of point objects for each body with the same colors
         points = [ax.plot([], [], [], 'o', color=colors[i], alpha=1, label='Body ' + str(i))[0] for i in range(self.n)]
         # Create line and point objects for the centre of mass
-        com_line, = ax.plot([], [], [], alpha=0.25, color='black')
-        com_point, = ax.plot([], [], [], 'o', label="Centre of Mass", color='black')
+        com_line, = ax.plot([], [], [], alpha=0.5, color='grey')
+        com_point, = ax.plot([], [], [], 'o', alpha=1, label="Centre of Mass", color='grey')
 
         def init():
             # Set the limits for the 3D plot based on the bodies' positions
@@ -140,10 +144,17 @@ class Plotter():
             return lines + points + [com_line, com_point]
 
         # Create the animation using the update function and the number of frames
-        ani = FuncAnimation(fig, update, frames=self.T, init_func=init, interval=self.plot_kwargs["animate_frame_interval"], blit=True)
+        ani = FuncAnimation(fig, update, frames=self.T, init_func=init, blit=True, interval=self.T/self.plot_kwargs["animate_fps"])
         # Display the animation
         fig.legend()
-        plt.show()
+        if self.plot_kwargs["animate_save"]:
+            video_writer = animation.FFMpegWriter(fps=self.plot_kwargs["animate_fps"], bitrate=5000)
+            ani.save("animation.mp4", writer=video_writer)
+            print("Animation saved as 'animation.mp4'")
+        else:
+            plt.show()
+        plt.close()
+        
         
 if __name__ == "__main__":
     import run
