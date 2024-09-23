@@ -105,3 +105,6 @@ class Simulation():
         for i in range(self.n):
             np.savetxt("Outputs\\output" + str(i) + ".csv", simulation[:,:,i], delimiter=",")
         
+if __name__ == "__main__":
+    import run
+    run.run()
