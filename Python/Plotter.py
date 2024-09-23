@@ -83,3 +83,8 @@ class Plotter():
     def add_centre_of_mass(self, fig, ax): 
         ax.plot(self.centreOfMass[:,0], self.centreOfMass[:,1], self.centreOfMass[:,2])
         ax.scatter(self.centreOfMass[-1, 0], self.centreOfMass[-1,1], self.centreOfMass[-1,2], label="Centre of Mass")
+        
+        
+if __name__ == "__main__":
+    import run
+    run.run()
