@@ -54,11 +54,12 @@ class Simulation():
         acceleration = np.zeros((self.n,3), dtype=float)
         for i, body in enumerate(self.bodies):
             acceleration[i,:] = np.sum([((-self.G * other_body.mass) / ((LA.norm(body.position - other_body.position))**3)) * (body.position - other_body.position) for other_body in self.bodies if other_body != body], axis=0)
+        return acceleration
+            
+        ##### DEPRICATED CODE #####
         # for body in range(0,self.n):
         #     acceleration[body,:] = np.sum([
         #         ((-self.G * self.bodies[i].mass)/((LA.norm(self.bodies[body].position - self.bodies[i].position))**3))*(self.bodies[body].position - self.bodies[i].position) for i in (set(range(0,self.n)))-set([body])], axis = 0)
-    
-        return acceleration
     
 ###################################################
 # Run Model
@@ -97,15 +98,15 @@ class Simulation():
 
     def runFast(self, Integrator=Integrators.symplecticEuler):
         """
-        A bare bons version of run(), only calculates body positions
+        A bare bones version of run(), only calculates body positions
         """
         bodies = self.bodies
         simulation = np.zeros((self.T, 6, self.n), dtype=float)
-        for i in range(0, self.T):
+        for t in range(0, self.T):
             accelerations = self.calculateAccelerations()
             bodies = Integrator(bodies, accelerations, self.dt)
-            for p in range(0,self.n):
-                simulation[i,:,p] = np.concatenate((bodies[p].position, bodies[p].velocity), axis=None)
+            for i, body in enumerate(bodies):
+                simulation[t,:,i] = np.concatenate((body.position, body.velocity), axis=None)
 
         simulationSettings = np.array([self.T, self.dt, self.n])
         np.savetxt("Outputs\\simulationSettings.csv", simulationSettings, delimiter=",")
