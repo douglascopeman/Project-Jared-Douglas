@@ -47,7 +47,6 @@ class Simulation():
             -self.G * self.bodies[combinationList[i][0]].mass * self.bodies[combinationList[i][1]].mass 
             / (LA.norm(self.bodies[combinationList[i][0]].position - self.bodies[combinationList[i][1]].position)) 
             for i in range(0,len(combinationList))])
-        print(combinationList)
         return potentialEnergy
 
     def kinetic_energies(self):
