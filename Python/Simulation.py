@@ -20,6 +20,11 @@ class Simulation():
     def run(self):
         simulationSettings = np.array([self.T, self.dt, self.n])
         simulation, centreOfMass = self.runTwo(self.bodies)
+        
+        
+        
+        
+        # saving data into csv files
         np.savetxt("Outputs\\simulationSettings.csv", simulationSettings, delimiter=",")
         np.savetxt("Outputs\\centreOfMass.csv", centreOfMass, delimiter=",")
         for i in range(self.n):
