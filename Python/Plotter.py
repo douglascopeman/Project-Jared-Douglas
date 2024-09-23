@@ -25,12 +25,12 @@ class Plotter():
             self.add_centre_of_mass(fig, ax)
         fig.legend()
         fig.show()
+        plt.show()
              
         #Other plots
         if self.plot_kwargs["plot_energy"]:
             self.total_energies = self.calculate_total_energy()
             self.plot_energy()
-        plt.show()
         
     def read_data(self):
         outputDirectory = os.path.join(os.getcwd(), self.outputDirectory)
