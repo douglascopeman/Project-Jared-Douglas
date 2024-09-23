@@ -16,12 +16,21 @@ class Plotter():
         
     def plot(self):
         self.read_data()
-        self.plot_orbits()
+        
+        #Orbit plot
+        fig = plt.figure()
+        ax = plt.axes(projection='3d')
+        self.add_orbits(fig, ax)
         if self.plot_kwargs["plot_centre_of_mass"]:
-            self.plot_centre_of_mass()
+            self.add_centre_of_mass(fig, ax)
+        fig.legend()
+        fig.show()
+             
+        #Other plots
         if self.plot_kwargs["plot_energy"]:
             self.total_energies = self.calculate_total_energy()
             self.plot_energy()
+        plt.show()
         
     def read_data(self):
         outputDirectory = os.path.join(os.getcwd(), self.outputDirectory)
@@ -57,14 +66,10 @@ class Plotter():
             self.kineticEnergy = np.loadtxt(f, delimiter=",")
         
 
-    def plot_orbits(self):
-        fig = plt.figure()
-        ax = plt.axes(projection='3d')  
+    def add_orbits(self, fig, ax):
         for i in range(self.n):
             ax.plot(self.bodies[:,0,i], self.bodies[:,1,i], self.bodies[:,2,i])
             ax.scatter(self.bodies[-1,0,i], self.bodies[-1,1,i], self.bodies[-1,2,i], label="Body " + str(i))
-        fig.legend()
-        plt.show()
             
     # def calculate_potential_energies(self):
     #     #TODO: check this works with arrays and tweak if necessary
@@ -91,10 +96,6 @@ class Plotter():
         plt.title("Total Energy of the System over Time")
         plt.show()
         
-    def plot_centre_of_mass(self):
-        fig = plt.figure()
-        ax = plt.axes(projection='3d')  
+    def add_centre_of_mass(self, fig, ax): 
         ax.plot(self.centreOfMass[:,0], self.centreOfMass[:,1], self.centreOfMass[:,2])
-        ax.scatter(self.centreOfMass[-1, 0], self.centreOfMass[-1,1], self.centreOfMass[-1,2])
-        fig.legend()
-        plt.show()
+        ax.scatter(self.centreOfMass[-1, 0], self.centreOfMass[-1,1], self.centreOfMass[-1,2], label="Centre of Mass")
