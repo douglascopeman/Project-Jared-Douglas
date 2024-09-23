@@ -42,13 +42,16 @@ class Plotter():
 
         # Set an array to hold centreOfMass and potentialEnergy
         self.centreOfMass = np.zeros((self.T, 3), dtype=float)
-        self.U = np.zeros((self.T), dtype=float)
+        self.potentialEnergy = np.zeros((self.T), dtype=float)
+        self.kineticEnergy = np.zeros((self.T), dtype=float)
 
         # Load in centreOfMass data
         with open(os.path.join(outputDirectory, "centreOfMass.csv"), 'r') as f:
             self.centreOfMass[:,:] = np.loadtxt(f, delimiter=",")
         with open(os.path.join(outputDirectory, "potentialEnergy.csv"), 'r') as f:
-            self.U[:] = np.loadtxt(f, delimiter=",")
+            self.potentialEnergy[:] = np.loadtxt(f, delimiter=",")
+        with open(os.path.join(outputDirectory, "kineticEnergy.csv"), 'r') as f:
+            self.kineticEnergy = np.loadtxt(f, delimiter=",")
         
 
     def plot_orbits(self):
@@ -77,12 +80,10 @@ class Plotter():
     def calculate_total_energy(self):
         '''Calculates the total energy of the system at each timestep and returns the result as a numpy array'''
         #TODO: check implimentation works with arrays and tweak if necessary as with the above
-        T = np.sum([Body.kinetic_energies(body) for body in self.bodies])
-        return T + self.U
+        return self.potentialEnergy + self.kineticEnergy
     
     def plot_energy(self):
-        x = np.linspace(0, len(self.total_energies * self.dt, self.nIter))
-        plt.plot(x, self.total_energies)
+        plt.plot(self.calculate_total_energy())
         plt.xlabel("Time")
         plt.ylabel("Total Energy (J)")
         plt.title("Total Energy of the System over Time")
