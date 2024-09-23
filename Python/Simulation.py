@@ -21,9 +21,9 @@ class Simulation():
     def run(self):
         simulationSettings = np.array([self.T, self.dt, self.n])
         simulation, centreOfMass, potentialEnergy = self.runTwo(self.bodies)
-        print(potentialEnergy)
         np.savetxt("Outputs\\simulationSettings.csv", simulationSettings, delimiter=",")
         np.savetxt("Outputs\\centreOfMass.csv", centreOfMass, delimiter=",")
+        np.savetxt("Outputs\\potentialEnergy.csv", potentialEnergy, delimiter=",")
         for i in range(self.n):
             np.savetxt("Outputs\\output" + str(i) + ".csv", simulation[:,:,i], delimiter=",")
 
@@ -43,10 +43,17 @@ class Simulation():
         """
         # Number of bodies choose 2
         combinationList = list(combinations(range(0,self.n), 2))
-        potentialEnergy = np.sum([-self.G * self.bodies[combinationList[i][0]].mass * self.bodies[combinationList[i][1]].mass / (LA.norm(self.bodies[combinationList[i][0]].position - self.bodies[combinationList[i][1]].position)) for i in range(0,len(combinationList))])
+        potentialEnergy = np.sum([
+            -self.G * self.bodies[combinationList[i][0]].mass * self.bodies[combinationList[i][1]].mass 
+            / (LA.norm(self.bodies[combinationList[i][0]].position - self.bodies[combinationList[i][1]].position)) 
+            for i in range(0,len(combinationList))])
         print(combinationList)
         return potentialEnergy
 
+    def kinetic_energies(self):
+        '''Calculates the kinetic energy of the body at each timestep and returns the result as a numpy array'''
+        kinetic_energy = np.sum([np.dot(body.velocity, body.velocity) * body.mass / 2 for body in self.bodies])
+        return kinetic_energy
 
 
     def calculateAccelerations(self):
