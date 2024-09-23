@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
+from itertools import combinations
 import numpy as np
 import os
 import Body
@@ -15,7 +16,9 @@ class Plotter():
     def plot(self):
         self.read_data()
         self.plot_orbits()
-        #self.total_energies = self.calculate_total_energy()
+        #self.plot_centre_of_mass()
+        self.total_energies = self.calculate_total_energy()
+        self.plot_energy()
         
     def read_data(self):
         outputDirectory = os.path.join(os.getcwd(), self.outputDirectory)
@@ -36,9 +39,21 @@ class Plotter():
             with open(os.path.join(outputDirectory, "output" + str(i) + ".csv"), 'r') as f:
                 data = np.loadtxt(f, delimiter=",")
                 self.bodies[:,:,i] = data
-                
-        print(self.bodies)
+
+        # Set an array to hold centreOfMass and potentialEnergy
+        self.centreOfMass = np.zeros((self.T, 3), dtype=float)
+        self.potentialEnergy = np.zeros((self.T), dtype=float)
+        self.kineticEnergy = np.zeros((self.T), dtype=float)
+
+        # Load in centreOfMass data
+        with open(os.path.join(outputDirectory, "centreOfMass.csv"), 'r') as f:
+            self.centreOfMass[:,:] = np.loadtxt(f, delimiter=",")
+        with open(os.path.join(outputDirectory, "potentialEnergy.csv"), 'r') as f:
+            self.potentialEnergy[:] = np.loadtxt(f, delimiter=",")
+        with open(os.path.join(outputDirectory, "kineticEnergy.csv"), 'r') as f:
+            self.kineticEnergy = np.loadtxt(f, delimiter=",")
         
+
     def plot_orbits(self):
         fig = plt.figure()
         ax = plt.axes(projection='3d')  
@@ -48,34 +63,36 @@ class Plotter():
         fig.legend()
         plt.show()
             
-    def calculate_potential_energies(self):
-        #TODO: check this works with arrays and tweak if necessary
-        twice_U = 0.0
-        for body in self.bodies:
-            for other_body in self.bodies:
-                if body is not other_body:
-                    for position in body.positions:
-                        direction = np.linalg.norm(body.position - other_body.position)
-                        twice_U -= self.G * body.mass * \
-                            other_body.mass / direction
-                            
-        return twice_U / 2
+    # def calculate_potential_energies(self):
+    #     #TODO: check this works with arrays and tweak if necessary
+    #     # twice_U = 0.0
+    #     # for body in self.bodies:
+    #     #     for other_body in self.bodies:
+    #     #         if body is not other_body:
+    #     #             for position in body.positions:
+    #     #                 direction = np.linalg.norm(body.position - other_body.position)
+    #     #                 twice_U -= self.G * body.mass * \
+    #     #                     other_body.mass / direction           
+    #     # return twice_U / 2
+
+
         
     def calculate_total_energy(self):
         '''Calculates the total energy of the system at each timestep and returns the result as a numpy array'''
         #TODO: check implimentation works with arrays and tweak if necessary as with the above
-        T = sum(body.kinetic_energies() for body in self.bodies)
-        U = self.calculate_potential_energies()
-        
-        return T + U
+        return self.potentialEnergy + self.kineticEnergy
     
     def plot_energy(self):
-        x = np.linspace(0, len(self.total_energies * self.dt, self.nIter))
-        plt.plot(x, self.total_energies)
+        plt.plot(self.calculate_total_energy())
         plt.xlabel("Time")
         plt.ylabel("Total Energy (J)")
         plt.title("Total Energy of the System over Time")
         plt.show()
         
     def plot_centre_of_mass(self):
-        pass
+        fig = plt.figure()
+        ax = plt.axes(projection='3d')  
+        ax.plot(self.centreOfMass[0,:], self.centreOfMass[1,:], self.centreOfMass[2,:])
+        ax.scatter(self.centreOfMass[0, -1], self.centreOfMass[1,-1], self.centreOfMass[2,-1])
+        fig.legend()
+        plt.show()
