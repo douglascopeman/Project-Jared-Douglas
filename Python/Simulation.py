@@ -21,6 +21,7 @@ class Simulation():
     def run(self):
         simulationSettings = np.array([self.T, self.dt, self.n])
         simulation, centreOfMass, potentialEnergy = self.runTwo(self.bodies)
+        print(potentialEnergy)
         np.savetxt("Outputs\\simulationSettings.csv", simulationSettings, delimiter=",")
         np.savetxt("Outputs\\centreOfMass.csv", centreOfMass, delimiter=",")
         for i in range(self.n):
@@ -41,11 +42,11 @@ class Simulation():
         Finds the total potential energy of the simulation. Runs at each timestep
         """
         # Number of bodies choose 2
-        # combinationList = list(combinations(range(0,self.n), 2))
-        # potentialEnergy = np.sum([-self.G * self.bodies[combinationList[i][0]].mass * self.bodies[combinationList[i][1]] / (LA.norm(self.bodies[combinationList[i][0]].position - self.bodies[combinationList[i][1]].position)) for i in range(0,self.n)])
-        # print(combinationList)
-        # return potentialEnergy
-        return None
+        combinationList = list(combinations(range(0,self.n), 2))
+        potentialEnergy = np.sum([-self.G * self.bodies[combinationList[i][0]].mass * self.bodies[combinationList[i][1]].mass / (LA.norm(self.bodies[combinationList[i][0]].position - self.bodies[combinationList[i][1]].position)) for i in range(0,len(combinationList))])
+        print(combinationList)
+        return potentialEnergy
+
 
 
     def calculateAccelerations(self):
