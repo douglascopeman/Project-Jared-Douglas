@@ -7,8 +7,9 @@ from Plotter import Plotter
 
 class Simulation():
     
-    def __init__(self, T, dt, bodies, G=1):
+    def __init__(self, T, dt, bodies, Integrator=Integrators.symplecticEuler, G=1):
         self.G = G
+        self.Integrator = Integrator
         self.bodies = bodies
         self.n = len(bodies)
         self.T = T
@@ -56,26 +57,30 @@ class Simulation():
 # Run Model
 ###################################################
 
-    def run(self, Integrator=Integrators.symplecticEuler):
+    def run(self):
         """
         Builds a 3 dimensional array filled with the 3 axes position data of every body for the length of the simulaiton
         """
+        #Initialise variables
         bodies = self.bodies
         simulation = np.zeros((self.T, 6, self.n), dtype=float)
-        totalMass = np.sum([self.bodies[i].mass for i in range(1, self.n)])
+        totalMass = np.sum([body.mass for body in self.bodies]) #np.sum([self.bodies[i].mass for i in range(1, self.n)])
         centreOfMass = np.zeros((self.T, 3), dtype=float)
         potentialEnergy = np.zeros((self.T), dtype=float)
         kineticEnergy = np.zeros((self.T), dtype=float)
-        for i in range(0, self.T):
+        
+        #Main time loop
+        for t in range(0, self.T):
             accelerations = self.calculateAccelerations()
-            bodies = Integrator(bodies, accelerations, self.dt)
-            centreOfMass[i,:] = self.centreOfMassCalc(totalMass)
-            potentialEnergy[i] = self.calculatePotentialEnergy()
-            kineticEnergy[i] = self.kinetic_energies()
+            bodies = self.Integrator(bodies, accelerations, self.dt)
+            centreOfMass[t,:] = self.centreOfMassCalc(totalMass)
+            potentialEnergy[t] = self.calculatePotentialEnergy()
+            kineticEnergy[t] = self.kinetic_energies()
             for p in range(0,self.n):
-                simulation[i,:,p] = np.concatenate((bodies[p].position, bodies[p].velocity), axis=None)
-
+                simulation[t,:,p] = np.concatenate((bodies[p].position, bodies[p].velocity), axis=None)
         simulationSettings = np.array([self.T, self.dt, self.n, self.G])
+        
+        #Write data to files in Outputs folder
         np.savetxt("Outputs\\simulationSettings.csv", simulationSettings, delimiter=",")
         np.savetxt("Outputs\\centreOfMass.csv", centreOfMass, delimiter=",")
         np.savetxt("Outputs\\potentialEnergy.csv", potentialEnergy, delimiter=",")
