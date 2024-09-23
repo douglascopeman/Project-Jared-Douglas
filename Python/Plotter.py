@@ -10,15 +10,20 @@ class Plotter():
         self.G = 1
         
         self.outputDirectory = outputDirectory
-        defaultKwargs = {}
+        defaultKwargs = {
+                        "plot_centre_of_mass":False,
+                        "plot_energy":False
+                        }
         self.plot_kwargs = defaultKwargs | plot_kwargs
         
     def plot(self):
         self.read_data()
         self.plot_orbits()
-        #self.plot_centre_of_mass()
-        self.total_energies = self.calculate_total_energy()
-        self.plot_energy()
+        if self.plot_kwargs["plot_centre_of_mass"]:
+            self.plot_centre_of_mass()
+        if self.plot_kwargs["plot_energy"]:
+            self.total_energies = self.calculate_total_energy()
+            self.plot_energy()
         
     def read_data(self):
         outputDirectory = os.path.join(os.getcwd(), self.outputDirectory)

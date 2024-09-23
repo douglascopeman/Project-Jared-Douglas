@@ -18,14 +18,14 @@ class Simulation():
 ###################################################
 # Run Model
 ###################################################
-    # def run(self):
-    #     simulationSettings = np.array([self.T, self.dt, self.n])
-    #     simulation, centreOfMass, potentialEnergy = self.runTwo(self.bodies)
-    #     np.savetxt("Outputs\\simulationSettings.csv", simulationSettings, delimiter=",")
-    #     np.savetxt("Outputs\\centreOfMass.csv", centreOfMass, delimiter=",")
-    #     np.savetxt("Outputs\\potentialEnergy.csv", potentialEnergy, delimiter=",")
-    #     for i in range(self.n):
-    #         np.savetxt("Outputs\\output" + str(i) + ".csv", simulation[:,:,i], delimiter=",")
+    def run(self):
+        simulationSettings = np.array([self.T, self.dt, self.n])
+        simulation, centreOfMass, potentialEnergy = self.runTwo(self.bodies)
+        np.savetxt("Outputs\\simulationSettings.csv", simulationSettings, delimiter=",")
+        np.savetxt("Outputs\\centreOfMass.csv", centreOfMass, delimiter=",")
+        np.savetxt("Outputs\\potentialEnergy.csv", potentialEnergy, delimiter=",")
+        for i in range(self.n):
+            np.savetxt("Outputs\\output" + str(i) + ".csv", simulation[:,:,i], delimiter=",")
 
 
 ###################################################
