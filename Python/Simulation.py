@@ -64,7 +64,7 @@ class Simulation():
         #Initialise variables
         bodies = self.bodies
         simulation = np.zeros((self.T, 6, self.n), dtype=float)
-        totalMass = np.sum([body.mass for body in self.bodies]) #np.sum([self.bodies[i].mass for i in range(1, self.n)])
+        totalMass = np.sum([body.mass for body in self.bodies])
         centreOfMass = np.zeros((self.T, 3), dtype=float)
         potentialEnergy = np.zeros((self.T), dtype=float)
         kineticEnergy = np.zeros((self.T), dtype=float)
