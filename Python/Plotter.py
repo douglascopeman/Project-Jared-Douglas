@@ -13,7 +13,7 @@ class Plotter():
                         "plot_centre_of_mass":False,
                         "plot_energy":False,
                         "animate_orbits":False,
-                        "animate_frame_interval":1
+                        "animate_frame_interval":1,
                         }
         self.plot_kwargs = defaultKwargs | plot_kwargs
         

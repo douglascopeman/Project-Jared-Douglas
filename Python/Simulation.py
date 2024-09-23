@@ -20,21 +20,26 @@ class Simulation():
 ###################################################
 
     def centreOfMassCalc(self, totalMass):
-        summation = np.sum([self.bodies[b].mass*self.bodies[b].position for b in range(0,self.n)], axis = 0)
-        position = (1/totalMass)*summation
+        summation = np.sum([body.mass * body.position for body in self.bodies], axis=0) 
+        position = (1/totalMass) * summation
         return position
     
     def calculatePotentialEnergy(self):
         """
         Finds the total potential energy of the simulation. Runs at each timestep
         """
+        body_pairs = list(combinations(self.bodies, 2))
+        potential_energy = np.sum([-self.G * body1.mass * body2.mass / LA.norm(body1.position - body2.position) for body1, body2 in body_pairs])
+        return potential_energy
+    
+        ##### DEPRICATED CODE #####
         # Number of bodies choose 2
-        combinationList = list(combinations(range(0,self.n), 2))
-        potentialEnergy = np.sum([
-            -self.G * self.bodies[combinationList[i][0]].mass * self.bodies[combinationList[i][1]].mass 
-            / (LA.norm(self.bodies[combinationList[i][0]].position - self.bodies[combinationList[i][1]].position)) 
-            for i in range(0,len(combinationList))])
-        return potentialEnergy
+        # combinationList = list(combinations(range(0,self.n), 2))
+        # potentialEnergy = np.sum([
+        #     -self.G * self.bodies[combinationList[i][0]].mass * self.bodies[combinationList[i][1]].mass 
+        #     / (LA.norm(self.bodies[combinationList[i][0]].position - self.bodies[combinationList[i][1]].position)) 
+        #     for i in range(0,len(combinationList))])
+        # return potentialEnergy
 
     def kinetic_energies(self):
         '''Calculates the kinetic energy of the body at each timestep and returns the result as a numpy array'''
@@ -47,9 +52,11 @@ class Simulation():
         Compute the acceleration between n bodies in the x,y and z axes. The output will be a nx3 array.
         """
         acceleration = np.zeros((self.n,3), dtype=float)
-        for body in range(0,self.n):
-            acceleration[body,:] = np.sum([
-                ((-self.G * self.bodies[i].mass)/((LA.norm(self.bodies[body].position - self.bodies[i].position))**3))*(self.bodies[body].position - self.bodies[i].position) for i in (set(range(0,self.n)))-set([body])], axis = 0)
+        for i, body in enumerate(self.bodies):
+            acceleration[i,:] = np.sum([((-self.G * other_body.mass) / ((LA.norm(body.position - other_body.position))**3)) * (body.position - other_body.position) for other_body in self.bodies if other_body != body], axis=0)
+        # for body in range(0,self.n):
+        #     acceleration[body,:] = np.sum([
+        #         ((-self.G * self.bodies[i].mass)/((LA.norm(self.bodies[body].position - self.bodies[i].position))**3))*(self.bodies[body].position - self.bodies[i].position) for i in (set(range(0,self.n)))-set([body])], axis = 0)
     
         return acceleration
     
