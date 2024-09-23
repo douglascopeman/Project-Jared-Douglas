@@ -29,7 +29,6 @@ class Plotter():
              
         #Other plots
         if self.plot_kwargs["plot_energy"]:
-            self.total_energies = self.calculate_total_energy()
             self.plot_energy()
         
     def read_data(self):
@@ -70,13 +69,12 @@ class Plotter():
         for i in range(self.n):
             ax.plot(self.bodies[:,0,i], self.bodies[:,1,i], self.bodies[:,2,i])
             ax.scatter(self.bodies[-1,0,i], self.bodies[-1,1,i], self.bodies[-1,2,i], label="Body " + str(i))
-            
-    def calculate_total_energy(self):
-        #TODO: check implimentation works with arrays and tweak if necessary as with the above
-        return self.potentialEnergy + self.kineticEnergy
     
     def plot_energy(self):
-        plt.plot(self.calculate_total_energy())
+        total_energy = self.potentialEnergy + self.kineticEnergy
+        energy_max_min = max(total_energy) - min(total_energy)
+        print(energy_max_min)
+        plt.plot(total_energy)
         plt.xlabel("Time")
         plt.ylabel("Total Energy (J)")
         plt.title("Total Energy of the System over Time")
