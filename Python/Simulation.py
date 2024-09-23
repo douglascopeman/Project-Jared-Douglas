@@ -14,22 +14,6 @@ class Simulation():
         self.T = T
         self.dt = dt
 
-
-###################################################
-# Run Model
-###################################################
-    def run(self):
-        simulationSettings = np.array([self.T, self.dt, self.n, self.G])
-        simulation, centreOfMass, potentialEnergy = self.runTwo(self.bodies)
-        
-        #Write data to files in Outputs folder
-        np.savetxt("Outputs\\simulationSettings.csv", simulationSettings, delimiter=",")
-        np.savetxt("Outputs\\centreOfMass.csv", centreOfMass, delimiter=",")
-        np.savetxt("Outputs\\potentialEnergy.csv", potentialEnergy, delimiter=",")
-        for i in range(self.n):
-            np.savetxt("Outputs\\output" + str(i) + ".csv", simulation[:,:,i], delimiter=",")
-
-
 ###################################################
 # Simulation Calculations
 ###################################################
@@ -91,7 +75,7 @@ class Simulation():
             for p in range(0,self.n):
                 simulation[i,:,p] = np.concatenate((bodies[p].position, bodies[p].velocity), axis=None)
 
-        simulationSettings = np.array([self.T, self.dt, self.n])
+        simulationSettings = np.array([self.T, self.dt, self.n, self.G])
         np.savetxt("Outputs\\simulationSettings.csv", simulationSettings, delimiter=",")
         np.savetxt("Outputs\\centreOfMass.csv", centreOfMass, delimiter=",")
         np.savetxt("Outputs\\potentialEnergy.csv", potentialEnergy, delimiter=",")
@@ -115,5 +99,21 @@ class Simulation():
         np.savetxt("Outputs\\simulationSettings.csv", simulationSettings, delimiter=",")
         for i in range(self.n):
             np.savetxt("Outputs\\output" + str(i) + ".csv", simulation[:,:,i], delimiter=",")
+            
+    ###################################################
+    # Run Model
+    ###################################################
+    # Deprecated
+    # def run(self):
+    #     simulationSettings = np.array([self.T, self.dt, self.n, self.G])
+    #     print(settings for settings in simulationSettings)
+    #     simulation, centreOfMass, potentialEnergy = self.runTwo(self.bodies)
+        
+    #     #Write data to files in Outputs folder
+    #     np.savetxt("Outputs\\simulationSettings.csv", simulationSettings, delimiter=",")
+    #     np.savetxt("Outputs\\centreOfMass.csv", centreOfMass, delimiter=",")
+    #     np.savetxt("Outputs\\potentialEnergy.csv", potentialEnergy, delimiter=",")
+    #     for i in range(self.n):
+    #         np.savetxt("Outputs\\output" + str(i) + ".csv", simulation[:,:,i], delimiter=",")
 
 

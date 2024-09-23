@@ -25,7 +25,6 @@ class Plotter():
         
     def read_data(self):
         outputDirectory = os.path.join(os.getcwd(), self.outputDirectory)
-        print(outputDirectory)
         
         #Start by loading in the simulation settings to determine what to plot
         with open(os.path.join(outputDirectory, "simulationSettings.csv"), 'r') as f:
@@ -82,7 +81,6 @@ class Plotter():
 
         
     def calculate_total_energy(self):
-        '''Calculates the total energy of the system at each timestep and returns the result as a numpy array'''
         #TODO: check implimentation works with arrays and tweak if necessary as with the above
         return self.potentialEnergy + self.kineticEnergy
     
