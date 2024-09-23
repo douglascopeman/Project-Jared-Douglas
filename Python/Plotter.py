@@ -7,8 +7,6 @@ import Body
 
 class Plotter():
     def __init__(self, outputDirectory, **plot_kwargs):
-        self.G = 1
-        
         self.outputDirectory = outputDirectory
         defaultKwargs = {
                         "plot_centre_of_mass":False,
@@ -35,6 +33,7 @@ class Plotter():
             self.T = int(data[0])
             self.dt = data[1]
             self.n = int(data[2])
+            self.G = float(data[3])
             
         #Then set an array up to hold the correct number of bodies and time steps
         self.bodies = np.zeros((self.T, 6, self.n))

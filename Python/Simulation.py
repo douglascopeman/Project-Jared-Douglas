@@ -19,8 +19,10 @@ class Simulation():
 # Run Model
 ###################################################
     def run(self):
-        simulationSettings = np.array([self.T, self.dt, self.n])
+        simulationSettings = np.array([self.T, self.dt, self.n, self.G])
         simulation, centreOfMass, potentialEnergy = self.runTwo(self.bodies)
+        
+        #Write data to files in Outputs folder
         np.savetxt("Outputs\\simulationSettings.csv", simulationSettings, delimiter=",")
         np.savetxt("Outputs\\centreOfMass.csv", centreOfMass, delimiter=",")
         np.savetxt("Outputs\\potentialEnergy.csv", potentialEnergy, delimiter=",")
