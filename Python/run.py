@@ -4,11 +4,11 @@ import Plotter
 import Simulation
 from orbit_examples import orbit_examples
 
-T = 650
+T = 1000 #rename to N
 dt = 0.01
 
-simulation = Simulation.Simulation(T, dt, orbit_examples.figure_eight_moving)
+simulation = Simulation.Simulation(T, dt, orbit_examples.circular)
 simulation.run()
 plotter = Plotter.Plotter("Outputs", plot_centre_of_mass=True, plot_energy=True, 
-                          animate_orbits=True, animate_save=False, animate_fps=650)
+                          animate_orbits=False, animate_save=False, animate_fps=650)
 plotter.plot()
