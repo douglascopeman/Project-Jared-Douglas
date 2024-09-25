@@ -25,23 +25,25 @@ class Plotter():
         self.read_data()
         
         ##### Orbit plot #####
-        fig = plt.figure()
+        fig_orbits = plt.figure("Orbits")
+        fig_orbits.set_size_inches(7.5, 7.5)
         #3D or 2D plot
         if self.plot_kwargs["plot_3D"]: 
-            ax = plt.axes(projection='3d') 
+            ax_orbits = plt.axes(projection='3d') 
         else: 
-            ax = plt.axes()
-        self.add_orbits(fig, ax)
+            ax_orbits = plt.axes()
+        self.add_orbits(fig_orbits, ax_orbits)
         if self.plot_kwargs["plot_centre_of_mass"]:
-            self.add_centre_of_mass(fig, ax)
-        fig.legend()
-        plt.show()
+            self.add_centre_of_mass(fig_orbits, ax_orbits)
+        fig_orbits.legend()
              
         #Other plots
         if self.plot_kwargs["plot_energy"]:
             self.plot_energy()
         if self.plot_kwargs["plot_energy_error"]:
             self.plot_energy_error()
+        
+        plt.show()
         
         #Animation
         if self.plot_kwargs["animate_orbits"]:
@@ -100,28 +102,32 @@ class Plotter():
             ax.plot(self.centreOfMass[-1, 0], self.centreOfMass[-1,1], 'o', label="Centre of Mass", color='grey')
     
     def plot_energy(self):
+        fig_energy = plt.figure("Energy")
+        ax_energy = fig_energy.add_subplot()
         total_energy = self.potentialEnergy + self.kineticEnergy
-        plt.plot(total_energy)
-        plt.xlabel("Time")
-        plt.ylabel("Total Energy (J)")
-        plt.title("Total Energy of the System over Time")
-        plt.show()
+        ax_energy.plot(total_energy)
+        ax_energy.set_xlabel("Time")
+        ax_energy.set_ylabel("Total Energy (J)")
+        ax_energy.set_title("Total Energy of the System over Time")
+        
         
     def plot_energy_error(self):
+        fig_energy_error = plt.figure("Energy Error")
+        ax_energy_error = fig_energy_error.add_subplot()
+
         total_energy = self.potentialEnergy + self.kineticEnergy
         initial_energy = total_energy[0]
         energy_error = [np.abs((total_energy[t] - initial_energy)/initial_energy) for t in range(0,self.N)]
-        plt.plot(energy_error)
-        plt.xlabel("Time")
-        plt.ylabel("Energy (J)")
-        plt.title("Change in Energy of the System over Time")
-        plt.show()
+        ax_energy_error.plot(energy_error)
+        ax_energy_error.set_xlabel("Time")
+        ax_energy_error.set_ylabel("Energy (J)")
+        ax_energy_error.set_title("Relative Energy Error of the System over Time")
           
     # The below is generated code
     def animate_orbits(self):
         # Create a new figure for the animation
         fig = plt.figure()
-        fig.set_size_inches(10, 10)
+        fig.set_size_inches(9, 9)
         # Add 3D axes to the figure
         ax = plt.axes(projection='3d')
 

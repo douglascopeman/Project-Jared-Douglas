@@ -9,17 +9,18 @@ class Body():
         self.plot_colour = plot_colour
         self.G = G
         
-    def kinetic_energies(self):
-        '''Calculates the kinetic energy of the body at each timestep and returns the result as a numpy array'''
-        kinetic_energy = np.zeros_like(self.velocities)
-        for i, velocity in enumerate(self.velocities):
-            T = np.dot(velocity, velocity) * self.mass / 2
-            kinetic_energy[i] = T
-        return kinetic_energy
+    ##### UNUSED METHODS #####
+    # def kinetic_energies(self):
+    #     '''Calculates the kinetic energy of the body at each timestep and returns the result as a numpy array'''
+    #     kinetic_energy = np.zeros_like(self.velocities)
+    #     for i, velocity in enumerate(self.velocities):
+    #         T = np.dot(velocity, velocity) * self.mass / 2
+    #         kinetic_energy[i] = T
+    #     return kinetic_energy
             
-    def determine_acceleration(self, other_bodies):
-        self.acceleration = np.array([0,0,0], dtype=float)
-        for other_body in other_bodies:
-            direction = other_body.position - self.position
-            self.acceleration = -self.G * other_body.mass * direction / (np.linalg.norm(direction)**3)
+    # def determine_acceleration(self, other_bodies):
+    #     self.acceleration = np.array([0,0,0], dtype=float)
+    #     for other_body in other_bodies:
+    #         direction = other_body.position - self.position
+    #         self.acceleration = -self.G * other_body.mass * direction / (np.linalg.norm(direction)**3)
             

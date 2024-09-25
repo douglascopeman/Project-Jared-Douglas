@@ -10,5 +10,5 @@ dt = 0.001
 
 simulation = Simulation.Simulation(N, dt, orbit_examples.circular)
 simulation.run()
-plotter = Plotter.Plotter("Outputs", plot_centre_of_mass=True, plot_energy_error=True, animate_orbits=False, plot_3D=False)
+plotter = Plotter.Plotter("Outputs", plot_centre_of_mass=True, plot_energy=True, plot_energy_error=True, animate_orbits=False, plot_3D=False)
 plotter.plot()
