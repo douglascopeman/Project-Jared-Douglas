@@ -81,10 +81,20 @@ class Plotter():
             self.potentialEnergy[:] = np.loadtxt(f, delimiter=",")
         with open(os.path.join(outputDirectory, "kineticEnergy.csv"), 'r') as f:
             self.kineticEnergy = np.loadtxt(f, delimiter=",")
+            
+    def determine_max_range(self, bodies):
+        max_range = np.max(np.abs(np.min(bodies[:,0:3,:], axis=(0,1)), 
+                                  np.max(bodies[:,0:3,:], axis=(0,1)))) * 1.1
+        
+        return max_range
         
     def add_orbits(self, fig, ax):
         colors = plt.cm.hsv(np.linspace(0.1, 1, self.n))
+        max_range = self.determine_max_range(self.bodies)
+        ax.set_xlim(-max_range, max_range)
+        ax.set_ylim(-max_range, max_range)
         if ax.name == '3d':
+            ax.set_zlim(-max_range, max_range)
             for i in range(self.n):
                 ax.plot(self.bodies[:,0,i], self.bodies[:,1,i], self.bodies[:,2,i], color=colors[i], alpha=0.25)
                 ax.plot(self.bodies[-1,0,i], self.bodies[-1,1,i], self.bodies[-1,2,i], 'o' ,label="Body " + str(i), color=colors[i])
@@ -128,6 +138,7 @@ class Plotter():
         # Create a new figure for the animation
         fig = plt.figure()
         fig.set_size_inches(7.5, 7.5)
+        max_range = self.determine_max_range(self.bodies) * 1.1
         
         # Check if 3D plotting is enabled
         if self.plot_kwargs["plot_3D"]:
@@ -136,7 +147,7 @@ class Plotter():
         else:
             # Add 2D axes to the figure
             ax = plt.axes()
-
+            
         # Create a list of line objects for each body with unique colors
         colors = plt.cm.hsv(np.linspace(0.1, 1, self.n))
         if self.plot_kwargs["plot_3D"]:
@@ -153,9 +164,9 @@ class Plotter():
         def init():
             if self.plot_kwargs["plot_3D"]:
                 # Set the limits for the 3D plot based on the bodies' positions
-                ax.set_xlim3d([np.min(self.bodies[:, 0, :]), np.max(self.bodies[:, 0, :])])
-                ax.set_ylim3d([np.min(self.bodies[:, 1, :]), np.max(self.bodies[:, 1, :])])
-                ax.set_zlim3d([np.min(self.bodies[:, 2, :]), np.max(self.bodies[:, 2, :])])
+                ax.set_xlim3d([-max_range, max_range])
+                ax.set_ylim3d([-max_range, max_range])
+                ax.set_zlim3d([-max_range, max_range])
                 # Initialize the lines and points to be empty
                 for line, point in zip(lines, points):
                     line.set_data([], [])
@@ -169,8 +180,8 @@ class Plotter():
                 com_point.set_3d_properties([])
             else:
                 # Set the limits for the 2D plot based on the bodies' positions
-                ax.set_xlim([np.min(self.bodies[:, 0, :]) * 1.1, np.max(self.bodies[:, 0, :]) * 1.1])
-                ax.set_ylim([np.min(self.bodies[:, 1, :]) * 1.1, np.max(self.bodies[:, 1, :]) * 1.1])
+                ax.set_xlim(-max_range, max_range)
+                ax.set_ylim(-max_range, max_range)
                 # Initialize the lines and points to be empty
                 for line, point in zip(lines, points):
                     line.set_data([], [])
