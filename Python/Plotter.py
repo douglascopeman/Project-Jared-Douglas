@@ -11,6 +11,7 @@ class Plotter():
     def __init__(self, outputDirectory, **plot_kwargs):
         self.outputDirectory = outputDirectory
         defaultKwargs = {
+                        "plot_3D":True,
                         "plot_centre_of_mass":False,
                         "plot_energy":False,
                         "plot_energy_error":False,
@@ -23,9 +24,13 @@ class Plotter():
     def plot(self):
         self.read_data()
         
-        #Orbit plot
+        ##### Orbit plot #####
         fig = plt.figure()
-        ax = plt.axes(projection='3d')
+        #3D or 2D plot
+        if self.plot_kwargs["plot_3D"]: 
+            ax = plt.axes(projection='3d') 
+        else: 
+            ax = plt.axes()
         self.add_orbits(fig, ax)
         if self.plot_kwargs["plot_centre_of_mass"]:
             self.add_centre_of_mass(fig, ax)
@@ -77,13 +82,22 @@ class Plotter():
         
     def add_orbits(self, fig, ax):
         colors = plt.cm.hsv(np.linspace(0, 1, self.n))
-        for i in range(self.n):
-            ax.plot(self.bodies[:,0,i], self.bodies[:,1,i], self.bodies[:,2,i], color=colors[i], alpha=0.25)
-            ax.plot(self.bodies[-1,0,i], self.bodies[-1,1,i], self.bodies[-1,2,i], 'o' ,label="Body " + str(i), color=colors[i])
+        if ax.name == '3d':
+            for i in range(self.n):
+                ax.plot(self.bodies[:,0,i], self.bodies[:,1,i], self.bodies[:,2,i], color=colors[i], alpha=0.25)
+                ax.plot(self.bodies[-1,0,i], self.bodies[-1,1,i], self.bodies[-1,2,i], 'o' ,label="Body " + str(i), color=colors[i])
+        else:
+            for i in range(self.n):
+                ax.plot(self.bodies[:,0,i], self.bodies[:,1,i], color=colors[i], alpha=0.25)
+                ax.plot(self.bodies[-1,0,i], self.bodies[-1,1,i], 'o' ,label="Body " + str(i), color=colors[i])
     
     def add_centre_of_mass(self, fig, ax): 
-        ax.plot(self.centreOfMass[:,0], self.centreOfMass[:,1], self.centreOfMass[:,2], color='grey', alpha=0.25)
-        ax.plot(self.centreOfMass[-1, 0], self.centreOfMass[-1,1], self.centreOfMass[-1,2], 'o', label="Centre of Mass", color='grey')
+        if ax.name == '3d':
+            ax.plot(self.centreOfMass[:,0], self.centreOfMass[:,1], self.centreOfMass[:,2], color='grey', alpha=0.25)
+            ax.plot(self.centreOfMass[-1, 0], self.centreOfMass[-1,1], self.centreOfMass[-1,2], 'o', label="Centre of Mass", color='grey')
+        else:
+            ax.plot(self.centreOfMass[:,0], self.centreOfMass[:,1], color='grey', alpha=0.25)
+            ax.plot(self.centreOfMass[-1, 0], self.centreOfMass[-1,1], 'o', label="Centre of Mass", color='grey')
     
     def plot_energy(self):
         total_energy = self.potentialEnergy + self.kineticEnergy
