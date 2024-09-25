@@ -85,7 +85,7 @@ class Plotter():
     def plot_energy(self):
         total_energy = self.potentialEnergy + self.kineticEnergy
         initial_energy = total_energy[0]
-        energy_error = [(total_energy[t] - initial_energy)/initial_energy for t in range(0,self.T)]
+        energy_error = [np.abs((total_energy[t] - initial_energy)/initial_energy) for t in range(0,self.T)]
         energy_max_min = max(total_energy) - min(total_energy)
         print(energy_max_min)
         plt.plot(energy_error)
