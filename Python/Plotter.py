@@ -48,13 +48,13 @@ class Plotter():
         #Start by loading in the simulation settings to determine what to plot
         with open(os.path.join(outputDirectory, "simulationSettings.csv"), 'r') as f:
             data = np.loadtxt(f, delimiter=",")
-            self.T = int(data[0])
+            self.N = int(data[0])
             self.dt = data[1]
             self.n = int(data[2])
             self.G = float(data[3])
             
         #Then set an array up to hold the correct number of bodies and time steps
-        self.bodies = np.zeros((self.T, 6, self.n))
+        self.bodies = np.zeros((self.N, 6, self.n))
         
         #Then load in the data for each body
         for i in range(self.n):
@@ -63,9 +63,9 @@ class Plotter():
                 self.bodies[:,:,i] = data
 
         # Set an array to hold centreOfMass and potentialEnergy
-        self.centreOfMass = np.zeros((self.T, 3), dtype=float)
-        self.potentialEnergy = np.zeros((self.T), dtype=float)
-        self.kineticEnergy = np.zeros((self.T), dtype=float)
+        self.centreOfMass = np.zeros((self.N, 3), dtype=float)
+        self.potentialEnergy = np.zeros((self.N), dtype=float)
+        self.kineticEnergy = np.zeros((self.N), dtype=float)
 
         # Load in centreOfMass data
         with open(os.path.join(outputDirectory, "centreOfMass.csv"), 'r') as f:
@@ -87,10 +87,6 @@ class Plotter():
     
     def plot_energy(self):
         total_energy = self.potentialEnergy + self.kineticEnergy
-        # initial_energy = total_energy[0]
-        # energy_error = [np.abs((total_energy[t] - initial_energy)/initial_energy) for t in range(0,self.T)]
-        # energy_max_min = max(total_energy) - min(total_energy)
-        # print(energy_max_min)
         plt.plot(total_energy)
         plt.xlabel("Time")
         plt.ylabel("Total Energy (J)")
@@ -100,7 +96,7 @@ class Plotter():
     def plot_energy_error(self):
         total_energy = self.potentialEnergy + self.kineticEnergy
         initial_energy = total_energy[0]
-        energy_error = [np.abs((total_energy[t] - initial_energy)/initial_energy) for t in range(0,self.T)]
+        energy_error = [np.abs((total_energy[t] - initial_energy)/initial_energy) for t in range(0,self.N)]
         plt.plot(energy_error)
         plt.xlabel("Time")
         plt.ylabel("Energy (J)")
@@ -159,7 +155,7 @@ class Plotter():
             return lines + points + [com_line, com_point]
 
         # Create the animation using the update function and the number of frames
-        ani = FuncAnimation(fig, update, frames=self.T, init_func=init, blit=True, interval=self.T/self.plot_kwargs["animate_fps"])
+        ani = FuncAnimation(fig, update, frames=self.N, init_func=init, blit=True, interval=self.N/self.plot_kwargs["animate_fps"])
         # Display the animation
         fig.legend()
         if self.plot_kwargs["animate_save"]:
