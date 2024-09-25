@@ -7,10 +7,10 @@ from Plotter import Plotter
 
 class Simulation():
     
-    def __init__(self, T, dt, bodies, **sim_kwargs):
+    def __init__(self, N, dt, bodies, **sim_kwargs):
         self.bodies = bodies
         self.n = len(bodies)
-        self.T = T
+        self.N = N
         self.dt = dt
         
         defaultKwargs = {
@@ -64,14 +64,14 @@ class Simulation():
         """
         #Initialise variables
         bodies = self.bodies
-        simulation = np.zeros((self.T, 6, self.n), dtype=float)
+        simulation = np.zeros((self.N, 6, self.n), dtype=float)
         totalMass = np.sum([body.mass for body in self.bodies])
-        centreOfMass = np.zeros((self.T, 3), dtype=float)
-        potentialEnergy = np.zeros((self.T), dtype=float)
-        kineticEnergy = np.zeros((self.T), dtype=float)
+        centreOfMass = np.zeros((self.N, 3), dtype=float)
+        potentialEnergy = np.zeros((self.N), dtype=float)
+        kineticEnergy = np.zeros((self.N), dtype=float)
         
         #Main time loop
-        for t in range(0, self.T):
+        for t in range(0, self.N):
             accelerations = self.calculateAccelerations() 
             bodies = self.sim_kwargs["Integrator"](bodies, accelerations, self.dt, self.sim_kwargs["variable_dt_constant"])
             centreOfMass[t,:] = self.centreOfMassCalc(totalMass)
@@ -79,7 +79,7 @@ class Simulation():
             kineticEnergy[t] = self.kinetic_energies()
             for p in range(0,self.n):
                 simulation[t,:,p] = np.concatenate((bodies[p].position, bodies[p].velocity), axis=None)
-        simulationSettings = np.array([self.T, self.dt, self.n, self.sim_kwargs["G"]])
+        simulationSettings = np.array([self.N, self.dt, self.n, self.sim_kwargs["G"]])
         
         #Write data to files in Outputs folder
         np.savetxt("Outputs\\simulationSettings.csv", simulationSettings, delimiter=",")
@@ -94,14 +94,14 @@ class Simulation():
         A bare bones version of run(), only calculates body positions
         """
         bodies = self.bodies
-        simulation = np.zeros((self.T, 6, self.n), dtype=float)
-        for t in range(0, self.T):
+        simulation = np.zeros((self.N, 6, self.n), dtype=float)
+        for t in range(0, self.N):
             accelerations = self.calculateAccelerations()
             bodies = Integrator(bodies, accelerations, self.dt, self.sim_kwargs["variable_dt_constant"])
             for i, body in enumerate(bodies):
                 simulation[t,:,i] = np.concatenate((body.position, body.velocity), axis=None)
 
-        simulationSettings = np.array([self.T, self.dt, self.n, self.sim_kwargs["G"]])
+        simulationSettings = np.array([self.N, self.dt, self.n, self.sim_kwargs["G"]])
         np.savetxt("Outputs\\simulationSettings.csv", simulationSettings, delimiter=",")
         for i in range(self.n):
             np.savetxt("Outputs\\output" + str(i) + ".csv", simulation[:,:,i], delimiter=",")
