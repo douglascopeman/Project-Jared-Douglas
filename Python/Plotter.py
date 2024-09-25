@@ -13,6 +13,7 @@ class Plotter():
         defaultKwargs = {
                         "plot_centre_of_mass":False,
                         "plot_energy":False,
+                        "plot_energy_error":False,
                         "animate_orbits":False,
                         "animate_save":False,
                         "animate_fps":30,
@@ -34,6 +35,8 @@ class Plotter():
         #Other plots
         if self.plot_kwargs["plot_energy"]:
             self.plot_energy()
+        if self.plot_kwargs["plot_energy_error"]:
+            self.plot_energy_error()
         
         #Animation
         if self.plot_kwargs["animate_orbits"]:
@@ -84,14 +87,24 @@ class Plotter():
     
     def plot_energy(self):
         total_energy = self.potentialEnergy + self.kineticEnergy
-        initial_energy = total_energy[0]
-        energy_error = [np.abs((total_energy[t] - initial_energy)/initial_energy) for t in range(0,self.T)]
-        energy_max_min = max(total_energy) - min(total_energy)
-        print(energy_max_min)
-        plt.plot(energy_error)
+        # initial_energy = total_energy[0]
+        # energy_error = [np.abs((total_energy[t] - initial_energy)/initial_energy) for t in range(0,self.T)]
+        # energy_max_min = max(total_energy) - min(total_energy)
+        # print(energy_max_min)
+        plt.plot(total_energy)
         plt.xlabel("Time")
         plt.ylabel("Total Energy (J)")
         plt.title("Total Energy of the System over Time")
+        plt.show()
+        
+    def plot_energy_error(self):
+        total_energy = self.potentialEnergy + self.kineticEnergy
+        initial_energy = total_energy[0]
+        energy_error = [np.abs((total_energy[t] - initial_energy)/initial_energy) for t in range(0,self.T)]
+        plt.plot(energy_error)
+        plt.xlabel("Time")
+        plt.ylabel("Energy (J)")
+        plt.title("Change in Energy of the System over Time")
         plt.show()
           
     # The below is generated code

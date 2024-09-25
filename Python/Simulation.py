@@ -16,6 +16,7 @@ class Simulation():
         defaultKwargs = {
                         "Integrator":Integrators.symplecticEuler,
                         "G":1,
+                        "variable_dt_constant":None,
                         }
         self.sim_kwargs = defaultKwargs | sim_kwargs
 
@@ -71,8 +72,8 @@ class Simulation():
         
         #Main time loop
         for t in range(0, self.T):
-            accelerations = self.calculateAccelerations()
-            bodies = self.sim_kwargs["Integrator"](bodies, accelerations, self.dt)
+            accelerations = self.calculateAccelerations() 
+            bodies = self.sim_kwargs["Integrator"](bodies, accelerations, self.dt, self.sim_kwargs["variable_dt_constant"])
             centreOfMass[t,:] = self.centreOfMassCalc(totalMass)
             potentialEnergy[t] = self.calculatePotentialEnergy()
             kineticEnergy[t] = self.kinetic_energies()
@@ -96,11 +97,11 @@ class Simulation():
         simulation = np.zeros((self.T, 6, self.n), dtype=float)
         for t in range(0, self.T):
             accelerations = self.calculateAccelerations()
-            bodies = Integrator(bodies, accelerations, self.dt)
+            bodies = Integrator(bodies, accelerations, self.dt, self.sim_kwargs["variable_dt_constant"])
             for i, body in enumerate(bodies):
                 simulation[t,:,i] = np.concatenate((body.position, body.velocity), axis=None)
 
-        simulationSettings = np.array([self.T, self.dt, self.n])
+        simulationSettings = np.array([self.T, self.dt, self.n, self.sim_kwargs["G"]])
         np.savetxt("Outputs\\simulationSettings.csv", simulationSettings, delimiter=",")
         for i in range(self.n):
             np.savetxt("Outputs\\output" + str(i) + ".csv", simulation[:,:,i], delimiter=",")
