@@ -7,13 +7,17 @@ from Plotter import Plotter
 
 class Simulation():
     
-    def __init__(self, T, dt, bodies, Integrator=Integrators.symplecticEuler, G=1):
-        self.G = G
-        self.Integrator = Integrator
+    def __init__(self, T, dt, bodies, **sim_kwargs):
         self.bodies = bodies
         self.n = len(bodies)
         self.T = T
         self.dt = dt
+        
+        defaultKwargs = {
+                        "Integrator":Integrators.symplecticEuler,
+                        "G":1,
+                        }
+        self.sim_kwargs = defaultKwargs | sim_kwargs
 
 ###################################################
 # Simulation Calculations
@@ -28,18 +32,10 @@ class Simulation():
         """
         Finds the total potential energy of the simulation. Runs at each timestep
         """
+        G = self.sim_kwargs["G"]
         body_pairs = list(combinations(self.bodies, 2))
-        potential_energy = np.sum([-self.G * body1.mass * body2.mass / LA.norm(body1.position - body2.position) for body1, body2 in body_pairs])
+        potential_energy = np.sum([-G * body1.mass * body2.mass / LA.norm(body1.position - body2.position) for body1, body2 in body_pairs])
         return potential_energy
-    
-        ##### DEPRICATED CODE #####
-        # Number of bodies choose 2
-        # combinationList = list(combinations(range(0,self.n), 2))
-        # potentialEnergy = np.sum([
-        #     -self.G * self.bodies[combinationList[i][0]].mass * self.bodies[combinationList[i][1]].mass 
-        #     / (LA.norm(self.bodies[combinationList[i][0]].position - self.bodies[combinationList[i][1]].position)) 
-        #     for i in range(0,len(combinationList))])
-        # return potentialEnergy
 
     def kinetic_energies(self):
         '''Calculates the kinetic energy of the body at each timestep and returns the result as a numpy array'''
@@ -51,15 +47,11 @@ class Simulation():
         """
         Compute the acceleration between n bodies in the x,y and z axes. The output will be a nx3 array.
         """
+        G = self.sim_kwargs["G"]
         acceleration = np.zeros((self.n,3), dtype=float)
         for i, body in enumerate(self.bodies):
-            acceleration[i,:] = np.sum([((-self.G * other_body.mass) / ((LA.norm(body.position - other_body.position))**3)) * (body.position - other_body.position) for other_body in self.bodies if other_body != body], axis=0)
+            acceleration[i,:] = np.sum([((-G * other_body.mass) / ((LA.norm(body.position - other_body.position))**3)) * (body.position - other_body.position) for other_body in self.bodies if other_body != body], axis=0)
         return acceleration
-            
-        ##### DEPRICATED CODE #####
-        # for body in range(0,self.n):
-        #     acceleration[body,:] = np.sum([
-        #         ((-self.G * self.bodies[i].mass)/((LA.norm(self.bodies[body].position - self.bodies[i].position))**3))*(self.bodies[body].position - self.bodies[i].position) for i in (set(range(0,self.n)))-set([body])], axis = 0)
     
 ###################################################
 # Run Model
@@ -80,13 +72,13 @@ class Simulation():
         #Main time loop
         for t in range(0, self.T):
             accelerations = self.calculateAccelerations()
-            bodies = self.Integrator(bodies, accelerations, self.dt)
+            bodies = self.sim_kwargs["Integrator"](bodies, accelerations, self.dt)
             centreOfMass[t,:] = self.centreOfMassCalc(totalMass)
             potentialEnergy[t] = self.calculatePotentialEnergy()
             kineticEnergy[t] = self.kinetic_energies()
             for p in range(0,self.n):
                 simulation[t,:,p] = np.concatenate((bodies[p].position, bodies[p].velocity), axis=None)
-        simulationSettings = np.array([self.T, self.dt, self.n, self.G])
+        simulationSettings = np.array([self.T, self.dt, self.n, self.sim_kwargs["G"]])
         
         #Write data to files in Outputs folder
         np.savetxt("Outputs\\simulationSettings.csv", simulationSettings, delimiter=",")

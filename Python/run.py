@@ -5,11 +5,11 @@ import Simulation
 from orbit_examples import orbit_examples
 import Integrators
 
-T = 100000 #rename to N
-dt = 0.02
+T = 1000 #rename to N
+dt = 0.01
 
-simulation = Simulation.Simulation(T, dt, orbit_examples.ellipse)#, Integrator=Integrators.Euler)
+simulation = Simulation.Simulation(T, dt, orbit_examples.circular)
 simulation.run()
-plotter = Plotter.Plotter("Outputs", plot_centre_of_mass=True, plot_energy=True, 
+plotter = Plotter.Plotter("Outputs", plot_centre_of_mass=True, plot_energy=False, 
                           animate_orbits=False, animate_save=False, animate_fps=650)
 plotter.plot()
