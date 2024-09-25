@@ -5,7 +5,7 @@ import Simulation
 from orbit_examples import orbit_examples
 import Integrators
 
-N = 100 #rename to N
+N = 10000 #rename to N
 dt = 0.001
 
 simulation = Simulation.Simulation(N, dt, orbit_examples.circular)
