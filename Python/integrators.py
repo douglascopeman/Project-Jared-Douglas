@@ -7,8 +7,8 @@ def symplecticEuler(bodies, acceleration, dt, variable_dt_constant=None):
     
     if variable_dt_constant is None:
         for (i, body) in enumerate(bodies):
-            body.position += dt * body.velocity  
             body.velocity += dt * acceleration[i, :]
+            body.position += dt * body.velocity  
     else:
         for (i, body) in enumerate(bodies):
             dt = variable_dt_constant * np.linalg.norm(body.position) / np.linalg.norm(body.velocity)
