@@ -42,7 +42,7 @@ class Simulation():
         potential_energy = np.sum([-G * body1.mass * body2.mass / LA.norm(body1.position - body2.position) for body1, body2 in body_pairs])
         return potential_energy
 
-    def kinetic_energies(self):
+    def kineticEnergies(self):
         '''Calculates the kinetic energy of the body at each timestep and returns the result as a numpy array'''
         kinetic_energy = np.sum([np.dot(body.velocity, body.velocity) * body.mass / 2 for body in self.bodies])
         return kinetic_energy
