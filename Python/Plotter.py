@@ -15,6 +15,7 @@ class Plotter():
                         "plot_centre_of_mass":False,
                         "plot_energy":False,
                         "plot_energy_error":False,
+                        "plot_angular_momentum_error":False,
                         "animate_orbits":False,
                         "animate_save":False,
                         "animate_fps":30,
@@ -42,6 +43,8 @@ class Plotter():
             self.plot_energy()
         if self.plot_kwargs["plot_energy_error"]:
             self.plot_energy_error()
+        if self.plot_kwargs["plot_angular_momentum_error"]:
+            self.plot_angular_momentum_error()
         
         plt.show()
         
@@ -73,6 +76,7 @@ class Plotter():
         self.centreOfMass = np.zeros((self.N, 3), dtype=float)
         self.potentialEnergy = np.zeros((self.N), dtype=float)
         self.kineticEnergy = np.zeros((self.N), dtype=float)
+        self.angularMomentum = np.zeros((self.N, 3), dtype=float)
 
         # Load in centreOfMass data
         with open(os.path.join(outputDirectory, "centreOfMass.csv"), 'r') as f:
@@ -81,6 +85,8 @@ class Plotter():
             self.potentialEnergy[:] = np.loadtxt(f, delimiter=",")
         with open(os.path.join(outputDirectory, "kineticEnergy.csv"), 'r') as f:
             self.kineticEnergy = np.loadtxt(f, delimiter=",")
+        with open(os.path.join(outputDirectory, "angularMomentum.csv"), 'r') as f:
+            self.angularMomentum = np.loadtxt(f, delimiter=",")
             
     def determine_max_range(self, bodies):
         max_range = np.max(np.abs(np.min(bodies[:,0:3,:], axis=(0,1)), 
@@ -132,6 +138,17 @@ class Plotter():
         ax_energy_error.set_xlabel("Time")
         ax_energy_error.set_ylabel("Energy (J)")
         ax_energy_error.set_title("Relative Energy Error of the System over Time")
+
+    def plot_angular_momentum_error(self):
+        fig_angular_momentum_error = plt.figure("Angular Momentum Error")
+        ax_energy_error = fig_angular_momentum_error.add_subplot()
+
+        initial_angular_momentum = self.angularMomentum[0]
+        angular_momentum_error = [np.abs((self.angularMomentum[t] - initial_angular_momentum)/initial_angular_momentum) for t in range(0,self.N)]
+        ax_energy_error.plot(angular_momentum_error)
+        ax_energy_error.set_xlabel("Time")
+        ax_energy_error.set_ylabel("Angular Momentum (kg-m^2/s)")
+        ax_energy_error.set_title("Relative Angular Momentum Error of the System over Time")
           
     # The below is generated code
     def animate_orbits(self):

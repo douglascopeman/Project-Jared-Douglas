@@ -73,15 +73,16 @@ class Simulation():
         centreOfMass = np.zeros((self.N, 3), dtype=float)
         potentialEnergy = np.zeros((self.N), dtype=float)
         kineticEnergy = np.zeros((self.N), dtype=float)
+        angularMomentum = np.zeros((self.N, 3), dtype=float)
         
         #Main time loop
         for t in range(0, self.N):
-            print(self.angularMomentum())
             accelerations = self.calculateAccelerations() 
             bodies = self.sim_kwargs["Integrator"](bodies, accelerations, self.dt, self.sim_kwargs["variable_dt_constant"])
             centreOfMass[t,:] = self.centreOfMassCalc(totalMass)
             potentialEnergy[t] = self.calculatePotentialEnergy()
-            kineticEnergy[t] = self.kinetic_energies()
+            kineticEnergy[t] = self.kineticEnergies()
+            angularMomentum[t,:] = self.angularMomentum()
             for p in range(0,self.n):
                 simulation[t,:,p] = np.concatenate((bodies[p].position, bodies[p].velocity), axis=None)
         simulationSettings = np.array([self.N, self.dt, self.n, self.sim_kwargs["G"]])
@@ -91,6 +92,7 @@ class Simulation():
         np.savetxt("Outputs\\centreOfMass.csv", centreOfMass, delimiter=",")
         np.savetxt("Outputs\\potentialEnergy.csv", potentialEnergy, delimiter=",")
         np.savetxt("Outputs\\kineticEnergy.csv", kineticEnergy, delimiter=",")
+        np.savetxt("Outputs\\angularMomentum.csv", angularMomentum, delimiter=",")
         for i in range(self.n):
             np.savetxt("Outputs\\output" + str(i) + ".csv", simulation[:,:,i], delimiter=",")
 
