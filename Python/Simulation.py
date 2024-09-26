@@ -24,6 +24,10 @@ class Simulation():
 # Simulation Calculations
 ###################################################
 
+    def angularMomentum(self):
+        summation = np.sum([body.mass * np.cross(body.position, body.velocity) for body in self.bodies], axis=0)
+        return summation
+
     def centreOfMassCalc(self, totalMass):
         summation = np.sum([body.mass * body.position for body in self.bodies], axis=0) 
         position = (1/totalMass) * summation
@@ -72,6 +76,7 @@ class Simulation():
         
         #Main time loop
         for t in range(0, self.N):
+            print(self.angularMomentum())
             accelerations = self.calculateAccelerations() 
             bodies = self.sim_kwargs["Integrator"](bodies, accelerations, self.dt, self.sim_kwargs["variable_dt_constant"])
             centreOfMass[t,:] = self.centreOfMassCalc(totalMass)
