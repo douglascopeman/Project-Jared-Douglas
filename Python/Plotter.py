@@ -19,6 +19,7 @@ class Plotter():
                         "animate_orbits":False,
                         "animate_save":False,
                         "animate_fps":30,
+                        "runFast":False
                         }
         self.plot_kwargs = defaultKwargs | plot_kwargs
         
@@ -72,21 +73,22 @@ class Plotter():
                 data = np.loadtxt(f, delimiter=",")
                 self.bodies[:,:,i] = data
 
-        # Set an array to hold centreOfMass and potentialEnergy
-        self.centreOfMass = np.zeros((self.N, 3), dtype=float)
-        self.potentialEnergy = np.zeros((self.N), dtype=float)
-        self.kineticEnergy = np.zeros((self.N), dtype=float)
-        self.angularMomentum = np.zeros((self.N, 3), dtype=float)
+        if not self.plot_kwargs["runFast"]:
+            # Set an array to hold centreOfMass and potentialEnergy
+            self.centreOfMass = np.zeros((self.N, 3), dtype=float)
+            self.potentialEnergy = np.zeros((self.N), dtype=float)
+            self.kineticEnergy = np.zeros((self.N), dtype=float)
+            self.angularMomentum = np.zeros((self.N, 3), dtype=float)
 
-        # Load in centreOfMass data
-        with open(os.path.join(outputDirectory, "centreOfMass.csv"), 'r') as f:
-            self.centreOfMass[:,:] = np.loadtxt(f, delimiter=",")
-        with open(os.path.join(outputDirectory, "potentialEnergy.csv"), 'r') as f:
-            self.potentialEnergy[:] = np.loadtxt(f, delimiter=",")
-        with open(os.path.join(outputDirectory, "kineticEnergy.csv"), 'r') as f:
-            self.kineticEnergy = np.loadtxt(f, delimiter=",")
-        with open(os.path.join(outputDirectory, "angularMomentum.csv"), 'r') as f:
-            self.angularMomentum = np.loadtxt(f, delimiter=",")
+            # Load in centreOfMass data
+            with open(os.path.join(outputDirectory, "centreOfMass.csv"), 'r') as f:
+                self.centreOfMass[:,:] = np.loadtxt(f, delimiter=",")
+            with open(os.path.join(outputDirectory, "potentialEnergy.csv"), 'r') as f:
+                self.potentialEnergy[:] = np.loadtxt(f, delimiter=",")
+            with open(os.path.join(outputDirectory, "kineticEnergy.csv"), 'r') as f:
+                self.kineticEnergy = np.loadtxt(f, delimiter=",")
+            with open(os.path.join(outputDirectory, "angularMomentum.csv"), 'r') as f:
+                self.angularMomentum = np.loadtxt(f, delimiter=",")
             
     def determine_max_range(self, bodies):
         max_range = np.max(np.abs(np.min(bodies[:,0:3,:], axis=(0,1)), 
