@@ -4,6 +4,7 @@ from itertools import combinations
 from Body import Body
 import Integrators
 from Plotter import Plotter
+import os
 
 class Simulation():
     
@@ -86,15 +87,17 @@ class Simulation():
             for p in range(0,self.n):
                 simulation[t,:,p] = np.concatenate((bodies[p].position, bodies[p].velocity), axis=None)
         simulationSettings = np.array([self.N, self.dt, self.n, self.sim_kwargs["G"]])
+
+        path = os.path.join(os.getcwd(), "Python\\Outputs")
         
         #Write data to files in Outputs folder
-        np.savetxt("Outputs\\simulationSettings.csv", simulationSettings, delimiter=",")
-        np.savetxt("Outputs\\centreOfMass.csv", centreOfMass, delimiter=",")
-        np.savetxt("Outputs\\potentialEnergy.csv", potentialEnergy, delimiter=",")
-        np.savetxt("Outputs\\kineticEnergy.csv", kineticEnergy, delimiter=",")
-        np.savetxt("Outputs\\angularMomentum.csv", angularMomentum, delimiter=",")
+        np.savetxt(os.path.join(path, "simulationSettings.csv"), simulationSettings, delimiter=",")
+        np.savetxt(os.path.join(path, "centreOfMass.csv"), centreOfMass, delimiter=",")
+        np.savetxt(os.path.join(path, "potentialEnergy.csv"), potentialEnergy, delimiter=",")
+        np.savetxt(os.path.join(path, "kineticEnergy.csv"), kineticEnergy, delimiter=",")
+        np.savetxt(os.path.join(path, "angularMomentum.csv"), angularMomentum, delimiter=",")
         for i in range(self.n):
-            np.savetxt("Outputs\\output" + str(i) + ".csv", simulation[:,:,i], delimiter=",")
+            np.savetxt(os.path.join(path, ("output"+ str(i)+ ".csv")), simulation[:,:,i], delimiter=",")
 
     def runFast(self, Integrator=Integrators.symplecticEuler):
         """
