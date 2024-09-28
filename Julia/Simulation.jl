@@ -58,7 +58,7 @@ Builds a 3 dimensional array filled with the 3 axes position data of every body 
 function runSimulation(bodies, N, dt::Float64)
     nBodies = length(bodies)
     simulation = zeros(Float64, (N, 6, nBodies))  # Simulation length by axes by number of bodies
-    path = raw"Julia/Outputs/output"
+    path = raw"Julia/Outputs/"
 
     for k=1:N
         accelerations = calculateAccelerations(bodies)     # Gives acceleration values at timestep n for all bodies and all axes
@@ -69,11 +69,11 @@ function runSimulation(bodies, N, dt::Float64)
     end
     
     for body=1:nBodies
-        pathBodies = path * string(body) * raw".csv"
+        pathBodies = path* raw"output" * string(body-1) * raw".csv"
         writedlm(pathBodies, simulation[:,:,body], ',')   
     end
 
-    writedlm(path * raw"SimulationSettings.csv", [N, dt, nBodies, G], ',')
+    writedlm(path * raw"simulationSettings.csv", [N, dt, nBodies, G], ',')
 end
 
 
