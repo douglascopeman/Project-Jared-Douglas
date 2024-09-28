@@ -1,36 +1,15 @@
-include("src/NBodyProblem.jl")
+include("Simulation.jl")
+include("Body.jl")
 
+using .Simulation
 
 # Defining the model space
-moon = Body()
-earth = Body()
-p3 = Body()
+moon = ModelSpace.Body([1,0,0], [0,0.6,0],1)
+earth = ModelSpace.Body([-1,0,0], [0,-0.6,0], 1)
 
-moon.pos = [-3.93e8, 0, 0]
-moon.vel = [0, 1e3, 0]
-moon.mass = 7.34767309e22
+bodies = [moon, earth]
+simLength = 1000
+dt = 0.1    
 
-p3.pos = [3.93e8, 0, 0]
-p3.vel = [0, -1e3, 0]
-p3.mass = 7.34767309e22
+model = Simulation.runSimulation(bodies, simLength, dt)
 
-spaceData = [moon, earth, p3]
-simLength = 1000000
-@assert simLength > 250
-
-dt = 20
-
-@btime
-    
-
-model, modelHamiltonian = runSimulation(spaceData, simLength, dt)
-
-animation(model, (simLength ÷ 1000), modelHamiltonian)
-
- plotHamiltonian(modelHamiltonian)
-
-# h5write("/tmp/test1.h5", "model", model)
-
-# @testset "NBodyProblem.jl" begin
-#     NBodyProblem.simulation(1,2)
-# end
