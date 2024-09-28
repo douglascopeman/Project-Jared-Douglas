@@ -1,3 +1,5 @@
+using BenchmarkTools
+
 include("Simulation.jl")
 include("Body.jl")
 
@@ -11,5 +13,6 @@ bodies = [moon, earth]
 simLength = 1000
 dt = 0.1    
 
-model = Simulation.runSimulation(bodies, simLength, dt)
+
+@benchmark Simulation.runSimulation(bodies, simLength, dt)
 
