@@ -32,23 +32,6 @@ function calculateAccelerations(bodies)
     return acceleration
 end
 
-# """
-#     Hamiltonian(spaceData::Vector{Body})
-
-# The Hamiltonian is the total amount of energy in the system, gravitational plus kinetic.
-# The function takes the spaceData and outputs both the value of the Hamiltonian, H, for all 
-# timesteps and the change in the Hamiltonian value over time, ΔH
-# """
-# function Hamiltonian(spaceData::Vector{Body})
-#     nBodies = length(spaceData)
-#     Ω = collect(combinations(1:nBodies, 2))     # nBodies choose 2
-#     hamiltonian = sum(                                                              # gravitational part of the hamiltonian
-#         -G * spaceData[Ω[i][1]].mass * spaceData[Ω[i][2]].mass / (norm(spaceData[Ω[i][1]].pos - spaceData[Ω[i][2]].pos)) 
-#         for i in length(Ω)) +
-#             sum((1/2) * spaceData[i].mass * norm(                                   # kinetic part of the hamiltonian
-#                 spaceData[i].vel)^2 for i in 1:nBodies)  
-#     return hamiltonian
-# end
 
 """
     simulation(spaceData::Vector{Body}, simLength::Int64)
