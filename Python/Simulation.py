@@ -103,6 +103,7 @@ class Simulation():
         """
         A bare bones version of run(), only calculates body positions
         """
+        path = os.path.join(os.getcwd(), "Python\\Outputs")
         bodies = self.bodies
         simulation = np.zeros((self.N, 6, self.n), dtype=float)
         for t in range(0, self.N):
@@ -112,9 +113,9 @@ class Simulation():
                 simulation[t,:,i] = np.concatenate((body.position, body.velocity), axis=None)
 
         simulationSettings = np.array([self.N, self.dt, self.n, self.sim_kwargs["G"]])
-        np.savetxt("Outputs\\simulationSettings.csv", simulationSettings, delimiter=",")
+        np.savetxt(os.path.join(path, "simulationSettings.csv"), simulationSettings, delimiter=",")
         for i in range(self.n):
-            np.savetxt("Outputs\\output" + str(i) + ".csv", simulation[:,:,i], delimiter=",")
+            np.savetxt(os.path.join(path, "output" + str(i) + ".csv"), simulation[:,:,i], delimiter=",")
         
 if __name__ == "__main__":
     import run
