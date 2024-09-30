@@ -79,7 +79,7 @@ class Simulation():
         #Main time loop
         for t in range(0, self.N):
             accelerations = self.calculateAccelerations() 
-            bodies = self.sim_kwargs["Integrator"](bodies, accelerations, self.dt, self.sim_kwargs["variable_dt_constant"])
+            bodies = self.sim_kwargs["Integrator"](bodies, accelerations, self.dt, self.sim_kwargs["G"], self.sim_kwargs["variable_dt_constant"])
             centreOfMass[t,:] = self.centreOfMassCalc(totalMass)
             potentialEnergy[t] = self.calculatePotentialEnergy()
             kineticEnergy[t] = self.kineticEnergies()

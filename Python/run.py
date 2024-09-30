@@ -9,7 +9,7 @@ import time
 N = 5000 #rename to N
 dt = 0.01
 
-simulation = Simulation.Simulation(N, dt, orbit_examples.elliptical)
+simulation = Simulation.Simulation(N, dt, orbit_examples.offset_elliptical, Integrator=Integrators.ThreeStepLeapFrog)
 
 start = time.time()
 simulation.run()
