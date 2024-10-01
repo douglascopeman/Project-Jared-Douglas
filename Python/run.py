@@ -6,8 +6,8 @@ from orbit_examples import orbit_examples
 import Integrators
 import time
 
-N = 5000 #rename to N
-dt = 0.02
+N = 50000 #rename to N
+dt = 0.01
 
 simulation = Simulation.Simulation(N, dt, orbit_examples.elliptical, variable_dt_constant=0.001)#, Integrator=Integrators.ThreeStepLeapFrog)
 

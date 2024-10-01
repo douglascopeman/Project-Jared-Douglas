@@ -13,17 +13,10 @@ def symplecticEuler(bodies, acceleration, dt, G=1, variable_dt_constant=None):
             body.velocity += dt * acceleration[i, :]
             body.position += dt * body.velocity  
     else:
-        bodies_copy = bodies.copy()
-        for (i, body) in enumerate(bodies_copy):
-            variable_dt_one = variable_dt_constant * np.linalg.norm(body.position) / np.linalg.norm(body.velocity)
-            body.velocity += variable_dt_one * acceleration[i, :]
-            body.position += variable_dt_one * body.velocity 
-        temp_accelerations = calculateAccelerations(bodies_copy, G)
-        variable_dt_two = (bodies_copy[0].velocity[0] - bodies[0].velocity[0]) / np.linalg.norm(temp_accelerations[0,0])
-        variable_dt_avg = (variable_dt_one - variable_dt_two) / 2
         for (i, body) in enumerate(bodies):
-            body.velocity += variable_dt_avg * acceleration[i, :]
-            body.position += variable_dt_avg * body.velocity
+            variable_dt = variable_dt_constant * np.linalg.norm(body.position) / np.linalg.norm(body.velocity)
+            body.velocity += variable_dt * acceleration[i, :]
+            body.position += variable_dt * body.velocity 
         
     return bodies
 
