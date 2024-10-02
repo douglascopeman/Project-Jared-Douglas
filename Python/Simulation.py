@@ -48,16 +48,16 @@ class Simulation():
         kinetic_energy = np.sum([np.dot(body.velocity, body.velocity) * body.mass / 2 for body in self.bodies])
         return kinetic_energy
 
-
-    def calculateAccelerations(self):
-        """
-        Compute the acceleration between n bodies in the x,y and z axes. The output will be a nx3 array.
-        """
-        G = self.sim_kwargs["G"]
-        acceleration = np.zeros((self.n,3), dtype=float)
-        for i, body in enumerate(self.bodies):
-            acceleration[i,:] = np.sum([((-G * other_body.mass) / ((LA.norm(body.position - other_body.position))**3)) * (body.position - other_body.position) for other_body in self.bodies if other_body != body], axis=0)
-        return acceleration
+    ##### DEPRECATED #####
+    # def calculateAccelerations(self):
+    #     """
+    #     Compute the acceleration between n bodies in the x,y and z axes. The output will be a nx3 array.
+    #     """
+    #     G = self.sim_kwargs["G"]
+    #     acceleration = np.zeros((self.n,3), dtype=float)
+    #     for i, body in enumerate(self.bodies):
+    #         acceleration[i,:] = np.sum([((-G * other_body.mass) / ((LA.norm(body.position - other_body.position))**3)) * (body.position - other_body.position) for other_body in self.bodies if other_body != body], axis=0)
+    #     return acceleration
     
 ###################################################
 # Run Model
@@ -67,7 +67,7 @@ class Simulation():
         """
         Builds a 3 dimensional array filled with the 3 axes position data of every body for the length of the simulaiton
         """
-        #Initialise variables
+        #-------------------- Initialise variables --------------------#
         bodies = self.bodies
         simulation = np.zeros((self.N, 6, self.n), dtype=float)
         totalMass = np.sum([body.mass for body in self.bodies])
@@ -75,11 +75,12 @@ class Simulation():
         potentialEnergy = np.zeros((self.N), dtype=float)
         kineticEnergy = np.zeros((self.N), dtype=float)
         angularMomentum = np.zeros((self.N, 3), dtype=float)
+        G = self.sim_kwargs["G"]
+        variable_dt_constant = self.sim_kwargs["variable_dt_constant"]
         
-        #Main time loop
+        #-------------------- Main Time Loop --------------------#
         for t in range(0, self.N):
-            accelerations = self.calculateAccelerations() 
-            bodies = self.sim_kwargs["Integrator"](bodies, accelerations, self.dt, self.sim_kwargs["G"], self.sim_kwargs["variable_dt_constant"])
+            bodies = self.sim_kwargs["Integrator"](bodies, self.dt, G, variable_dt_constant)
             centreOfMass[t,:] = self.centreOfMassCalc(totalMass)
             potentialEnergy[t] = self.calculatePotentialEnergy()
             kineticEnergy[t] = self.kineticEnergies()
@@ -90,7 +91,7 @@ class Simulation():
 
         path = os.path.join(os.getcwd(), "Python\\Outputs")
         
-        #Write data to files in Outputs folder
+        #-------------------- Write Data to CSVs --------------------#
         np.savetxt(os.path.join(path, "simulationSettings.csv"), simulationSettings, delimiter=",")
         np.savetxt(os.path.join(path, "centreOfMass.csv"), centreOfMass, delimiter=",")
         np.savetxt(os.path.join(path, "potentialEnergy.csv"), potentialEnergy, delimiter=",")
@@ -107,8 +108,7 @@ class Simulation():
         bodies = self.bodies
         simulation = np.zeros((self.N, 6, self.n), dtype=float)
         for t in range(0, self.N):
-            accelerations = self.calculateAccelerations()
-            bodies = Integrator(bodies, accelerations, self.dt, self.sim_kwargs["variable_dt_constant"])
+            bodies = Integrator(bodies, self.dt)
             for i, body in enumerate(bodies):
                 simulation[t,:,i] = np.concatenate((body.position, body.velocity), axis=None)
 
