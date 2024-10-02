@@ -74,21 +74,24 @@ class Plotter():
                 self.bodies[:,:,i] = data
 
         if not self.plot_kwargs["runFast"]:
-            # Set an array to hold centreOfMass and potentialEnergy
-            self.centreOfMass = np.zeros((self.N, 3), dtype=float)
-            self.potentialEnergy = np.zeros((self.N), dtype=float)
-            self.kineticEnergy = np.zeros((self.N), dtype=float)
-            self.angularMomentum = np.zeros((self.N, 3), dtype=float)
-
-            # Load in centreOfMass data
-            with open(os.path.join(outputDirectory, "centreOfMass.csv"), 'r') as f:
-                self.centreOfMass[:,:] = np.loadtxt(f, delimiter=",")
-            with open(os.path.join(outputDirectory, "potentialEnergy.csv"), 'r') as f:
-                self.potentialEnergy[:] = np.loadtxt(f, delimiter=",")
-            with open(os.path.join(outputDirectory, "kineticEnergy.csv"), 'r') as f:
-                self.kineticEnergy = np.loadtxt(f, delimiter=",")
-            with open(os.path.join(outputDirectory, "angularMomentum.csv"), 'r') as f:
-                self.angularMomentum = np.loadtxt(f, delimiter=",")
+            if self.plot_kwargs["plot_centre_of_mass"]:
+                self.centreOfMass = np.zeros((self.N, 3), dtype=float)
+                with open(os.path.join(outputDirectory, "centreOfMass.csv"), 'r') as f:
+                    self.centreOfMass[:,:] = np.loadtxt(f, delimiter=",")
+                    
+            if self.plot_kwargs["plot_energy"]:
+                self.potentialEnergy = np.zeros((self.N), dtype=float)
+                self.kineticEnergy = np.zeros((self.N), dtype=float)
+                with open(os.path.join(outputDirectory, "potentialEnergy.csv"), 'r') as f:
+                    self.potentialEnergy[:] = np.loadtxt(f, delimiter=",")
+                with open(os.path.join(outputDirectory, "kineticEnergy.csv"), 'r') as f:
+                    self.kineticEnergy = np.loadtxt(f, delimiter=",")
+            
+            if self.plot_kwargs["plot_angular_momentum_error"]:
+                self.angularMomentum = np.zeros((self.N, 3), dtype=float)
+                with open(os.path.join(outputDirectory, "angularMomentum.csv"), 'r') as f:
+                    self.angularMomentum = np.loadtxt(f, delimiter=",")
+            
             
     def determine_max_range(self, bodies):
         max_range = np.max(np.abs(np.min(bodies[:,0:3,:], axis=(0,1)), 
