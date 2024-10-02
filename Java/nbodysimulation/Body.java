@@ -6,10 +6,10 @@ public class Body {
     private Vector velocity;
     private Vector acceleration;
 
-    public Body(double mass, Vector position, Vector velocity) {
-        this.mass = mass;
+    public Body(Vector position, Vector velocity, double mass) {
         this.position = position;
         this.velocity = velocity;
+        this.mass = mass;
     }
 
     // Getters & Setters

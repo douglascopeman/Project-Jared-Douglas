@@ -9,7 +9,12 @@ public class Simulation {
     private final int N;
     private final double dt;
 
-
+    /**
+     * @param bodies Array of Body objects
+     * @param N Number of iterations
+     * @param dt Time step
+     * 
+     */
     public Simulation(Body[] bodies, int N, double dt){
         this.bodies = bodies;
         this.n = bodies.length;
@@ -40,9 +45,16 @@ public class Simulation {
 
         for (int bodyNum = 0; bodyNum < this.n; bodyNum++) {
             try (FileWriter writer = new FileWriter("Outputs/output" + bodyNum + ".csv")) {
+                StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < this.N; i++) {
-                    writer.append(simulation[i][0][bodyNum] + "," + simulation[i][1][bodyNum] + "," + simulation[i][2][bodyNum] + "\n");
+                    sb.append(simulation[i][0][bodyNum])
+                    .append(",")
+                    .append(simulation[i][1][bodyNum])
+                    .append(",")
+                    .append(simulation[i][2][bodyNum])
+                    .append("\n");
                 }
+                writer.write(sb.toString());
             } catch (IOException e) {
                 e.printStackTrace();
             }
