@@ -8,7 +8,7 @@ import os
 
 class Simulation():
     
-    def __init__(self, N, dt, bodies, **sim_kwargs):
+    def __init__(self, N, dt, bodies, **kwargs):
         self.bodies = bodies
         self.n = len(bodies)
         self.N = N
@@ -19,7 +19,7 @@ class Simulation():
                         "G":1,
                         "variable_dt_constant":None,
                         }
-        self.sim_kwargs = defaultKwargs | sim_kwargs
+        self.kwargs = defaultKwargs | kwargs
 
 ###################################################
 # Simulation Calculations
@@ -38,7 +38,7 @@ class Simulation():
         """
         Finds the total potential energy of the simulation. Runs at each timestep
         """
-        G = self.sim_kwargs["G"]
+        G = self.kwargs["G"]
         body_pairs = list(combinations(self.bodies, 2))
         potential_energy = np.sum([-G * body1.mass * body2.mass / LA.norm(body1.position - body2.position) for body1, body2 in body_pairs])
         return potential_energy
@@ -75,19 +75,19 @@ class Simulation():
         potentialEnergy = np.zeros((self.N), dtype=float)
         kineticEnergy = np.zeros((self.N), dtype=float)
         angularMomentum = np.zeros((self.N, 3), dtype=float)
-        G = self.sim_kwargs["G"]
-        variable_dt_constant = self.sim_kwargs["variable_dt_constant"]
+        G = self.kwargs["G"]
+        variable_dt_constant = self.kwargs["variable_dt_constant"]
         
         #-------------------- Main Time Loop --------------------#
         for t in range(0, self.N):
-            bodies = self.sim_kwargs["Integrator"](bodies, self.dt, G, variable_dt_constant)
+            bodies = self.kwargs["Integrator"](bodies, self.dt, G, variable_dt_constant)
             centreOfMass[t,:] = self.centreOfMassCalc(totalMass)
             potentialEnergy[t] = self.calculatePotentialEnergy()
             kineticEnergy[t] = self.kineticEnergies()
             angularMomentum[t,:] = self.angularMomentum()
             for p in range(0,self.n):
                 simulation[t,:,p] = np.concatenate((bodies[p].position, bodies[p].velocity), axis=None)
-        simulationSettings = np.array([self.N, self.dt, self.n, self.sim_kwargs["G"]])
+        simulationSettings = np.array([self.N, self.dt, self.n, self.kwargs["G"]])
 
         path = os.path.join(os.getcwd(), "Python\\Outputs")
         
@@ -112,7 +112,7 @@ class Simulation():
             for i, body in enumerate(bodies):
                 simulation[t,:,i] = np.concatenate((body.position, body.velocity), axis=None)
 
-        simulationSettings = np.array([self.N, self.dt, self.n, self.sim_kwargs["G"]])
+        simulationSettings = np.array([self.N, self.dt, self.n, self.kwargs["G"]])
         np.savetxt(os.path.join(path, "simulationSettings.csv"), simulationSettings, delimiter=",")
         for i in range(self.n):
             np.savetxt(os.path.join(path, "output" + str(i) + ".csv"), simulation[:,:,i], delimiter=",")

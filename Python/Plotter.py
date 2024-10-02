@@ -8,7 +8,7 @@ import Body
 from matplotlib.animation import FuncAnimation
 
 class Plotter():
-    def __init__(self, outputDirectory, **plot_kwargs):
+    def __init__(self, outputDirectory, **kwargs):
         self.outputDirectory = outputDirectory
         defaultKwargs = {
                         "plot_3D":True,
@@ -21,7 +21,7 @@ class Plotter():
                         "animate_fps":30,
                         "runFast":False
                         }
-        self.plot_kwargs = defaultKwargs | plot_kwargs
+        self.kwargs = defaultKwargs | kwargs
         
     def plot(self):
         self.read_data()
@@ -29,28 +29,31 @@ class Plotter():
         ##### Orbit plot #####
         fig_orbits = plt.figure("Orbits")
         fig_orbits.set_size_inches(7.5, 7.5)
-        #3D or 2D plot
-        if self.plot_kwargs["plot_3D"]: 
+        
+        if self.kwargs["plot_3D"]: 
             ax_orbits = plt.axes(projection='3d') 
         else: 
             ax_orbits = plt.axes()
+            
         self.add_orbits(fig_orbits, ax_orbits)
-        if self.plot_kwargs["plot_centre_of_mass"]:
+        
+        if self.kwargs["plot_centre_of_mass"]:
             self.add_centre_of_mass(fig_orbits, ax_orbits)
+            
         fig_orbits.legend()
              
         #Other plots
-        if self.plot_kwargs["plot_energy"]:
+        if self.kwargs["plot_energy"]:
             self.plot_energy()
-        if self.plot_kwargs["plot_energy_error"]:
+        if self.kwargs["plot_energy_error"]:
             self.plot_energy_error()
-        if self.plot_kwargs["plot_angular_momentum_error"]:
+        if self.kwargs["plot_angular_momentum_error"]:
             self.plot_angular_momentum_error()
         
         plt.show()
         
         #Animation
-        if self.plot_kwargs["animate_orbits"]:
+        if self.kwargs["animate_orbits"]:
             self.animate_orbits()
             
     def read_data(self):
@@ -73,13 +76,13 @@ class Plotter():
                 data = np.loadtxt(f, delimiter=",")
                 self.bodies[:,:,i] = data
 
-        if not self.plot_kwargs["runFast"]:
-            if self.plot_kwargs["plot_centre_of_mass"]:
+        if not self.kwargs["runFast"]:
+            if self.kwargs["plot_centre_of_mass"]:
                 self.centreOfMass = np.zeros((self.N, 3), dtype=float)
                 with open(os.path.join(outputDirectory, "centreOfMass.csv"), 'r') as f:
                     self.centreOfMass[:,:] = np.loadtxt(f, delimiter=",")
                     
-            if self.plot_kwargs["plot_energy"] or self.plot_kwargs["plot_energy_error"]:
+            if self.kwargs["plot_energy"] or self.kwargs["plot_energy_error"]:
                 self.potentialEnergy = np.zeros((self.N), dtype=float)
                 self.kineticEnergy = np.zeros((self.N), dtype=float)
                 with open(os.path.join(outputDirectory, "potentialEnergy.csv"), 'r') as f:
@@ -87,7 +90,7 @@ class Plotter():
                 with open(os.path.join(outputDirectory, "kineticEnergy.csv"), 'r') as f:
                     self.kineticEnergy = np.loadtxt(f, delimiter=",")
             
-            if self.plot_kwargs["plot_angular_momentum_error"]:
+            if self.kwargs["plot_angular_momentum_error"]:
                 self.angularMomentum = np.zeros((self.N, 3), dtype=float)
                 with open(os.path.join(outputDirectory, "angularMomentum.csv"), 'r') as f:
                     self.angularMomentum = np.loadtxt(f, delimiter=",")
@@ -163,7 +166,7 @@ class Plotter():
         max_range = self.determine_max_range(self.bodies) * 1.1
         
         # Check if 3D plotting is enabled
-        if self.plot_kwargs["plot_3D"]:
+        if self.kwargs["plot_3D"]:
             # Add 3D axes to the figure
             ax = plt.axes(projection='3d')
         else:
@@ -172,7 +175,7 @@ class Plotter():
             
         # Create a list of line objects for each body with unique colors
         colors = plt.cm.hsv(np.linspace(0.1, 1, self.n))
-        if self.plot_kwargs["plot_3D"]:
+        if self.kwargs["plot_3D"]:
             lines = [ax.plot([], [], [], color=colors[i], alpha=0.5)[0] for i in range(self.n)]
             points = [ax.plot([], [], [], 'o', color=colors[i], alpha=1, label='Body ' + str(i))[0] for i in range(self.n)]
             com_line, = ax.plot([], [], [], alpha=0.5, color='grey')
@@ -184,7 +187,7 @@ class Plotter():
             com_point, = ax.plot([], [], 'o', alpha=1, label="Centre of Mass", color='grey')
 
         def init():
-            if self.plot_kwargs["plot_3D"]:
+            if self.kwargs["plot_3D"]:
                 # Set the limits for the 3D plot based on the bodies' positions
                 ax.set_xlim3d([-max_range, max_range])
                 ax.set_ylim3d([-max_range, max_range])
@@ -215,7 +218,7 @@ class Plotter():
             return lines + points + [com_line, com_point]
 
         def update(frame):
-            if self.plot_kwargs["plot_3D"]:
+            if self.kwargs["plot_3D"]:
                 # Update the lines and points for each body up to the current frame
                 for i, (line, point) in enumerate(zip(lines, points)):
                     line.set_data(self.bodies[:frame, 0, i], self.bodies[:frame, 1, i])
@@ -239,11 +242,11 @@ class Plotter():
             return lines + points + [com_line, com_point]
 
         # Create the animation using the update function and the number of frames
-        ani = FuncAnimation(fig, update, frames=self.N, init_func=init, blit=True, interval=self.N/self.plot_kwargs["animate_fps"])
+        ani = FuncAnimation(fig, update, frames=self.N, init_func=init, blit=True, interval=self.N/self.kwargs["animate_fps"])
         # Display the animation
         fig.legend()
-        if self.plot_kwargs["animate_save"]:
-            video_writer = animation.FFMpegWriter(fps=self.plot_kwargs["animate_fps"], bitrate=5000)
+        if self.kwargs["animate_save"]:
+            video_writer = animation.FFMpegWriter(fps=self.kwargs["animate_fps"], bitrate=5000)
             ani.save("animation.mp4", writer=video_writer)
             print("Animation saved as 'animation.mp4'")
         else:
