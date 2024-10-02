@@ -6,6 +6,7 @@ class Body():
         self.mass = mass
         self.position = position
         self.velocity = velocity
+        self.acceleration = np.zeros(3, dtype=float)
         self.plot_colour = plot_colour
         self.G = G
         
@@ -18,9 +19,10 @@ class Body():
     #         kinetic_energy[i] = T
     #     return kinetic_energy
             
-    # def determine_acceleration(self, other_bodies):
-    #     self.acceleration = np.array([0,0,0], dtype=float)
-    #     for other_body in other_bodies:
-    #         direction = other_body.position - self.position
-    #         self.acceleration = -self.G * other_body.mass * direction / (np.linalg.norm(direction)**3)
+    def calculate_acceleration(self, bodies):
+        self.acceleration = np.zeros(3, dtype=float)
+        for other_body in bodies:
+            if other_body != self:
+                direction = self.position - other_body.position
+                self.acceleration += -self.G * other_body.mass * direction / (np.linalg.norm(direction)**3)
             

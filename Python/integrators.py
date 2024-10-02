@@ -7,16 +7,14 @@ def symplecticEuler(bodies, acceleration, dt, G=1, variable_dt_constant=None):
     """
     The symplectic euler numerical method, calculates the velocity at timestep n+1 using it along with the n position step to calculate the position at n+1
     """
+    for body in bodies:
+            body.calculate_acceleration(bodies)
     
-    if variable_dt_constant is None:
-        for (i, body) in enumerate(bodies):
-            body.velocity += dt * acceleration[i, :]
-            body.position += dt * body.velocity  
-    else:
-        for (i, body) in enumerate(bodies):
-            variable_dt = variable_dt_constant * np.linalg.norm(body.position) / np.linalg.norm(body.velocity)
-            body.velocity += variable_dt * acceleration[i, :]
-            body.position += variable_dt * body.velocity 
+    for body in bodies:
+        if variable_dt_constant is not None:
+            dt = variable_dt_constant * np.linalg.norm(body.position) / np.linalg.norm(body.velocity)
+        body.velocity += dt * body.acceleration
+        body.position += dt * body.velocity 
         
     return bodies
 

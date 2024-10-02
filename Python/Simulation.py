@@ -26,8 +26,8 @@ class Simulation():
 ###################################################
 
     def angularMomentum(self):
-        summation = np.sum([body.mass * np.cross(body.position, body.velocity) for body in self.bodies], axis=0)
-        return summation
+        L = np.sum([body.mass * np.cross(body.position, body.velocity) for body in self.bodies], axis=0)
+        return L
 
     def centreOfMassCalc(self, totalMass):
         summation = np.sum([body.mass * body.position for body in self.bodies], axis=0) 

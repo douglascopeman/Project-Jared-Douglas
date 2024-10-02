@@ -79,7 +79,7 @@ class Plotter():
                 with open(os.path.join(outputDirectory, "centreOfMass.csv"), 'r') as f:
                     self.centreOfMass[:,:] = np.loadtxt(f, delimiter=",")
                     
-            if self.plot_kwargs["plot_energy"]:
+            if self.plot_kwargs["plot_energy"] or self.plot_kwargs["plot_energy_error"]:
                 self.potentialEnergy = np.zeros((self.N), dtype=float)
                 self.kineticEnergy = np.zeros((self.N), dtype=float)
                 with open(os.path.join(outputDirectory, "potentialEnergy.csv"), 'r') as f:
