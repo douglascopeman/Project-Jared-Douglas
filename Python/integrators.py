@@ -1,30 +1,47 @@
 import numpy as np 
 import Simulation
 from numpy import linalg as LA
+import copy
+
+def get_variable_dt_helper(bodies, variable_dt_constant):
+    """
+    Calculates the desired timestep at the current frame
+    """
+    # Initialising the possible timesteps
+    possible_dts = np.zeros(len(bodies), dtype=float)
+
+    # Each possible timestep equal to the constant times one ove rthe acceleration of the body
+    for (i, body) in enumerate(bodies):
+        possible_dts[i] = variable_dt_constant * 1 / np.linalg.norm(body.velocity)
+
+    return min(possible_dts) # We pick the smallest of the timesteps 
+
+def get_variable_dt(bodies, variable_dt_constant):
+
+    temp_dt = get_variable_dt_helper(bodies, variable_dt_constant)  # We find the temporary timestep moving forwards
+    temp_bodies = copy.deepcopy(symplecticEuler(bodies, temp_dt))                  # We find the temporary state moving forwards
+    for body in temp_bodies:
+        body.velocity = -1*body.velocity                  # Reversing state direction
+
+    temp_dt_backwards = get_variable_dt_helper(temp_bodies, variable_dt_constant)
+    average_dt = (temp_dt+temp_dt_backwards)/2
+    return average_dt
 
     
 def symplecticEuler(bodies, dt, G=1, variable_dt_constant=None):
     """
     The symplectic euler numerical method, calculates the velocity at timestep n+1 using it along with the n position step to calculate the position at n+1
     """
+    # Finding the acceleration of each body
     for body in bodies:
             body.calculate_acceleration(bodies)
-    
+
     if variable_dt_constant is not None:
-        for body in bodies:
-            dt = variable_dt_constant * np.linalg.norm(body.position) / np.linalg.norm(body.velocity)
-            body.velocity += dt/2 * body.acceleration # half step velocity
-            dt = variable_dt_constant * np.linalg.norm(body.position) / np.linalg.norm(body.velocity)
-            body.position += dt * body.velocity  # full step position
-            dt = variable_dt_constant * np.linalg.norm(body.position) / np.linalg.norm(body.velocity)
-        for body in bodies:
-            body.calculate_acceleration(bodies) # update accelerations
-        for body in bodies:
-            body.velocity += dt/2 * body.acceleration # half step velocity
-    else:
-        for body in bodies:
-            body.velocity += dt * body.acceleration
-            body.position += dt * body.velocity
+        dt = get_variable_dt(bodies, variable_dt_constant)
+    
+    for body in bodies:
+        body.velocity += dt * body.acceleration
+        body.position += dt * body.velocity 
         
     return bodies
 
@@ -49,7 +66,7 @@ def Euler(bodies, dt, G=1, variable_dt_constant=None):
 
 
 # changed to use body class's acceleration calculation. Still needs to be tested
-def ThreeStepLeapFrog(bodies, dt, G, variable_dt_constant=None):
+def threeStepLeapFrog(bodies, dt, G, variable_dt_constant=None):
     """
     The 3-Step Leapfrog method in "kick-drift-kick" form is both symplectic and can take a variable timestep
     """
