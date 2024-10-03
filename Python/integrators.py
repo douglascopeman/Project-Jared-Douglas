@@ -45,6 +45,28 @@ def symplecticEuler(bodies, dt, G=1, variable_dt_constant=None):
         
     return bodies
 
+def symplecticEulerHalfSteps(bodies, dt, G=1, variable_dt_constant=None):
+    for body in bodies:
+        body.calculate_acceleration(bodies)
+        
+    if variable_dt_constant is not None:
+        for body in bodies:
+            dt = variable_dt_constant * np.linalg.norm(body.position) / np.linalg.norm(body.velocity)
+            body.velocity += dt/2 * body.acceleration
+            dt = variable_dt_constant * np.linalg.norm(body.position) / np.linalg.norm(body.velocity)
+            body.position += dt * body.velocity
+            dt = variable_dt_constant * np.linalg.norm(body.position) / np.linalg.norm(body.velocity)
+        for body in bodies:
+            body.calculate_acceleration(bodies)
+        for body in bodies:
+            body.velocity += dt/2 * body.acceleration
+    else:
+        body.velocity += dt * body.acceleration
+        body.position += dt * body.velocity
+        
+    return bodies
+            
+
 def Euler(bodies, dt, G=1, variable_dt_constant=None):
     """
     The symplectic euler numerical method, calculates the velocity at timestep n+1 using it along with the n position step to calculate the position at n+1
