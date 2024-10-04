@@ -25,6 +25,10 @@ class Simulation():
 # Simulation Calculations
 ###################################################
 
+    def linearMomentum(self):
+        p = np.sum([body.mass*body.velocity for body in self.bodies], axis=0)
+        return p
+
     def angularMomentum(self):
         L = np.sum([body.mass * np.cross(body.position, body.velocity) for body in self.bodies], axis=0)
         return L
@@ -75,6 +79,7 @@ class Simulation():
         potentialEnergy = np.zeros((self.N), dtype=float)
         kineticEnergy = np.zeros((self.N), dtype=float)
         angularMomentum = np.zeros((self.N, 3), dtype=float)
+        linearMomentum = np.zeros((self.N,3), dtype=float)
         G = self.kwargs["G"]
         variable_dt_constant = self.kwargs["variable_dt_constant"]
         
@@ -85,6 +90,7 @@ class Simulation():
             potentialEnergy[t] = self.calculatePotentialEnergy()
             kineticEnergy[t] = self.kineticEnergies()
             angularMomentum[t,:] = self.angularMomentum()
+            linearMomentum[t,:] = self.linearMomentum()
             for p in range(0,self.n):
                 simulation[t,:,p] = np.concatenate((bodies[p].position, bodies[p].velocity), axis=None)
         simulationSettings = np.array([self.N, self.dt, self.n, self.kwargs["G"]])
@@ -97,6 +103,7 @@ class Simulation():
         np.savetxt(os.path.join(path, "potentialEnergy.csv"), potentialEnergy, delimiter=",")
         np.savetxt(os.path.join(path, "kineticEnergy.csv"), kineticEnergy, delimiter=",")
         np.savetxt(os.path.join(path, "angularMomentum.csv"), angularMomentum, delimiter=",")
+        np.savetxt(os.path.join(path, "linearMomentum.csv"), linearMomentum, delimiter=',')
         for i in range(self.n):
             np.savetxt(os.path.join(path, ("output"+ str(i)+ ".csv")), simulation[:,:,i], delimiter=",")
 

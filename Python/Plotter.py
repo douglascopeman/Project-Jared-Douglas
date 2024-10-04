@@ -16,6 +16,7 @@ class Plotter():
                         "plot_energy":False,
                         "plot_energy_error":False,
                         "plot_angular_momentum_error":False,
+                        "plot_linear_momentum_error":False,
                         "animate_orbits":False,
                         "animate_save":False,
                         "animate_fps":30,
@@ -49,7 +50,9 @@ class Plotter():
             self.plot_energy_error()
         if self.kwargs["plot_angular_momentum_error"]:
             self.plot_angular_momentum_error()
-        
+        if self.kwargs["plot_linear_momentum_error"]:
+            self.plot_linear_momentum_error()
+    
         plt.show()
         
         #Animation
@@ -94,6 +97,11 @@ class Plotter():
                 self.angularMomentum = np.zeros((self.N, 3), dtype=float)
                 with open(os.path.join(outputDirectory, "angularMomentum.csv"), 'r') as f:
                     self.angularMomentum = np.loadtxt(f, delimiter=",")
+
+            if self.kwargs["plot_linear_momentum_error"]:
+                self.linearMomentum = np.zeros((self.N, 3), dtype=float)
+                with open(os.path.join(outputDirectory, "linearMomentum.csv"), 'r') as f:
+                    self.linearMomentum = np.loadtxt(f, delimiter=",")
             
             
     def determine_max_range(self, bodies):
@@ -157,6 +165,18 @@ class Plotter():
         ax_energy_error.set_xlabel("Time")
         ax_energy_error.set_ylabel("Angular Momentum (kg-m^2/s)")
         ax_energy_error.set_title("Relative Angular Momentum Error of the System over Time")
+
+    def plot_linear_momentum_error(self):
+        fig_linear_momentum_error = plt.figure("Linear Momentum Error")
+        ax_energy_error = fig_linear_momentum_error.add_subplot()
+
+        initial_linear_momentum = self.linearMomentum[0]
+        linear_momentum_error = [np.abs((self.linearMomentum[t] - initial_linear_momentum)/initial_linear_momentum) for t in range(0, self.N)]
+        print(linear_momentum_error)
+        ax_energy_error.plot(linear_momentum_error)
+        ax_energy_error.set_xlabel("Time")
+        ax_energy_error.set_ylabel("Linear Momentum (kg ms^-1)")
+        ax_energy_error.set_title("Relative Linear Momentum Error of the System over Time")
           
     # The below is generated code
     def animate_orbits(self):
