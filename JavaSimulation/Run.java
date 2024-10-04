@@ -9,6 +9,11 @@ public class Run{
         int N = Integer.parseInt(args[0]);
         double dt = Double.parseDouble(args[1]);
         Simulation simulation = new Simulation(bodies, N, dt);
+
+        long statTime = System.currentTimeMillis();
         simulation.run();
+        long endTime = System.currentTimeMillis();
+
+        System.out.println("Time: " + (endTime - statTime) + "ms");
     }
 }
