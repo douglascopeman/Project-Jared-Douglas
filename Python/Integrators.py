@@ -55,10 +55,10 @@ def symplecticEulerHalfSteps(bodies, dt, G=1, variable_dt_constant=None):
             body.velocity += dt/2 * body.acceleration
             dt = variable_dt_constant * np.linalg.norm(body.position) / np.linalg.norm(body.velocity)
             body.position += dt * body.velocity
-            dt = variable_dt_constant * np.linalg.norm(body.position) / np.linalg.norm(body.velocity)
         for body in bodies:
             body.calculate_acceleration(bodies)
         for body in bodies:
+            dt = variable_dt_constant * np.linalg.norm(body.position) / np.linalg.norm(body.velocity)
             body.velocity += dt/2 * body.acceleration
     else:
         body.velocity += dt * body.acceleration
@@ -80,14 +80,6 @@ def Euler(bodies, dt, G=1, variable_dt_constant=None):
             
     return bodies
 
-# def calculateAccelerations(bodies, G):
-#     acceleration = np.zeros((len(bodies),3), dtype=float)
-#     for i, body in enumerate(bodies):
-#         acceleration[i,:] = np.sum([((-G * other_body.mass) / ((LA.norm(body.position - other_body.position))**3)) * (body.position - other_body.position) for other_body in bodies if other_body != body], axis=0)
-#         return acceleration
-
-
-# changed to use body class's acceleration calculation. Still needs to be tested
 def threeStepLeapFrog(bodies, dt, G, variable_dt_constant=None):
     """
     The 3-Step Leapfrog method in "kick-drift-kick" form is both symplectic and can take a variable timestep
