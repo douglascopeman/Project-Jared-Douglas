@@ -172,7 +172,6 @@ class Plotter():
 
         initial_linear_momentum = self.linearMomentum[0]
         linear_momentum_error = [np.abs((self.linearMomentum[t] - initial_linear_momentum)/initial_linear_momentum) for t in range(0, self.N)]
-        print(linear_momentum_error)
         ax_energy_error.plot(linear_momentum_error)
         ax_energy_error.set_xlabel("Time")
         ax_energy_error.set_ylabel("Linear Momentum (kg ms^-1)")

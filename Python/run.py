@@ -19,12 +19,12 @@ simulation.run()
 
 plotter = Plotter.Plotter("Python\Outputs", 
                           runFast=False, 
-                          plot_centre_of_mass=False, 
+                          plot_centre_of_mass=True, 
                           plot_energy=False, 
                           plot_energy_error=True, 
-                          animate_orbits=False, 
+                          animate_orbits=True, 
                           plot_angular_momentum_error = False, 
-                          plot_linear_momentum_error=True, 
+                          plot_linear_momentum_error=False, 
                           plot_3D=False)
 plotter.plot()
 
