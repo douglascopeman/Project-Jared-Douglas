@@ -1,4 +1,6 @@
 #include <iostream>
+#include <vector>
+using namespace std;
 
 class Body{
 public:
@@ -6,8 +8,12 @@ public:
     //Default Constructor
     Body() {}
 
-    double calculateAcceleration() {
-        return 0;
+    double calculateAcceleration(vector<Body> bodies) {
+        for(Body otherBody : bodies){
+            if(otherBody != *this){
+                vector<double> direction = *this->position - otherBody.position
+            }
+        }
     }
 
 private:
@@ -15,4 +21,5 @@ private:
     double position[3];
     double velocity[3];
     double acceleration[3];
+    float G = 1
 };
