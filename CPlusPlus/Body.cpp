@@ -11,7 +11,7 @@ public:
     double calculateAcceleration(vector<Body> bodies) {
         for(Body otherBody : bodies){
             if(otherBody != *this){
-                vector<double> direction = *this->position - otherBody.position
+                vector<double> direction = *this->position - otherBody.position;
             }
         }
     }
