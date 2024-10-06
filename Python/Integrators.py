@@ -100,3 +100,17 @@ def threeStepLeapFrog(bodies, dt, G, variable_dt_constant=None):
         body.velocity = halfVelocity[i,:] + body.acceleration * dt/2
 
     return bodies
+
+def forestRuth(bodies, dt, G, variable_dt_constatn = None):
+    # Initialising constants
+    C1, C4 = 1/(2*(2-2**(1/3)))
+    C2, C3 = (1-2**(1/3))/(2*(2-2**(1/3)))
+    D1, D3 = 1/(2-2**(1/3))
+    D2 = -2**(1/3)/(2-2**(1/3))
+    D4 = 0
+
+    
+    for body in bodies:
+        body.calculate_acceleration(bodies)
+        x0 = body.velocity
+        x1 = x0 + 
