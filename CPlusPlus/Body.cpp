@@ -11,7 +11,6 @@ private:
     Vector position;
     Vector velocity;
     Vector acceleration;
-    float G = 1;
 
 public:
 
@@ -22,7 +21,7 @@ public:
         this->mass = mass;
     }
 
-    double calculateAcceleration(Body bodies[]) {
+    double calculateAcceleration(Body bodies[], double G) {
         Vector acceleration = Vector(0, 0, 0);
         for (int i = 0; i < sizeof(bodies); i++) {
             if (&bodies[i] != this) {
@@ -30,5 +29,13 @@ public:
                 acceleration = acceleration + positionDifference.scalarMultiply(-G * bodies[i].mass / pow(positionDifference.norm(), 3));
             }
         }
+    }
+
+    double calculateAcceleration(Body bodies[]) {
+        return calculateAcceleration(bodies, 1);
+    }
+
+    Vector acceleration() {
+        return acceleration;
     }
 };
