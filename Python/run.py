@@ -9,7 +9,7 @@ import time
 N = 5000 #rename to N
 dt = 0.02
 
-simulation = Simulation.Simulation(N, dt, orbit_examples.figure_eight, Integrator=Integrators.symplecticEuler)
+simulation = Simulation.Simulation(N, dt, orbit_examples.figure_eight, Integrator=Integrators.threeStepLeapFrog)
 
 # start = time.time()
 simulation.run()
@@ -22,7 +22,7 @@ plotter = Plotter.Plotter("Python\Outputs",
                           plot_centre_of_mass=True, 
                           plot_energy=False, 
                           plot_energy_error=True, 
-                          animate_orbits=True, 
+                          animate_orbits=False, 
                           plot_angular_momentum_error = False, 
                           plot_linear_momentum_error=False, 
                           plot_3D=False)

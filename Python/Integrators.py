@@ -110,7 +110,9 @@ def forestRuth(bodies, dt, G, variable_dt_constatn = None):
     D4 = 0
 
     
-    for body in bodies:
-        body.calculate_acceleration(bodies)
-        x0 = body.velocity
-        x1 = x0 + 
+    # for body in bodies:
+    #     body.calculate_acceleration(bodies)
+    #     x0 = body.velocity
+    #     x1 = x0 + 
+
+    return None
