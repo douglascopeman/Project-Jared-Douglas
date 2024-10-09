@@ -1,41 +1,33 @@
 #include <iostream>
-#include "Vector.cpp"
+#include <vector>
+#include "Vector.h"
+#include "Body.h"
 using namespace std;
 
-class Body{
-private:
-    float mass = 1;
-    // double position[3];
-    // double velocity[3];
-    // double acceleration[3];
-    Vector position;
-    Vector velocity;
-    Vector acceleration;
 
-public:
+/**
+ * @brief Constructs a new Body object with the given position, velocity, and mass.
+ * 
+ * @param position The initial position of the body.
+ * @param velocity The initial velocity of the body.
+ * @param mass The mass of the body.
+ */
+Body::Body(Vector position, Vector velocity, double mass) 
+: position(position), velocity(velocity), mass(mass) {}
 
-    //Default Constructor
-    Body(Vector position, Vector velocity, double mass) {
-        this->position = position;
-        this->velocity = velocity;
-        this->mass = mass;
-    }
+Body::Body(Vector position, Vector velocity) : position(position), velocity(velocity), mass(1) {}
 
-    double calculateAcceleration(Body bodies[], double G) {
-        Vector acceleration = Vector(0, 0, 0);
-        for (int i = 0; i < sizeof(bodies); i++) {
-            if (&bodies[i] != this) {
-                Vector positionDifference = bodies[i].position - position;
-                acceleration = acceleration + positionDifference.scalarMultiply(-G * bodies[i].mass / pow(positionDifference.norm(), 3));
-            }
+void Body::calculateAcceleration(std::vector<Body> bodies, double G) {
+    for (Body otherBody : bodies) {
+        if (this != &otherBody) {
+            Vector direction = position - otherBody.position;
+            double r_norm = direction.norm();
+            double r_norm_cubed = r_norm * r_norm * r_norm;
+            acceleration = acceleration + direction.scalarMultiply(-G * otherBody.mass / r_norm_cubed);
         }
     }
+}
 
-    double calculateAcceleration(Body bodies[]) {
-        return calculateAcceleration(bodies, 1);
-    }
-
-    Vector acceleration() {
-        return acceleration;
-    }
-};
+void Body::calculateAcceleration(std::vector<Body> bodies) {
+    Body::calculateAcceleration(bodies, 1);
+}
