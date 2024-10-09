@@ -31,3 +31,23 @@ void Body::calculateAcceleration(std::vector<Body> bodies, double G) {
 void Body::calculateAcceleration(std::vector<Body> bodies) {
     Body::calculateAcceleration(bodies, 1);
 }
+
+void Body::setPosition(Vector position) {
+    this->position = position;
+}
+
+void Body::setVelocity(Vector velocity) {
+    this->velocity = velocity;
+}
+
+Vector Body::getPosition() {
+    return position;
+}
+
+Vector Body::getVelocity() {
+    return velocity;
+}
+
+Vector Body::getAcceleration() {
+    return acceleration;
+}

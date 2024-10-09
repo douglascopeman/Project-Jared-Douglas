@@ -1,13 +1,16 @@
 #include <iostream>
 #include <cmath>
+#include <vector>
+#include "Vector.h"
+#include "Body.h"
+#include "Simulation.h"
 
-class Simulation {
-    public:
-    Bodies bodies;
-    int n;
-    int Ν;
-    double dt;
-    Simulation(Bodies bodies, int n, int N, double dt){
-     
+Simulation::Simulation(std::vector<Body> bodies, int n, int N, double dt) : bodies(bodies), n(n), N(N), dt(dt) {}
+
+void Simulation::run() {
+    std::vector<std::vector<std::vector<double>>> sim(N, std::vector<std::vector<double>>(6, std::vector<double>(n)));
+    for (int i = 0; i < N; i++) {
+        
+
     }
 }
