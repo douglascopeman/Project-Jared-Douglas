@@ -1,5 +1,6 @@
 #include <iostream>
 #include <array>
+#include <cmath>
 #include "Vector.h"
 
 Vector::Vector() : elements{0.0, 0.0, 0.0} {}
