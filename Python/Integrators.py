@@ -1,30 +1,26 @@
 import numpy as np 
 import Simulation
 from numpy import linalg as LA
+from itertools import combinations 
 import copy
 
 def get_variable_dt_helper(bodies, variable_dt_constant):
     """
     Calculates the desired timestep at the current frame
     """
-    # Initialising the possible timesteps
-    possible_dts = np.zeros(len(bodies), dtype=float)
+    body_pairs = list(combinations(bodies, 2))
+    max_relative_velocity = max([LA.norm(body1.velocity - body2.velocity) for body1, body2 in body_pairs])
+    min_relative_position = min([LA.norm(body1.position - body2.position) for body1, body2 in body_pairs])
 
-    # Each possible timestep equal to the constant times one ove rthe acceleration of the body
-    for (i, body) in enumerate(bodies):
-        possible_dts[i] = variable_dt_constant * 1 / np.linalg.norm(body.velocity)
-
-    return min(possible_dts) # We pick the smallest of the timesteps 
+    return variable_dt_constant * max_relative_velocity / min_relative_position
 
 def get_variable_dt(bodies, variable_dt_constant):
-
     temp_dt = get_variable_dt_helper(bodies, variable_dt_constant)  # We find the temporary timestep moving forwards
-    temp_bodies = copy.deepcopy(symplecticEuler(bodies, temp_dt))                  # We find the temporary state moving forwards
-    for body in temp_bodies:
-        body.velocity = -1*body.velocity                  # Reversing state direction
+    temp_bodies = copy.deepcopy(symplecticEuler(bodies, temp_dt))   # We find the temporary state moving forwards
 
     temp_dt_backwards = get_variable_dt_helper(temp_bodies, variable_dt_constant)
     average_dt = (temp_dt+temp_dt_backwards)/2
+    print(temp_dt-temp_dt_backwards)
     return average_dt
 
     

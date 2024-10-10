@@ -6,10 +6,10 @@ from orbit_examples import orbit_examples
 import Integrators
 import time
 
-N = 5000 #rename to N
-dt = 0.02
+N = 10000 #rename to N
+dt = 0.005
 
-simulation = Simulation.Simulation(N, dt, orbit_examples.figure_eight, Integrator=Integrators.threeStepLeapFrog)
+simulation = Simulation.Simulation(N, dt, orbit_examples.elliptical, Integrator=Integrators.symplecticEuler, variable_dt_constant = 0.1)
 
 # start = time.time()
 simulation.run()
@@ -23,7 +23,7 @@ plotter = Plotter.Plotter("Python\Outputs",
                           plot_energy=False, 
                           plot_energy_error=True, 
                           animate_orbits=False, 
-                          plot_angular_momentum_error = False, 
+                          plot_angular_momentum_error = True, 
                           plot_linear_momentum_error=False, 
                           plot_3D=False)
 plotter.plot()
