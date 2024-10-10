@@ -51,17 +51,6 @@ class Simulation():
         '''Calculates the kinetic energy of the body at each timestep and returns the result as a numpy array'''
         kinetic_energy = np.sum([np.dot(body.velocity, body.velocity) * body.mass / 2 for body in self.bodies])
         return kinetic_energy
-
-    ##### DEPRECATED #####
-    # def calculateAccelerations(self):
-    #     """
-    #     Compute the acceleration between n bodies in the x,y and z axes. The output will be a nx3 array.
-    #     """
-    #     G = self.sim_kwargs["G"]
-    #     acceleration = np.zeros((self.n,3), dtype=float)
-    #     for i, body in enumerate(self.bodies):
-    #         acceleration[i,:] = np.sum([((-G * other_body.mass) / ((LA.norm(body.position - other_body.position))**3)) * (body.position - other_body.position) for other_body in self.bodies if other_body != body], axis=0)
-    #     return acceleration
     
 ###################################################
 # Run Model
