@@ -2,7 +2,6 @@
 #define INTERGRATORS_H
 
 #include <vector>
-#include "Vector.h"
 #include "Body.h"
 
 class Integrators {

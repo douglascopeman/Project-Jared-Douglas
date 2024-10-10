@@ -2,7 +2,6 @@
 #define SIMULATION_H
 
 #include <vector>
-#include "Vector.h"
 #include "Body.h"
 
 class Simulation {
@@ -13,7 +12,7 @@ private:
     double dt;
 
 public:
-    Simulation(std::vector<Body> bodies, int n, int N, double dt) : bodies(bodies), n(n), N(N), dt(dt) {};
+    Simulation(std::vector<Body> bodies, int N, double dt) : bodies(bodies), n(bodies.size()), N(N), dt(dt) {};
     void run();
 };
 

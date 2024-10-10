@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-#include "Vector.h"
+// #include "Vector.h"
 #include "Body.h"
 #include "Integrators.h"
 using namespace std;
