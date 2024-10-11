@@ -18,6 +18,7 @@ class Simulation():
                         "Integrator":Integrators.symplecticEuler,
                         "G":1,
                         "variable_dt_constant":None,
+                        "focus_on_body": None,
                         }
         self.kwargs = defaultKwargs | kwargs
 
@@ -30,7 +31,11 @@ class Simulation():
         return p
 
     def angularMomentum(self):
-        L = np.sum([body.mass * np.cross(body.position, body.velocity) for body in self.bodies], axis=0)
+        if self.kwargs["focus_on_body"] is not None:
+            body = self.bodies[self.kwargs["focus_on_body"]]
+            L = body.mass * np.cross(body.position, body.velocity)
+        else:
+            L = np.sum([body.mass * np.cross(body.position, body.velocity) for body in self.bodies], axis=0)
         return L
 
     def centreOfMassCalc(self, totalMass):

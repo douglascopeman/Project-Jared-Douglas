@@ -6,10 +6,10 @@ from orbit_examples import orbit_examples
 import Integrators
 import time
 
-N = 10000 #rename to N
-dt = 0.005
+N = 5000 #rename to N
+dt = 0.01
 
-simulation = Simulation.Simulation(N, dt, orbit_examples.elliptical, Integrator=Integrators.symplecticEuler, variable_dt_constant = 0.1)
+simulation = Simulation.Simulation(N, dt, orbit_examples.elliptical)
 
 # start = time.time()
 simulation.run()
