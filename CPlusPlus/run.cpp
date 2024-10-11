@@ -9,7 +9,7 @@ int main() {
     std::vector<Body> bodies = {body1, body2};
 
     // Create a Simulation object
-    Simulation simulation(bodies, 5000, 0.01);
+    Simulation simulation(bodies, 10, 0.1);
 
     simulation.run();
 

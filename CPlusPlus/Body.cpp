@@ -20,6 +20,7 @@ void Body::calculateAcceleration(std::vector<Body> bodies, double G) {
     for (Body otherBody : bodies) {
         if (this != &otherBody) {
             Vector direction = position - otherBody.position;
+            direction.print();
             double r_norm = direction.norm();
             double r_norm_cubed = r_norm * r_norm * r_norm;
             acceleration = acceleration + direction.scalarMultiply(-G * otherBody.mass / r_norm_cubed);
@@ -31,12 +32,12 @@ void Body::calculateAcceleration(std::vector<Body> bodies) {
     Body::calculateAcceleration(bodies, 1);
 }
 
-void Body::setPosition(Vector position) {
-    this->position = position;
+void Body::setPosition(Vector newPosition) {
+    position = newPosition;
 }
 
-void Body::setVelocity(Vector velocity) {
-    this->velocity = velocity;
+void Body::setVelocity(Vector newVelocity) {
+    velocity = newVelocity;
 }
 
 Vector Body::getPosition() {
