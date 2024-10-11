@@ -27,7 +27,11 @@ class Simulation():
 ###################################################
 
     def linearMomentum(self):
-        p = np.sum([body.mass*body.velocity for body in self.bodies], axis=0)
+        if self.kwargs["focus_on_body"] is not None:
+            body = self.bodies[self.kwargs["focus_on_body"]]
+            p = body.mass * body.velocity
+        else:
+            p = np.sum([body.mass*body.velocity for body in self.bodies], axis=0)
         return p
 
     def angularMomentum(self):
