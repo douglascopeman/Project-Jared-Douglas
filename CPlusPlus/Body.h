@@ -7,9 +7,9 @@
 class Body{
 private:
     float mass = 1;
-    Vector position;
-    Vector velocity;
-    Vector acceleration;
+    Vector position = Vector(0.0,0.0,0.0);
+    Vector velocity = Vector(0.0,0.0,0.0);
+    Vector acceleration = Vector(0.0,0.0,0.0);
 
 public:
     Body(Vector position = Vector(0.0,0.0,0.0), Vector velocity = Vector(0.0,0.0,0.0), double mass = 1);

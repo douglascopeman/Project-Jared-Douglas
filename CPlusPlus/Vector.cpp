@@ -3,7 +3,7 @@
 #include <cmath>
 #include "Vector.h"
 
-Vector::Vector() : elements{0.0, 0.0, 0.0} {}
+// Vector::Vector() : elements{0, 0, 0} {}
 Vector::Vector(double x, double y, double z) : elements{x, y, z} {}
 
 //Override the [] subscript operator for the Vector class

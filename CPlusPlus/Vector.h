@@ -8,7 +8,7 @@ private:
     std::array<double, 3> elements;
 
 public:
-    Vector();
+    // Vector();
     Vector(double x, double y, double z);
 
     double& operator[](int index);
