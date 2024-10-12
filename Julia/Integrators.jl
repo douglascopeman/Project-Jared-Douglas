@@ -17,8 +17,8 @@ function symplecticEuler(bodies, dt)
     # Updates the entries in each isntance of the class
     calculateAccelerations(bodies)
     for (i,body) in enumerate(bodies)
-        body.vel += dt * body.acceleration   # x-velocity 
-        body.pos += dt * body.vel      # x-position
+        body.velocity += dt * body.acceleration   # x-velocity 
+        body.position += dt * body.velocity      # x-position
 
     end
     return bodies
@@ -39,11 +39,11 @@ function yoshida(bodies,  dt)
 
     for i in range(1,4)
         for body in bodies 
-            body.pos += Cs[i]*dt*body.vel
+            body.position += Cs[i]*dt*body.velocity
         end
         calculateAccelerations(bodies)
         for body in bodies
-            body.vel += Ds[i]*dt*body.acceleration
+            body.velocity += Ds[i]*dt*body.acceleration
         end
     end
     return bodies

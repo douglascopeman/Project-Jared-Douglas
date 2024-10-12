@@ -4,9 +4,9 @@ export Body, calculateAccelerations
 using LinearAlgebra
 
 # define the Body "structure"
-Base.@kwdef mutable struct Body
-    pos::Vector{Float64} 
-    vel::Vector{Float64} 
+@kwdef mutable struct Body
+    position::Vector{Float64} = [0,0,0]
+    velocity::Vector{Float64} = [0,0,0]
     mass::Float64 = 1
     acceleration::Vector{Float64} = [0,0,0]
     G = 1
@@ -21,7 +21,7 @@ function calculateAccelerations(bodies)
     n = length(bodies)
     for (i,body) in enumerate(bodies)
         body.acceleration = sum(
-            -body.G*otherBody.mass*(body.pos - otherBody.pos)/((norm(body.pos - otherBody.pos))^3)
+            -body.G*otherBody.mass*(body.position - otherBody.position)/((norm(body.position - otherBody.position))^3)
             for otherBody in setdiff(bodies, [body]))
     end
 end
