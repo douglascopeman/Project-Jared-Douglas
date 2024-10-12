@@ -1,51 +1,28 @@
 module Simulation
 
-export runSimulation, calculateAccelerations
+export runSimulation
 
 include("Integrators.jl")
-
 
 using LinearAlgebra
 using Combinatorics
 using DelimitedFiles
+using .Integrators: symplecticEuler, yoshida
 
 G = 1
-
-# function f()
-#     print(a)
-    
-# end
-    
-"""
-    accelerationCalc(spaceData)
-
-Compute the acceleration between n bodies in the x,y and z axes. The output will be a nx3 array.
-"""
-function calculateAccelerations(bodies)
-    n = length(bodies)
-    acceleration = zeros(Float64, (n,3))
-    for (i,body) in enumerate(bodies)
-        acceleration[i,:] = sum(
-            -G*otherBody.mass*(body.pos - otherBody.pos)/((norm(body.pos - otherBody.pos))^3)
-            for otherBody in setdiff(bodies, [body]))
-    end
-    return acceleration
-end
-
 
 """
     simulation(spaceData::Vector{Body}, simLength::Int64)
 
 Builds a 3 dimensional array filled with the 3 axes position data of every body for the length of the simulaiton
 """
-function runSimulation(bodies, N, dt::Float64)
+function runSimulation(bodies, N::Int64, dt::Float64)
     nBodies = length(bodies)
     simulation = zeros(Float64, (N, 6, nBodies))  # Simulation length by axes by number of bodies
     path = raw"Julia/Outputs/"
 
     for k=1:N
-        accelerations = calculateAccelerations(bodies)     # Gives acceleration values at timestep n for all bodies and all axes
-        bodies = Integrators.symplecticEuler(bodies, accelerations, dt) # Updates each instance of the class
+        bodies = yoshida(bodies, dt) # Updates each instance of the class
         for (i,body) in enumerate(bodies)
             simulation[k,:,i] = [body.pos; body.vel]   # Fills relevent timestep and body in the array with the position data
         end
