@@ -6,13 +6,12 @@ include("Body.jl")
 using .Simulation
 
 # Defining the model space
-moon = ModelSpace.Body([1,0,0], [0,0.6,0],1)
-earth = ModelSpace.Body([-1,0,0], [0,-0.6,0], 1)
+moon = ModelSpace.Body(position = [1,0,0], velocity =[0,0.6,0])
+earth = ModelSpace.Body(position = [-1,0,0], velocity = [0,-0.6,0])
 
 bodies = [moon, earth]
 simLength = 10000
 dt = 0.01    
-
 
 @btime Simulation.runSimulation(bodies, simLength, dt)
 

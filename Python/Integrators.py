@@ -36,7 +36,7 @@ def symplecticEuler(bodies, dt, G=1, variable_dt_constant=None):
         dt = get_variable_dt(bodies, variable_dt_constant)
     
     for body in bodies:
-        body.velocity += dt * body.acceleration
+        body.velocity += dt * body.acceleration   
         body.position += dt * body.velocity 
         
     return bodies
@@ -70,7 +70,7 @@ def Euler(bodies, dt, G=1, variable_dt_constant=None):
     for body in bodies:
         body.calculate_acceleration(bodies)
     
-    for (i, body) in enumerate(bodies):
+    for body in bodies:
         body.position += dt * body.velocity  
         body.velocity += dt * body.acceleration
             
@@ -86,6 +86,8 @@ def threeStepLeapFrog(bodies, dt, G, variable_dt_constant=None):
     halfVelocity = np.zeros((len(bodies), 3), dtype=float)
     for (i, body) in enumerate(bodies):
         halfVelocity[i, :] = body.velocity + body.acceleration*dt/2
+
+    for (i, body )  in enumerate(bodies):
         body.position += halfVelocity[i,:]*dt
     
     # acceleration = calculateAccelerations(bodies, G)
@@ -97,18 +99,32 @@ def threeStepLeapFrog(bodies, dt, G, variable_dt_constant=None):
 
     return bodies
 
-def forestRuth(bodies, dt, G, variable_dt_constatn = None):
+def higherOrderHelpers(c, d, bodies, dt):
+    for body in bodies:    
+        body.position += c*dt*body.velocity
+
+    for body in bodies:
+        body.calculate_acceleration(bodies)
+
+    for body in bodies:
+        body.velocity += d*dt*body.acceleration
+    return bodies
+
+def yoshida(bodies, dt, G, variable_dt_constatn = None):
     # Initialising constants
-    C1, C4 = 1/(2*(2-2**(1/3)))
-    C2, C3 = (1-2**(1/3))/(2*(2-2**(1/3)))
-    D1, D3 = 1/(2-2**(1/3))
-    D2 = -2**(1/3)/(2-2**(1/3))
-    D4 = 0
+    Cs = np.zeros(4)
+    Ds = np.zeros(4)
+    w0 = -(2**(1/3))/(2-(2**(1/3)))
+    w1 = 1/(2-(2**(1/3)))
+    Cs[0] = w1/2
+    Cs[3] = w1/2
+    Cs[1] = (w0+w1)/2
+    Cs[2] = (w0+w1)/2
+    Ds[0] = w1
+    Ds[2] = w1
+    Ds[1] = w0
 
-    
-    # for body in bodies:
-    #     body.calculate_acceleration(bodies)
-    #     x0 = body.velocity
-    #     x1 = x0 + 
+    for i in range(0,4):
+        bodies = higherOrderHelpers(Cs[i], Ds[i], bodies, dt)
 
-    return None
+    return bodies
