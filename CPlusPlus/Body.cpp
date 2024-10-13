@@ -14,19 +14,36 @@ using namespace std;
 Body::Body(Vector position, Vector velocity, double mass) 
 : position(position), velocity(velocity), mass(mass) {}
 
-void Body::calculateAcceleration(std::vector<Body> bodies, double G) {
-    for (Body otherBody : bodies) {
-        if (this != &otherBody) {
-            Vector direction = position - otherBody.position;
-            direction.print();
+// void Body::calculateAcceleration(std::vector<Body>* bodies, double G) {
+//     for (Body otherBody : *bodies) {
+//         if (this != &otherBody) {
+//             std::cout << this << " and " << &otherBody << std::endl;
+//             Vector direction = position - otherBody.position;
+//             std::cout << "direction: ";
+//             direction.print();
+//             double r_norm = direction.norm();
+//             double r_norm_cubed = r_norm * r_norm * r_norm;
+//             acceleration = acceleration + direction.scalarMultiply(-G * otherBody.mass / r_norm_cubed);
+//         }
+//     }
+// }
+
+void Body::calculateAcceleration(std::vector<Body*> bodies, double G) {
+    for (Body* otherBody : bodies) {
+        if (this != otherBody) {
+            Vector direction = position - (*otherBody).position;
             double r_norm = direction.norm();
             double r_norm_cubed = r_norm * r_norm * r_norm;
-            acceleration = acceleration + direction.scalarMultiply(-G * otherBody.mass / r_norm_cubed);
+            acceleration = acceleration + direction.scalarMultiply(-G * (*otherBody).mass / r_norm_cubed);
         }
     }
 }
 
-void Body::calculateAcceleration(std::vector<Body> bodies) {
+// void Body::calculateAcceleration(std::vector<Body>* bodies) {
+//     Body::calculateAcceleration(bodies, 1);
+// }
+
+void Body::calculateAcceleration(std::vector<Body*> bodies) {
     Body::calculateAcceleration(bodies, 1);
 }
 
