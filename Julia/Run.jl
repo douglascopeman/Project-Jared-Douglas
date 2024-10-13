@@ -14,5 +14,5 @@ simLength = 10000
 dt = 0.01    
 
 
-@benchmark Simulation.runSimulation(bodies, simLength, dt)
+@btime Simulation.runSimulation(bodies, simLength, dt)
 
