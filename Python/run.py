@@ -22,10 +22,10 @@ plotter = Plotter.Plotter("Python\Outputs",
                           plot_centre_of_mass=False, 
                           plot_energy=False, 
                           plot_energy_error=False, 
-                          animate_orbits=False, 
                           plot_angular_momentum_error = False, 
                           plot_linear_momentum_error=False, 
-                          plot_3D=False)
+                          plot_3D=False,
+                          animate_orbits=False)
 
 plotter.plot()
 
@@ -34,9 +34,9 @@ plotter_c = Plotter.Plotter("CPlusPlus\Outputs",
                           plot_centre_of_mass=False, 
                           plot_energy=False, 
                           plot_energy_error=False, 
-                          animate_orbits=False, 
                           plot_angular_momentum_error = False, 
                           plot_linear_momentum_error=False, 
-                          plot_3D=False)
+                          plot_3D=False,
+                          animate_orbits=True)
 plotter_c.plot()
 
