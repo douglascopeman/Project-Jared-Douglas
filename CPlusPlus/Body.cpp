@@ -9,6 +9,7 @@ Body::Body(Vector position, Vector velocity, double mass)
 : position(position), velocity(velocity), mass(mass) {}
 
 void Body::calculateAcceleration(std::vector<Body*> bodies, double G) {
+    acceleration = Vector(0, 0, 0);
     for (Body* otherBody : bodies) {
         if (this != otherBody) {
             Vector difference = position - (*otherBody).position;

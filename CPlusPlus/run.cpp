@@ -14,7 +14,7 @@ int main() {
     }
 
     // Create a Simulation object
-    Simulation simulation(bodies, 100, 0.01);
+    Simulation simulation(bodies, 10000, 0.01);
     // Simulation simulation(bodies, 5, 0.1);
 
     simulation.run();
