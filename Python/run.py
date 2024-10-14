@@ -6,11 +6,14 @@ from orbit_examples import orbit_examples
 import Integrators
 import time
 
+N = 1000 #rename to N
+dt = 0.01
 N = 5000 #rename to N
 dt = 0.02
 
 simulation = Simulation.Simulation(N, 
                                    dt, 
+                                   orbit_examples.circular)
                                    orbit_examples.elliptical,
                                    #Integrator = Integrators.yoshida
                                    variable_dt_constant = 0.005
@@ -23,25 +26,14 @@ simulation.run()
 # print("Elapsed Time:" + str(end - start))
 
 plotter = Plotter.Plotter("Python\Outputs", 
-                          runFast=False, 
-                          plot_centre_of_mass=True, 
+                          runFast=True, 
+                          plot_centre_of_mass=False, 
                           plot_energy=False, 
-                          plot_energy_error=True, 
-                          animate_orbits=False, 
-                          plot_angular_momentum_error = True, 
+                          plot_energy_error=False, 
+                          plot_angular_momentum_error = False, 
                           plot_linear_momentum_error=False, 
-                          plot_3D=False)
+                          plot_3D=False,
+                          animate_orbits=False)
 
 plotter.plot()
-
-# plotter_c = Plotter.Plotter("CPlusPlus\Outputs", 
-#                           runFast=True, 
-#                           plot_centre_of_mass=False, 
-#                           plot_energy=False, 
-#                           plot_energy_error=False, 
-#                           animate_orbits=False, 
-#                           plot_angular_momentum_error = False, 
-#                           plot_linear_momentum_error=False, 
-#                           plot_3D=False)
-# plotter_c.plot()
 

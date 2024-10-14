@@ -5,12 +5,12 @@
 using namespace std;
 
 std::vector<Body*> Integrators::symplecticEuler(std::vector<Body*> bodies, double dt) {
-    for (int i = 0; i < bodies.size(); i++) {
-        (*bodies[i]).calculateAcceleration(bodies);
+    for (Body* body : bodies) {
+        (*body).calculateAcceleration(bodies);
     }
-    for (int i = 0; i < bodies.size(); i++) {
-        (*bodies[i]).setVelocity((*bodies[i]).getVelocity() + (*bodies[i]).getAcceleration().scalarMultiply(dt));
-        (*bodies[i]).setPosition((*bodies[i]).getPosition() + (*bodies[i]).getVelocity().scalarMultiply(dt));
+    for (Body* body : bodies) {
+        (*body).setVelocity((*body).getVelocity() + (*body).getAcceleration().scalarMultiply(dt));
+        (*body).setPosition((*body).getPosition() + (*body).getVelocity().scalarMultiply(dt));
     }
     return bodies;
 }

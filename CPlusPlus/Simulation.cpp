@@ -11,7 +11,7 @@ void Simulation::run() {
 
     std::vector<std::vector<std::vector<double>>> sim(N, std::vector<std::vector<double>>(6, std::vector<double>(n)));
     for (int i = 0; i < N; i++) {
-        Integrators::symplecticEuler(bodies, dt);
+        bodies = Integrators::symplecticEuler(bodies, dt);
         for (int bodyNum = 0; bodyNum < n; bodyNum++) {
             sim[i][0][bodyNum] = (*bodies[bodyNum]).getPosition()[0];
             sim[i][1][bodyNum] = (*bodies[bodyNum]).getPosition()[1];

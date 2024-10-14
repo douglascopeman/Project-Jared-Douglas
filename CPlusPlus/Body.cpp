@@ -1,26 +1,19 @@
 #include <iostream>
+#include <cmath>
 #include <vector>
 #include "Body.h"
 using namespace std;
 
 
-/**
- * @brief Constructs a new Body object with the given position, velocity, and mass.
- * 
- * @param position The initial position of the body.
- * @param velocity The initial velocity of the body.
- * @param mass The mass of the body.
- */
 Body::Body(Vector position, Vector velocity, double mass) 
 : position(position), velocity(velocity), mass(mass) {}
 
 void Body::calculateAcceleration(std::vector<Body*> bodies, double G) {
+    acceleration = Vector(0, 0, 0);
     for (Body* otherBody : bodies) {
         if (this != otherBody) {
-            Vector direction = position - (*otherBody).position;
-            double r_norm = direction.norm();
-            double r_norm_cubed = r_norm * r_norm * r_norm;
-            acceleration = acceleration + direction.scalarMultiply(-G * (*otherBody).mass / r_norm_cubed);
+            Vector difference = position - (*otherBody).position;
+            acceleration = acceleration + difference.scalarMultiply(-G * (*otherBody).mass / pow(difference.norm(), 3));
         }
     }
 }

@@ -142,7 +142,6 @@ class Plotter():
         ax_energy.set_ylabel("Total Energy (J)")
         ax_energy.set_title("Total Energy of the System over Time")
         
-        
     def plot_energy_error(self):
         fig_energy_error = plt.figure("Energy Error")
         ax_energy_error = fig_energy_error.add_subplot()
@@ -197,13 +196,15 @@ class Plotter():
         if self.kwargs["plot_3D"]:
             lines = [ax.plot([], [], [], color=colors[i], alpha=0.5)[0] for i in range(self.n)]
             points = [ax.plot([], [], [], 'o', color=colors[i], alpha=1, label='Body ' + str(i))[0] for i in range(self.n)]
-            com_line, = ax.plot([], [], [], alpha=0.5, color='grey')
-            com_point, = ax.plot([], [], [], 'o', alpha=1, label="Centre of Mass", color='grey')
+            if self.kwargs["plot_centre_of_mass"]:
+                com_line, = ax.plot([], [], [], alpha=0.5, color='grey')
+                com_point, = ax.plot([], [], [], 'o', alpha=1, label="Centre of Mass", color='grey')
         else:
             lines = [ax.plot([], [], color=colors[i], alpha=0.5)[0] for i in range(self.n)]
             points = [ax.plot([], [], 'o', color=colors[i], alpha=1, label='Body ' + str(i))[0] for i in range(self.n)]
-            com_line, = ax.plot([], [], alpha=0.5, color='grey')
-            com_point, = ax.plot([], [], 'o', alpha=1, label="Centre of Mass", color='grey')
+            if self.kwargs["plot_centre_of_mass"]:
+                com_line, = ax.plot([], [], alpha=0.5, color='grey')
+                com_point, = ax.plot([], [], 'o', alpha=1, label="Centre of Mass", color='grey')
 
         def init():
             if self.kwargs["plot_3D"]:
@@ -218,10 +219,11 @@ class Plotter():
                     point.set_data([], [])
                     point.set_3d_properties([])
                 # Initialize the centre of mass line and point to be empty
-                com_line.set_data([], [])
-                com_line.set_3d_properties([])
-                com_point.set_data([], [])
-                com_point.set_3d_properties([])
+                if self.kwargs["plot_centre_of_mass"]:
+                    com_line.set_data([], [])
+                    com_line.set_3d_properties([])
+                    com_point.set_data([], [])
+                    com_point.set_3d_properties([])
             else:
                 # Set the limits for the 2D plot based on the bodies' positions
                 ax.set_xlim(-max_range, max_range)
@@ -231,10 +233,14 @@ class Plotter():
                     line.set_data([], [])
                     point.set_data([], [])
                 # Initialize the centre of mass line and point to be empty
-                com_line.set_data([], [])
-                com_point.set_data([], [])
+                if self.kwargs["plot_centre_of_mass"]:
+                    com_line.set_data([], [])
+                    com_point.set_data([], [])
             # Return all line and point objects
-            return lines + points + [com_line, com_point]
+            if self.kwargs["plot_centre_of_mass"]:
+                return lines + points + [com_line, com_point]
+            else:
+                return lines + points
 
         def update(frame):
             if self.kwargs["plot_3D"]:
@@ -245,20 +251,25 @@ class Plotter():
                     point.set_data(self.bodies[frame, 0, i], self.bodies[frame, 1, i])
                     point.set_3d_properties(self.bodies[frame, 2, i])
                 # Update the centre of mass line and point up to the current frame
-                com_line.set_data(self.centreOfMass[:frame, 0], self.centreOfMass[:frame, 1])
-                com_line.set_3d_properties(self.centreOfMass[:frame, 2])
-                com_point.set_data(self.centreOfMass[frame, 0], self.centreOfMass[frame, 1])
-                com_point.set_3d_properties(self.centreOfMass[frame, 2])
+                if self.kwargs["plot_centre_of_mass"]:
+                    com_line.set_data(self.centreOfMass[:frame, 0], self.centreOfMass[:frame, 1])
+                    com_line.set_3d_properties(self.centreOfMass[:frame, 2])
+                    com_point.set_data(self.centreOfMass[frame, 0], self.centreOfMass[frame, 1])
+                    com_point.set_3d_properties(self.centreOfMass[frame, 2])
             else:
                 # Update the lines and points for each body up to the current frame
                 for i, (line, point) in enumerate(zip(lines, points)):
                     line.set_data(self.bodies[:frame, 0, i], self.bodies[:frame, 1, i])
                     point.set_data(self.bodies[frame, 0, i], self.bodies[frame, 1, i])
                 # Update the centre of mass line and point up to the current frame
-                com_line.set_data(self.centreOfMass[:frame, 0], self.centreOfMass[:frame, 1])
-                com_point.set_data(self.centreOfMass[frame, 0], self.centreOfMass[frame, 1])
+                if self.kwargs["plot_centre_of_mass"]:
+                    com_line.set_data(self.centreOfMass[:frame, 0], self.centreOfMass[:frame, 1])
+                    com_point.set_data(self.centreOfMass[frame, 0], self.centreOfMass[frame, 1])
             # Return all updated line and point objects
-            return lines + points + [com_line, com_point]
+            if self.kwargs["plot_centre_of_mass"]:
+                return lines + points + [com_line, com_point]
+            else:
+                return lines + points
 
         # Create the animation using the update function and the number of frames
         ani = FuncAnimation(fig, update, frames=self.N, init_func=init, blit=True, interval=self.N/self.kwargs["animate_fps"])
