@@ -15,13 +15,20 @@ def get_variable_dt_helper(bodies, variable_dt_constant):
     return variable_dt_constant * (min_relative_position / max_relative_velocity)
 
 def get_variable_dt(bodies, variable_dt_constant):
+    bodies_copy = copy.deepcopy(bodies)
     temp_dt = get_variable_dt_helper(bodies, variable_dt_constant)  # We find the temporary timestep moving forwards
-    temp_bodies = (symplecticEuler(bodies, temp_dt))   # We find the temporary state moving forwards
+    temp_bodies = (symplecticEuler(bodies_copy, temp_dt))   # We find the temporary state moving forwards
 
     temp_dt_backwards = get_variable_dt_helper(temp_bodies, variable_dt_constant)
     average_dt = (temp_dt+temp_dt_backwards)/2
-    print(average_dt)
+    # print(average_dt)
+    # print(temp_dt - temp_dt_backwards)
+    # print("\n")
     return average_dt
+    # bodies_copy_2 = copy.deepcopy(bodies)
+    # temp_bodies2 = (symplecticEuler(bodies_copy_2, average_dt))
+    # temp_dt_2 = get_variable_dt_helper(temp_bodies2, variable_dt_constant)
+    # return (temp_dt_2+average_dt)/2
 
     
 def symplecticEuler(bodies, dt, G=1, variable_dt_constant=None):
@@ -33,8 +40,7 @@ def symplecticEuler(bodies, dt, G=1, variable_dt_constant=None):
             body.calculate_acceleration(bodies)
 
     if variable_dt_constant is not None:
-        bodies_copy = copy.deepcopy(bodies)
-        dt = get_variable_dt(bodies_copy, variable_dt_constant)
+        dt = get_variable_dt(bodies, variable_dt_constant)
 
     for body in bodies:
         body.velocity += dt * body.acceleration   
