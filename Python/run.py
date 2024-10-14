@@ -31,14 +31,3 @@ plotter = Plotter.Plotter("Python\Outputs",
 
 plotter.plot()
 
-plotter_c = Plotter.Plotter("CPlusPlus\Outputs", 
-                          runFast=True, 
-                          plot_centre_of_mass=False, 
-                          plot_energy=False, 
-                          plot_energy_error=False, 
-                          plot_angular_momentum_error = False, 
-                          plot_linear_momentum_error=False, 
-                          plot_3D=False,
-                          animate_orbits=True)
-plotter_c.plot()
-
