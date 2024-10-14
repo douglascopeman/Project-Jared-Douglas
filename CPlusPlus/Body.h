@@ -12,7 +12,7 @@ private:
     Vector acceleration = Vector(0.0,0.0,0.0);
 
 public:
-    Body(Vector position = Vector(0.0,0.0,0.0), Vector velocity = Vector(0.0,0.0,0.0), double mass = 1);
+    Body(Vector position, Vector velocity, double mass);
     void calculateAcceleration(std::vector<Body*> bodies, double G);
     void calculateAcceleration(std::vector<Body*> bodies);
     void setPosition(Vector position);
