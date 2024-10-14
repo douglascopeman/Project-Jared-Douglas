@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
     simulation.run();
     auto end = std::chrono::high_resolution_clock::now();
 
-    std::cout << "Time taken: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms" << std::endl;
+    std::cout << "\tTime: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << "ms" << std::endl;
 
     return 0;
 }
