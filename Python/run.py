@@ -21,4 +21,5 @@ else:
     simulation.run()
     end = time.time()
 
-    print("\tTime:" + str(end - start))
+    elapsed_time_ms = (end - start) * 1000
+    print("\tTime: {:.3f} ms".format(elapsed_time_ms))

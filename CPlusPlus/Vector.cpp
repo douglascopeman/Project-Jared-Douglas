@@ -23,7 +23,6 @@ Vector Vector::operator-(const Vector& other) const {
 }
 
 double Vector::norm() const {
-    double norm = sqrt(elements[0] * elements[0] + elements[1] * elements[1] + elements[2] * elements[2]);
     return sqrt(elements[0] * elements[0] + elements[1] * elements[1] + elements[2] * elements[2]);
 }
 
