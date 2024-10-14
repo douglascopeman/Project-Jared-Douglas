@@ -8,12 +8,10 @@ import time
 
 N = 1000 #rename to N
 dt = 0.01
-N = 5000 #rename to N
-dt = 0.02
+
 
 simulation = Simulation.Simulation(N, 
-                                   dt, 
-                                   orbit_examples.circular)
+                                   dt,
                                    orbit_examples.elliptical,
                                    #Integrator = Integrators.yoshida
                                    variable_dt_constant = 0.005
