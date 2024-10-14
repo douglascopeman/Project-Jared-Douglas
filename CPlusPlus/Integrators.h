@@ -6,8 +6,6 @@
 
 class Integrators {
     public:
-    // static std::vector<Body> symplecticEuler(std::vector<Body> bodies, double dt);
-    // static std::vector<Body> symplecticEuler(std::vector<Body>* bodies, double dt);
     static std::vector<Body*> symplecticEuler(std::vector<Body*> bodies, double dt);
 
 };

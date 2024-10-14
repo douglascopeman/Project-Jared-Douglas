@@ -8,7 +8,6 @@ private:
     std::array<double, 3> elements;
 
 public:
-    // Vector();
     Vector(double x, double y, double z);
 
     double& operator[](int index);
@@ -20,11 +19,9 @@ public:
     double norm() const;
 
     Vector scalarMultiply(double scalar) const;
-    // Vector vectorMultiply(const Vector& other) const;
 
     Vector power(double p) const;
 
-    // Vector divideByScalar(double scalar) const;
     Vector dividingScalar(double scalar) const;
 
     void print() const;

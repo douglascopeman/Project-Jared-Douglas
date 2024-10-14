@@ -3,7 +3,6 @@
 #include <cmath>
 #include "Vector.h"
 
-// Vector::Vector() : elements{0, 0, 0} {}
 Vector::Vector(double x, double y, double z) : elements{x, y, z} {}
 
 //Override the [] subscript operator for the Vector class
@@ -35,17 +34,9 @@ Vector Vector::scalarMultiply(double scalar) const {
     return Vector(elements[0] * scalar, elements[1] * scalar, elements[2] * scalar);
 }
 
-// Vector Vector::vectorMultiply(const Vector& other) const {
-//     return Vector(elements[0] * other[0], elements[1] * other[1], elements[2] * other[2]);
-// }
-
 Vector Vector::power(double p) const {
     return Vector(pow(elements[0], p), pow(elements[1], p), pow(elements[2], p));
 }
-
-// Vector Vector::divideByScalar(double scalar) const {
-//     return Vector(elements[0] / scalar, elements[1] / scalar, elements[2] / scalar);
-// }
 
 Vector Vector::dividingScalar(double scalar) const {
     return Vector(scalar / elements[0], scalar / elements[1], scalar / elements[2]);

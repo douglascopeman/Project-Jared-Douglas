@@ -1,7 +1,8 @@
 # param ($N = $(throw "N parameter is required."), $dt = $(throw "dt parameter is required."))
 
-clear
-cd CPlusPlus
+Clear-host
+Set-Location CPlusPlus
 g++ -o run *.cpp
 .\run.exe
-cd ..
+Set-Location ..
+write-host "Done!"
