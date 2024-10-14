@@ -14,6 +14,6 @@ public class Run{
         simulation.run();
         long endTime = System.currentTimeMillis();
 
-        System.out.println("Time: " + (endTime - statTime) + "ms");
+        System.out.println("\tTime: " + (endTime - statTime) + "ms");
     }
 }

@@ -1,4 +1,4 @@
-param ($N = $(throw "N parameter is required."), $dt = $(throw "dt parameter is required."))
+param ($N = $(throw "N parameter is required for Cpp."), $dt = $(throw "dt parameter is required for Cpp."))
 
 # Clear-host
 Set-Location CPlusPlus
