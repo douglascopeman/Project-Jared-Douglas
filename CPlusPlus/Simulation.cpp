@@ -22,9 +22,6 @@ void Simulation::run() {
         }
     }
 
-
-
-
     std::ofstream settingsFile("Outputs/simulationSettings.csv");
     if (settingsFile.is_open()) {
         settingsFile << N << "," << dt << "," << n << ",1\n";

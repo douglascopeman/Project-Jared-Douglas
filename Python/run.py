@@ -9,7 +9,7 @@ import time
 N = 10000 #rename to N
 dt = 0.01
 
-simulation = Simulation.Simulation(N, dt, orbit_examples.elliptical, Integrator=Integrators.symplecticEuler)
+# simulation = Simulation.Simulation(N, dt, orbit_examples.elliptical, Integrator=Integrators.symplecticEuler)
 
 # start = time.time()
 # simulation.runFast()
@@ -28,7 +28,7 @@ simulation = Simulation.Simulation(N, dt, orbit_examples.elliptical, Integrator=
 #                           plot_3D=False)
 # plotter.plot()
 
-plotter = Plotter.Plotter("Julia\Outputs", runFast=True, plot_centre_of_mass=False, plot_energy=False, plot_energy_error=False, animate_orbits=False, plot_angular_momentum_error=False, plot_3D=False)
+plotter = Plotter.Plotter("CPlusPlus\Outputs", runFast=True, plot_centre_of_mass=False, plot_energy=False, plot_energy_error=False, animate_orbits=False, plot_angular_momentum_error=False, plot_3D=False)
 plotter.plot()
 
 # plotter = Plotter.Plotter("JavaSimulation\\Outputs", runFast=False, plot_centre_of_mass=False, plot_energy=False, plot_energy_error=False, animate_orbits=False, plot_angular_momentum_error=False, plot_3D=False)
