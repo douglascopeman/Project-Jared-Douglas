@@ -12,7 +12,7 @@ def get_variable_dt_helper(bodies, variable_dt_constant):
     max_relative_velocity = max([LA.norm(body1.velocity - body2.velocity) for body1, body2 in body_pairs])
     min_relative_position = min([LA.norm(body1.position - body2.position) for body1, body2 in body_pairs])
 
-    return variable_dt_constant * max_relative_velocity / min_relative_position
+    return variable_dt_constant * (min_relative_position / max_relative_velocity)
 
 def get_variable_dt(bodies, variable_dt_constant):
     temp_dt = get_variable_dt_helper(bodies, variable_dt_constant)  # We find the temporary timestep moving forwards
@@ -20,7 +20,7 @@ def get_variable_dt(bodies, variable_dt_constant):
 
     temp_dt_backwards = get_variable_dt_helper(temp_bodies, variable_dt_constant)
     average_dt = (temp_dt+temp_dt_backwards)/2
-    print(temp_dt-temp_dt_backwards)
+    print(average_dt)
     return average_dt
 
     
