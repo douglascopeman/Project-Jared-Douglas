@@ -14,7 +14,6 @@ simLength = 10000
 dt = 0.01  
 
 if length(ARGS) > 0
-    print("Arguments: ", ARGS)
     simLength = parse(Int64, ARGS[1])
     dt = parse(Float64, ARGS[2])
 end
