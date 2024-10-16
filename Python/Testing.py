@@ -10,14 +10,14 @@ import sys
 N = 1000 #rename to N
 dt = 0.05
 
-# simulation = Simulation.Simulation(N, 
-#                                    dt,
-#                                    orbit_examples.elliptical,
-#                                    Integrator = Integrators.threeStepLeapFrog,
-#                                    variable_dt = True
-#                                    )
+simulation = Simulation.Simulation(N, 
+                                   dt,
+                                   orbit_examples.figure_eight,
+                                   Integrator = Integrators.threeStepLeapFrog,
+                                   is_focus_on_body = False
+                                   )
 
-# simulation.run()
+simulation.run()
 
 plotter = Plotter.Plotter("Python\\Outputs", 
                           runFast=False, 

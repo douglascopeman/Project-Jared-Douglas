@@ -13,12 +13,13 @@ class Simulation():
         self.n = len(bodies)
         self.N = N
         self.dt = dt
+        self.focus_body = None
         
         defaultKwargs = {
                         "Integrator":Integrators.symplecticEuler,
                         "G":1,
-                        "variable_dt":False,
-                        "focus_on_body": None,
+                        "is_variable_dt":False,
+                        "is_focus_on_body": False,
                         }
         self.kwargs = defaultKwargs | kwargs
 
@@ -26,21 +27,31 @@ class Simulation():
 # Simulation Calculations
 ###################################################
 
+
     def linearMomentum(self):
-        if self.kwargs["focus_on_body"] is not None:
-            body = self.bodies[self.kwargs["focus_on_body"]]
-            p = body.mass * body.velocity
+        p = [body.mass*body.velocity for body in self.bodies]
+        p_norm = [LA.norm(q) for q in p]
+
+        if self.kwargs["is_focus_on_body"]:
+            if self.focus_body is not None:
+                return p[self.focus_body]
+            else:
+                self.focus_body = p_norm.index(np.max(p_norm))
+                return p[self.focus_body]
         else:
-            p = np.sum([body.mass*body.velocity for body in self.bodies], axis=0)
-        return p
+            return np.sum(p, axis=0)
 
     def angularMomentum(self):
-        if self.kwargs["focus_on_body"] is not None:
-            body = self.bodies[self.kwargs["focus_on_body"]]
-            L = body.mass * np.cross(body.position, body.velocity)
+        L = [body.mass * np.cross(body.position, body.velocity) for body in self.bodies]
+        L_norm = [LA.norm(q) for q in L]
+        if self.kwargs["is_focus_on_body"]:
+            if self.focus_body is not None:
+                return L[self.focus_body]
+            else:
+                self.focus_body = L_norm.index(np.max(L_norm))
+                return L[self.focus_body]
         else:
-            L = np.sum([body.mass * np.cross(body.position, body.velocity) for body in self.bodies], axis=0)
-        return L
+            return np.sum(L, axis=0)
 
     def centreOfMassCalc(self, totalMass):
         summation = np.sum([body.mass * body.position for body in self.bodies], axis=0) 
@@ -79,11 +90,11 @@ class Simulation():
         angularMomentum = np.zeros((self.N, 3), dtype=float)
         linearMomentum = np.zeros((self.N,3), dtype=float)
         G = self.kwargs["G"]
-        variable_dt = self.kwargs["variable_dt"]
+        is_variable_dt = self.kwargs["is_variable_dt"]
         
         #-------------------- Main Time Loop --------------------#
         for t in range(0, self.N):
-            bodies = self.kwargs["Integrator"](bodies, self.dt, G, variable_dt)
+            bodies = self.kwargs["Integrator"](bodies, self.dt, G, is_variable_dt)
             centreOfMass[t,:] = self.centreOfMassCalc(totalMass)
             potentialEnergy[t] = self.calculatePotentialEnergy()
             kineticEnergy[t] = self.kineticEnergies()
@@ -123,4 +134,4 @@ class Simulation():
             np.savetxt(os.path.join(path, "output" + str(i) + ".csv"), simulation[:,:,i], delimiter=",")
         
 if __name__ == "__main__":
-    import run
+    import Testing
