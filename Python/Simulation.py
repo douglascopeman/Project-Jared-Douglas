@@ -20,6 +20,7 @@ class Simulation():
                         "G":1,
                         "is_variable_dt":False,
                         "is_focus_on_body": False,
+                        "stop_conditions": None
                         }
         self.kwargs = defaultKwargs | kwargs
 
@@ -81,6 +82,7 @@ class Simulation():
         Builds a 3 dimensional array filled with the 3 axes position data of every body for the length of the simulaiton
         """
         #-------------------- Initialise variables --------------------#
+        stop_conditions = self.kwargs["stop_conditions"]
         bodies = self.bodies
         simulation = np.zeros((self.N, 6, self.n), dtype=float)
         totalMass = np.sum([body.mass for body in self.bodies])
@@ -94,6 +96,9 @@ class Simulation():
         
         #-------------------- Main Time Loop --------------------#
         for t in range(0, self.N):
+            if stop_conditions is not None:
+                #Impliment stop conditions
+                break
             bodies = self.kwargs["Integrator"](bodies, self.dt, G, is_variable_dt)
             centreOfMass[t,:] = self.centreOfMassCalc(totalMass)
             potentialEnergy[t] = self.calculatePotentialEnergy()
