@@ -16,7 +16,6 @@ N-Body Problem Project
 - implement forrest ruth (across languages)
 - check to see if language speed is linear in timesteps (graph speeds over num timesteps)
 - optimise c++ code?
-- fix all plots to actually show time instead of timesteps
 - compare cpu times for different integration algorithms
 - make close plot close all plots
 - change c++ implementation to use floats instead of doubles
@@ -35,3 +34,4 @@ N-Body Problem Project
 
 **Code Changes made in Week 5**
 - change variable_timestep_constant to use the dt variable
+- fix all plots to actually show time instead of timesteps
