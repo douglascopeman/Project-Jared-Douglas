@@ -20,7 +20,6 @@ N-Body Problem Project
 - compare cpu times for different integration algorithms
 - make close plot close all plots
 - change c++ implementation to use floats instead of doubles
-- change variable_timestep_constant to use the dt variable
 - start moving onto 3 body cases
 - add means of perturbing initial conditions (maintiaining total energy and angular momentum as constants - also CoM's pos & vel)
 - keep in plain. vary 2 pos * 2 vel * 3 bodies variables
@@ -33,3 +32,6 @@ N-Body Problem Project
     - if energy error is too large (output unbelievable anyway)
     - number of timesteps to be as large as we can get away with
     - if stopping condition is met, output which broke and how long it took to get there
+
+**Code Changes made in Week 5**
+- change variable_timestep_constant to use the dt variable
