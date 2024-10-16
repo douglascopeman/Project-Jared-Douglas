@@ -86,8 +86,6 @@ def threeStepLeapFrog(bodies, dt, G=1, variable_dt = False):
 
     if variable_dt is True:
         dt = get_variable_dt(bodies, dt)
-    
-    print(dt)
 
     halfVelocity = np.zeros((len(bodies), 3), dtype=float)
     for (i, body) in enumerate(bodies):
