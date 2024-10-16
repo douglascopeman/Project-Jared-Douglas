@@ -12,7 +12,7 @@ N-Body Problem Project
 
 
 **Code changes to make for week 5**
-- make body focus automatically chose the largest initial value (i.e. one that is not zero)
+- ~~make body focus automatically chose the largest initial value (i.e. one that is not zero)~~
 - implement forrest ruth (across languages)
 - check to see if language speed is linear in timesteps (graph speeds over num timesteps)
 - optimise c++ code?
