@@ -114,7 +114,7 @@ def higherOrderHelpers(c, d, bodies, dt):
         body.velocity += d*dt*body.acceleration
     return bodies
 
-def yoshida(bodies, dt, G, variable_dt = False):
+def yoshida(bodies, dt, G=1, variable_dt = False):
     # Initialising constants
     Cs = np.zeros(4)
     Ds = np.zeros(4)
@@ -127,6 +127,17 @@ def yoshida(bodies, dt, G, variable_dt = False):
     Ds[0] = w1
     Ds[2] = w1
     Ds[1] = w0
+
+    for i in range(0,4):
+        bodies = higherOrderHelpers(Cs[i], Ds[i], bodies, dt)
+
+    return bodies
+
+def forestRuth(bodies, dt, G=1, variable_dt = False):
+    #Initialising constants
+    x = 1/6 * (2**(1/3) + 2**(-1/3)-1)
+    Cs = [x+1/2, -x, -x, x+1/2]
+    Ds = [2*x+1, -4*x-1, 2*x+1, 0]
 
     for i in range(0,4):
         bodies = higherOrderHelpers(Cs[i], Ds[i], bodies, dt)

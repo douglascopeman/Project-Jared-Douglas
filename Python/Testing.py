@@ -7,13 +7,13 @@ import Integrators
 import time
 import sys
 
-N = 1000 #rename to N
+N = 5000 #rename to N
 dt = 0.05
 
 simulation = Simulation.Simulation(N, 
                                    dt,
-                                   orbit_examples.figure_eight,
-                                   Integrator = Integrators.threeStepLeapFrog,
+                                   orbit_examples.elliptical,
+                                   Integrator = Integrators.forestRuth,
                                    is_focus_on_body = False
                                    )
 
