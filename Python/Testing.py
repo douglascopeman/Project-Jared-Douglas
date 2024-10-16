@@ -8,23 +8,23 @@ import time
 import sys
 
 N = 1000 #rename to N
-dt = 0.01
+dt = 0.05
 
 simulation = Simulation.Simulation(N, 
                                    dt,
                                    orbit_examples.elliptical,
-                                   #Integrator = Integrators.yoshida
-                                   variable_dt_constant = 0.005
+                                   Integrator = Integrators.threeStepLeapFrog,
+                                   variable_dt = True
                                    )
 
 simulation.run()
 
 plotter = Plotter.Plotter("Python\\Outputs", 
-                          runFast=True, 
+                          runFast=False, 
                           plot_centre_of_mass=False, 
                           plot_energy=False, 
-                          plot_energy_error=False, 
-                          plot_angular_momentum_error = False, 
+                          plot_energy_error=True, 
+                          plot_angular_momentum_error = True, 
                           plot_linear_momentum_error=False, 
                           plot_3D=False,
                           animate_orbits=False)

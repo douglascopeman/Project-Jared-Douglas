@@ -17,7 +17,7 @@ class Simulation():
         defaultKwargs = {
                         "Integrator":Integrators.symplecticEuler,
                         "G":1,
-                        "variable_dt_constant":None,
+                        "variable_dt":False,
                         "focus_on_body": None,
                         }
         self.kwargs = defaultKwargs | kwargs
@@ -79,11 +79,11 @@ class Simulation():
         angularMomentum = np.zeros((self.N, 3), dtype=float)
         linearMomentum = np.zeros((self.N,3), dtype=float)
         G = self.kwargs["G"]
-        variable_dt_constant = self.kwargs["variable_dt_constant"]
+        variable_dt = self.kwargs["variable_dt"]
         
         #-------------------- Main Time Loop --------------------#
         for t in range(0, self.N):
-            bodies = self.kwargs["Integrator"](bodies, self.dt, G, variable_dt_constant)
+            bodies = self.kwargs["Integrator"](bodies, self.dt, G, variable_dt)
             centreOfMass[t,:] = self.centreOfMassCalc(totalMass)
             potentialEnergy[t] = self.calculatePotentialEnergy()
             kineticEnergy[t] = self.kineticEnergies()

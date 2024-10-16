@@ -17,21 +17,15 @@ def get_variable_dt_helper(bodies, variable_dt_constant):
 def get_variable_dt(bodies, variable_dt_constant):
     bodies_copy = copy.deepcopy(bodies)
     temp_dt = get_variable_dt_helper(bodies, variable_dt_constant)  # We find the temporary timestep moving forwards
-    temp_bodies = (symplecticEuler(bodies_copy, temp_dt))   # We find the temporary state moving forwards
+    temp_bodies = (threeStepLeapFrog(bodies_copy, temp_dt))   # We find the temporary state moving forwards
 
     temp_dt_backwards = get_variable_dt_helper(temp_bodies, variable_dt_constant)
     average_dt = (temp_dt+temp_dt_backwards)/2
-    # print(average_dt)
-    # print(temp_dt - temp_dt_backwards)
-    # print("\n")
+
     return average_dt
-    # bodies_copy_2 = copy.deepcopy(bodies)
-    # temp_bodies2 = (symplecticEuler(bodies_copy_2, average_dt))
-    # temp_dt_2 = get_variable_dt_helper(temp_bodies2, variable_dt_constant)
-    # return (temp_dt_2+average_dt)/2
 
     
-def symplecticEuler(bodies, dt, G=1, variable_dt_constant=None):
+def symplecticEuler(bodies, dt, G=1, variable_dt=False):
     """
     The symplectic euler numerical method, calculates the velocity at timestep n+1 using it along with the n position step to calculate the position at n+1
     """
@@ -39,8 +33,8 @@ def symplecticEuler(bodies, dt, G=1, variable_dt_constant=None):
     for body in bodies:
             body.calculate_acceleration(bodies)
 
-    if variable_dt_constant is not None:
-        dt = get_variable_dt(bodies, variable_dt_constant)
+    if variable_dt is True:
+        dt = get_variable_dt(bodies, dt)
 
     for body in bodies:
         body.velocity += dt * body.acceleration   
@@ -48,29 +42,29 @@ def symplecticEuler(bodies, dt, G=1, variable_dt_constant=None):
         
     return bodies
 
-def symplecticEulerHalfSteps(bodies, dt, G=1, variable_dt_constant=None):
-    for body in bodies:
-        body.calculate_acceleration(bodies)
+# def symplecticEulerHalfSteps(bodies, dt, G=1, variable_dt = False):
+#     for body in bodies:
+#         body.calculate_acceleration(bodies)
         
-    if variable_dt_constant is not None:
-        for body in bodies:
-            dt = variable_dt_constant * np.linalg.norm(body.position) / np.linalg.norm(body.velocity)
-            body.velocity += dt/2 * body.acceleration
-            dt = variable_dt_constant * np.linalg.norm(body.position) / np.linalg.norm(body.velocity)
-            body.position += dt * body.velocity
-        for body in bodies:
-            body.calculate_acceleration(bodies)
-        for body in bodies:
-            dt = variable_dt_constant * np.linalg.norm(body.position) / np.linalg.norm(body.velocity)
-            body.velocity += dt/2 * body.acceleration
-    else:
-        body.velocity += dt * body.acceleration
-        body.position += dt * body.velocity
+#     if variable_dt_constant is not None:
+#         for body in bodies:
+#             dt = variable_dt_constant * np.linalg.norm(body.position) / np.linalg.norm(body.velocity)
+#             body.velocity += dt/2 * body.acceleration
+#             dt = variable_dt_constant * np.linalg.norm(body.position) / np.linalg.norm(body.velocity)
+#             body.position += dt * body.velocity
+#         for body in bodies:
+#             body.calculate_acceleration(bodies)
+#         for body in bodies:
+#             dt = variable_dt_constant * np.linalg.norm(body.position) / np.linalg.norm(body.velocity)
+#             body.velocity += dt/2 * body.acceleration
+#     else:
+#         body.velocity += dt * body.acceleration
+#         body.position += dt * body.velocity
         
-    return bodies
+#     return bodies
             
 
-def Euler(bodies, dt, G=1, variable_dt_constant=None):
+def Euler(bodies, dt, G=1, variable_dt = False):
     """
     The symplectic euler numerical method, calculates the velocity at timestep n+1 using it along with the n position step to calculate the position at n+1
     """
@@ -83,12 +77,17 @@ def Euler(bodies, dt, G=1, variable_dt_constant=None):
             
     return bodies
 
-def threeStepLeapFrog(bodies, dt, G, variable_dt_constant=None):
+def threeStepLeapFrog(bodies, dt, G=1, variable_dt = False):
     """
     The 3-Step Leapfrog method in "kick-drift-kick" form is both symplectic and can take a variable timestep
     """
     for body in bodies:
         body.calculate_acceleration(bodies)
+
+    if variable_dt is True:
+        dt = get_variable_dt(bodies, dt)
+    
+    print(dt)
 
     halfVelocity = np.zeros((len(bodies), 3), dtype=float)
     for (i, body) in enumerate(bodies):
@@ -117,7 +116,7 @@ def higherOrderHelpers(c, d, bodies, dt):
         body.velocity += d*dt*body.acceleration
     return bodies
 
-def yoshida(bodies, dt, G, variable_dt_constatn = None):
+def yoshida(bodies, dt, G, variable_dt = False):
     # Initialising constants
     Cs = np.zeros(4)
     Ds = np.zeros(4)
