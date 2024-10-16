@@ -28,8 +28,13 @@ class Plotter():
         self.read_data()
         
         ##### Orbit plot #####
+        
+        def close_all(something):
+            plt.close('all')
+        
         fig_orbits = plt.figure("Orbits")
         fig_orbits.set_size_inches(7.5, 7.5)
+        fig_orbits.canvas.mpl_connect('close_event', close_all)
         
         if self.kwargs["plot_3D"]: 
             ax_orbits = plt.axes(projection='3d') 
@@ -45,13 +50,17 @@ class Plotter():
              
         #Other plots
         if self.kwargs["plot_energy"]:
-            self.plot_energy()
+            fig_energy = self.plot_energy()
+            fig_energy.canvas.mpl_connect('close_event', close_all)
         if self.kwargs["plot_energy_error"]:
-            self.plot_energy_error()
+            fig_energy_error = self.plot_energy_error()
+            fig_energy_error.canvas.mpl_connect('close_event', close_all)
         if self.kwargs["plot_angular_momentum_error"]:
-            self.plot_angular_momentum_error()
+            fig_angular_momentum_error = self.plot_angular_momentum_error()
+            fig_angular_momentum_error.canvas.mpl_connect('close_event', close_all)
         if self.kwargs["plot_linear_momentum_error"]:
-            self.plot_linear_momentum_error()
+            fig_linear_momentum_error = self.plot_linear_momentum_error()
+            fig_linear_momentum_error.canvas.mpl_connect('close_event', close_all)
     
         plt.show()
         
@@ -144,6 +153,7 @@ class Plotter():
         ax_energy.set_xlabel("Time")
         ax_energy.set_ylabel("Total Energy (J)")
         ax_energy.set_title("Total Energy of the System over Time")
+        return fig_energy
         
     def plot_energy_error(self):
         fig_energy_error = plt.figure("Energy Error")
@@ -156,6 +166,7 @@ class Plotter():
         ax_energy_error.set_xlabel("Time")
         ax_energy_error.set_ylabel("Energy (J)")
         ax_energy_error.set_title("Relative Energy Error of the System over Time")
+        return fig_energy_error
 
     def plot_angular_momentum_error(self):
         fig_angular_momentum_error = plt.figure("Angular Momentum Error")
@@ -167,6 +178,7 @@ class Plotter():
         ax_energy_error.set_xlabel("Time")
         ax_energy_error.set_ylabel("Angular Momentum (kg-m^2/s)")
         ax_energy_error.set_title("Relative Angular Momentum Error of the System over Time")
+        return fig_angular_momentum_error
 
     def plot_linear_momentum_error(self):
         fig_linear_momentum_error = plt.figure("Linear Momentum Error")
@@ -178,6 +190,7 @@ class Plotter():
         ax_energy_error.set_xlabel("Time")
         ax_energy_error.set_ylabel("Linear Momentum (kg ms^-1)")
         ax_energy_error.set_title("Relative Linear Momentum Error of the System over Time")
+        return fig_linear_momentum_error
           
     # The below is generated code
     def animate_orbits(self):
@@ -288,4 +301,4 @@ class Plotter():
         
         
 if __name__ == "__main__":
-    import run
+    import Testing

@@ -19,7 +19,7 @@ N-Body Problem Project
 - check to see if language speed is linear in timesteps (graph speeds over num timesteps)
 - optimise c++ code?
 - compare cpu times for different integration algorithms
-- make close plot close all plots
+- ~~make close plot close all plots~~
 - change c++ implementation to use floats instead of doubles
 - start moving onto 3 body cases
 - add means of perturbing initial conditions (maintiaining total energy and angular momentum as constants - also CoM's pos & vel)
