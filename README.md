@@ -14,6 +14,8 @@ N-Body Problem Project
 **Code changes to make for week 5**
 - ~~make body focus automatically chose the largest initial value (i.e. one that is not zero)~~
 - implement forrest ruth (across languages)
+- ~~change variable_timestep_constant to use the dt variable~~
+- ~~fix all plots to actually show time instead of timesteps~~
 - check to see if language speed is linear in timesteps (graph speeds over num timesteps)
 - optimise c++ code?
 - compare cpu times for different integration algorithms
@@ -33,5 +35,3 @@ N-Body Problem Project
     - if stopping condition is met, output which broke and how long it took to get there
 
 **Code Changes made in Week 5**
-- change variable_timestep_constant to use the dt variable
-- fix all plots to actually show time instead of timesteps
