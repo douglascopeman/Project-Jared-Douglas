@@ -84,20 +84,26 @@ class Simulation():
         #-------------------- Initialise variables --------------------#
         stop_conditions = self.kwargs["stop_conditions"]
         bodies = self.bodies
-        simulation = np.zeros((self.N, 6, self.n), dtype=float)
+        simulation = np.concatenate((bodies[p].position, bodies[p].velocity), axis=None)
         totalMass = np.sum([body.mass for body in self.bodies])
-        centreOfMass = np.zeros((self.N, 3), dtype=float)
-        potentialEnergy = np.zeros((self.N), dtype=float)
-        kineticEnergy = np.zeros((self.N), dtype=float)
-        angularMomentum = np.zeros((self.N, 3), dtype=float)
-        linearMomentum = np.zeros((self.N,3), dtype=float)
+        centreOfMass = self.centreOfMassCalc(totalMass)
+        potentialEnergy = self.calculatePotentialEnergy()
+        kineticEnergy = self.kineticEnergies()
+        angularMomentum = self.angularMomentum()
+        linearMomentum = self.linearMomentum()
         G = self.kwargs["G"]
         is_variable_dt = self.kwargs["is_variable_dt"]
+        
+        # Holding Initial Values for Error
+        initialPotentialEnergy = np.copy(potentialEnergy)
+        initialKineticEnergy = np.copy(kineticEnergy)
+        initialAngularMomentum = np.copy(angularMomentum)
+        initialLinearMomentum = np.copy(linearMomentum)
         
         #-------------------- Main Time Loop --------------------#
         for t in range(0, self.N):
             if stop_conditions is not None:
-                #Impliment stop conditions
+                
                 break
             bodies = self.kwargs["Integrator"](bodies, self.dt, G, is_variable_dt)
             centreOfMass[t,:] = self.centreOfMassCalc(totalMass)
