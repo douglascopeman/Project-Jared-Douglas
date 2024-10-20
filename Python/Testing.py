@@ -16,7 +16,9 @@ simulation = Simulation.Simulation(N,
                                    Integrator = Integrators.forestRuth,
                                    is_focus_on_body = False,
                                    stop_conditions = {
-                                       "energy_error_bound": 100
+                                       "energy_error_bound": 1*10**(-9),
+                                        "distance_bound": 1,
+                                        "variable_dt_bound": 1
                                    }
                                    )
 
