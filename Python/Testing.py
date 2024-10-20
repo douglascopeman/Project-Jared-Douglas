@@ -15,7 +15,9 @@ simulation = Simulation.Simulation(N,
                                    orbit_examples.elliptical,
                                    Integrator = Integrators.forestRuth,
                                    is_focus_on_body = False,
-                                   stop_conditions = [1,1]
+                                   stop_conditions = {
+                                       "energy_error_bound": 100
+                                   }
                                    )
 
 simulation.run()

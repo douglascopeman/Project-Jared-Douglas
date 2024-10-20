@@ -113,11 +113,10 @@ class Simulation():
             # Checking if stop conditions are met
             if stop_conditions is not None:
                 if t%10 == 0:
-                    print("Simulation Terminated")
                     energy_error = (np.abs((kineticEnergy[t]-initialKineticEnergy+potentialEnergy[t]-initialPotentialEnergy)/(initialPotentialEnergy+initialKineticEnergy)))
-                    if stop_conditions[0] > energy_error:
+                    if stop_conditions['energy_error_bound'] < energy_error:
+                        print("Simulation Terminated")
                         break
-                break
             
             # Update position of all bodies
             bodies = self.kwargs["Integrator"](bodies, self.dt, G, is_variable_dt)
