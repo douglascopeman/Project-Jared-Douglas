@@ -14,7 +14,8 @@ simulation = Simulation.Simulation(N,
                                    dt,
                                    orbit_examples.elliptical,
                                    Integrator = Integrators.forestRuth,
-                                   is_focus_on_body = False
+                                   is_focus_on_body = False,
+                                   stop_conditions = [1,1]
                                    )
 
 simulation.run()

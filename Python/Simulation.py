@@ -84,13 +84,13 @@ class Simulation():
         #-------------------- Initialise variables --------------------#
         stop_conditions = self.kwargs["stop_conditions"]
         bodies = self.bodies
-        simulation = np.concatenate((bodies[p].position, bodies[p].velocity), axis=None)
+        simulation = np.zeros((self.N, 6, self.n), dtype=float)
         totalMass = np.sum([body.mass for body in self.bodies])
-        centreOfMass = self.centreOfMassCalc(totalMass)
-        potentialEnergy = self.calculatePotentialEnergy()
-        kineticEnergy = self.kineticEnergies()
-        angularMomentum = self.angularMomentum()
-        linearMomentum = self.linearMomentum()
+        centreOfMass = np.zeros((self.N, 3), dtype=float)
+        potentialEnergy = np.zeros((self.N), dtype=float)
+        kineticEnergy = np.zeros((self.N), dtype=float)
+        angularMomentum = np.zeros((self.N, 3), dtype=float)
+        linearMomentum = np.zeros((self.N,3), dtype=float)
         G = self.kwargs["G"]
         is_variable_dt = self.kwargs["is_variable_dt"]
         
@@ -103,8 +103,13 @@ class Simulation():
         #-------------------- Main Time Loop --------------------#
         for t in range(0, self.N):
             if stop_conditions is not None:
-                
-                break
+                if t%10 == 0:
+                    print(stop_conditions)
+                    # energy_error = (np.abs((kineticEnergy[t]-initialKineticEnergy+linearMomentum[t]-initialLinearMomentum)/(initialAngularMomentum+initialLinearMomentum)))
+                    # if stop_conditions[0] > 0.5:
+                    #     print("bound met")
+                    #     break
+
             bodies = self.kwargs["Integrator"](bodies, self.dt, G, is_variable_dt)
             centreOfMass[t,:] = self.centreOfMassCalc(totalMass)
             potentialEnergy[t] = self.calculatePotentialEnergy()
