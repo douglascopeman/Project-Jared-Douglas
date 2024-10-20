@@ -93,6 +93,7 @@ class Simulation():
         linearMomentum = np.zeros((self.N,3), dtype=float)
         G = self.kwargs["G"]
         is_variable_dt = self.kwargs["is_variable_dt"]
+        integrator = Integrators.Integrators(self.dt)
         
         # Holding Initial Values for Error
         initialPotentialEnergy = self.calculatePotentialEnergy()
