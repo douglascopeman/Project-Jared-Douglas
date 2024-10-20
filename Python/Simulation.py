@@ -95,22 +95,13 @@ class Simulation():
         is_variable_dt = self.kwargs["is_variable_dt"]
         
         # Holding Initial Values for Error
-        initialPotentialEnergy = np.copy(potentialEnergy)
-        initialKineticEnergy = np.copy(kineticEnergy)
-        initialAngularMomentum = np.copy(angularMomentum)
-        initialLinearMomentum = np.copy(linearMomentum)
+        initialPotentialEnergy = self.calculatePotentialEnergy()
+        initialKineticEnergy = self.kineticEnergies()
+        initialAngularMomentum = self.angularMomentum()
+        initialLinearMomentum = self.linearMomentum()
         
         #-------------------- Main Time Loop --------------------#
         for t in range(0, self.N):
-            if stop_conditions is not None:
-                if t%10 == 0:
-                    print(stop_conditions)
-                    # energy_error = (np.abs((kineticEnergy[t]-initialKineticEnergy+linearMomentum[t]-initialLinearMomentum)/(initialAngularMomentum+initialLinearMomentum)))
-                    # if stop_conditions[0] > 0.5:
-                    #     print("bound met")
-                    #     break
-
-            bodies = self.kwargs["Integrator"](bodies, self.dt, G, is_variable_dt)
             centreOfMass[t,:] = self.centreOfMassCalc(totalMass)
             potentialEnergy[t] = self.calculatePotentialEnergy()
             kineticEnergy[t] = self.kineticEnergies()
@@ -118,6 +109,19 @@ class Simulation():
             linearMomentum[t,:] = self.linearMomentum()
             for p in range(0,self.n):
                 simulation[t,:,p] = np.concatenate((bodies[p].position, bodies[p].velocity), axis=None)
+
+            # Checking if stop conditions are met
+            if stop_conditions is not None:
+                if t%10 == 0:
+                    print("Simulation Terminated")
+                    energy_error = (np.abs((kineticEnergy[t]-initialKineticEnergy+potentialEnergy[t]-initialPotentialEnergy)/(initialPotentialEnergy+initialKineticEnergy)))
+                    if stop_conditions[0] > energy_error:
+                        break
+                break
+            
+            # Update position of all bodies
+            bodies = self.kwargs["Integrator"](bodies, self.dt, G, is_variable_dt)
+
         simulationSettings = np.array([self.N, self.dt, self.n, self.kwargs["G"]])
 
         path = os.path.join(os.getcwd(), "Python\\Outputs")
