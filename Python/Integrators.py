@@ -112,7 +112,7 @@ def higherOrderHelpers(c, d, bodies, dt):
 
     for body in bodies:
         body.velocity += d*dt*body.acceleration
-    return bodies, dt
+    return bodies
 
 def yoshida(bodies, dt, G=1, variable_dt = False):
     # Initialising constants
