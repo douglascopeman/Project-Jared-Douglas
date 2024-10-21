@@ -28,10 +28,10 @@ N-Body Problem Project
 - 6 constants (1 for ang momentum, 1 for energy, 2 for CoM pos, 2 for CoM vel)
 - solving this would be purely analytical, no numerics needed
 - include stopping conditions for orbits
-    - if variable timestep becomes too small (eg 10e-10 or something similar)
-    - if particles move too far away from each other (eg max distance > some number)
-    - if energy error is too large (output unbelievable anyway)
+    - ~~if variable timestep becomes too small (eg 10e-10 or something similar)~~
+    - ~~if particles move too far away from each other (eg max distance > some number)~~
+    - ~~if energy error is too large (output unbelievable anyway)~~
     - number of timesteps to be as large as we can get away with
-    - if stopping condition is met, output which broke and how long it took to get there
+    - ~~if stopping condition is met, output which broke and how long it took to get there~~
 
 **Code Changes made in Week 5**
