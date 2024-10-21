@@ -10,7 +10,6 @@ class Integrators():
 
         defaultKwargs = {
             "G": 1,
-            "method": self.symplecticEuler,
             "is_variable_dt": False
         }
         self.kwargs = defaultKwargs | kwargs
@@ -131,6 +130,6 @@ class Integrators():
         Ds = [2*x+1, -4*x-1, 2*x+1, 0]
 
         for i in range(0,4):
-            bodies = self.higherOrderHelpers(Cs[i], Ds[i], bodies, self.dt)
+            bodies = self.higherOrderHelpers(bodies, Cs[i], Ds[i])
 
         return bodies

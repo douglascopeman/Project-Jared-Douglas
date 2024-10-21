@@ -16,7 +16,7 @@ class Simulation():
         self.focus_body = None
         
         defaultKwargs = {
-                        "Integrator":Integrators.Integrators(dt),
+                        "Integrator": Integrators.Integrators(dt).symplecticEuler,
                         "G":1,
                         "is_variable_dt":False,
                         "is_focus_on_body": False,
@@ -121,7 +121,7 @@ class Simulation():
                         break
             
             # Update position of all bodies
-            bodies = self.kwargs["Integrator"].symplecticEuler(bodies)
+            bodies = self.kwargs["Integrator"](bodies)
 
         simulationSettings = np.array([self.N, self.dt, self.n, self.kwargs["G"]])
 
