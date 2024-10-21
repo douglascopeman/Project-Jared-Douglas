@@ -115,9 +115,7 @@ class Simulation():
                 if t%10 == 0:
                     energy_error = (np.abs((kineticEnergy[t]-initialKineticEnergy+potentialEnergy[t]-initialPotentialEnergy)/(initialPotentialEnergy+initialKineticEnergy)))
                     if stop_conditions['energy_error_bound'] < energy_error:
-                        print("Simulation Terminated due to energy error bound exceded")
-                        print("Energy errror is: ", energy_error)
-                        print("Timestep reached: ", t, "\n")
+                        print("Simulation Terminated")
                         break
             
             # Update position of all bodies
