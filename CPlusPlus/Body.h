@@ -13,13 +13,13 @@ private:
 
 public:
     Body(Vector position, Vector velocity, float mass);
-    void calculateAcceleration(std::vector<Body*> bodies, float G);
-    void calculateAcceleration(std::vector<Body*> bodies);
-    void setPosition(Vector position);
-    void setVelocity(Vector velocity);
-    Vector getPosition();
-    Vector getVelocity();
-    Vector getAcceleration();
+    void calculateAcceleration(std::vector<Body*>& bodies, float G);
+    void calculateAcceleration(std::vector<Body*>& bodies);
+    void setPosition(const Vector& position);
+    void setVelocity(const Vector& velocity);
+    Vector getPosition() const;
+    Vector getVelocity() const;
+    Vector getAcceleration() const;
 };
 
 #endif

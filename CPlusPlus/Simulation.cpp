@@ -13,12 +13,14 @@ void Simulation::run() {
     for (int i = 0; i < N; i++) {
         bodies = Integrators::symplecticEuler(bodies, dt);
         for (int bodyNum = 0; bodyNum < n; bodyNum++) {
-            sim[i][0][bodyNum] = (*bodies[bodyNum]).getPosition()[0];
-            sim[i][1][bodyNum] = (*bodies[bodyNum]).getPosition()[1];
-            sim[i][2][bodyNum] = (*bodies[bodyNum]).getPosition()[2];
-            sim[i][3][bodyNum] = (*bodies[bodyNum]).getVelocity()[0];
-            sim[i][4][bodyNum] = (*bodies[bodyNum]).getVelocity()[1];
-            sim[i][5][bodyNum] = (*bodies[bodyNum]).getVelocity()[2];
+            const Vector& pos = bodies[bodyNum]->getPosition();
+            const Vector& vel = bodies[bodyNum]->getVelocity();
+            sim[i][0][bodyNum] = pos[0];
+            sim[i][1][bodyNum] = pos[1];
+            sim[i][2][bodyNum] = pos[2];
+            sim[i][3][bodyNum] = vel[0];
+            sim[i][4][bodyNum] = vel[1];
+            sim[i][5][bodyNum] = vel[2];
         }
     }
 

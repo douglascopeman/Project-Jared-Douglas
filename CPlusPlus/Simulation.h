@@ -12,7 +12,7 @@ private:
     double dt;
 
 public:
-    Simulation(std::vector<Body*> bodies, int N, float dt) : bodies(bodies), n(bodies.size()), N(N), dt(dt) {};
+    Simulation(std::vector<Body*>& bodies, int N, float dt) : bodies(bodies), n(bodies.size()), N(N), dt(dt) {};
     void run();
 };
 

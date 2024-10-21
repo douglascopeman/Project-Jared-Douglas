@@ -6,8 +6,8 @@
 
 int main(int argc, char* argv[]) {
     // Instantiate two Body objects
-    Body body1(Vector(1, 0, 0), Vector(0, 0.5, 0), 1);
-    Body body2(Vector(-1, 0, 0), Vector(0, -0.5, 0), 1);
+    Body body1(Vector(1, 0, 0), Vector(0, 0.6, 0), 1);
+    Body body2(Vector(-1, 0, 0), Vector(0, -0.6, 0), 1);
     std::vector<Body*> bodies = {&body1, &body2}; // Vector of body pointers
 
     if (argc < 3) {
