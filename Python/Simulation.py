@@ -112,7 +112,7 @@ class Simulation():
 
             # Checking if stop conditions are met
             if stop_conditions is not None:
-                if t%10 == 0:
+                if t%10 == 1:
                     body_pairs = list(combinations(bodies, 2))
                     energy_error = (np.abs((kineticEnergy[t]-initialKineticEnergy+potentialEnergy[t]-initialPotentialEnergy)/(initialPotentialEnergy+initialKineticEnergy)))
                     max_relative_position = max([LA.norm(body1.position - body2.position) for body1, body2 in body_pairs])
