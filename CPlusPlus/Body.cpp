@@ -2,13 +2,12 @@
 #include <cmath>
 #include <vector>
 #include "Body.h"
-using namespace std;
 
 
-Body::Body(Vector position, Vector velocity, double mass) 
+Body::Body(Vector position, Vector velocity, float mass) 
 : position(position), velocity(velocity), mass(mass) {}
 
-void Body::calculateAcceleration(std::vector<Body*> bodies, double G) {
+void Body::calculateAcceleration(std::vector<Body*> bodies, float G) {
     acceleration = Vector(0, 0, 0);
     for (Body* otherBody : bodies) {
         if (this != otherBody) {

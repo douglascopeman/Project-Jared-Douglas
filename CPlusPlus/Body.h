@@ -12,8 +12,8 @@ private:
     Vector acceleration = Vector(0.0,0.0,0.0);
 
 public:
-    Body(Vector position, Vector velocity, double mass);
-    void calculateAcceleration(std::vector<Body*> bodies, double G);
+    Body(Vector position, Vector velocity, float mass);
+    void calculateAcceleration(std::vector<Body*> bodies, float G);
     void calculateAcceleration(std::vector<Body*> bodies);
     void setPosition(Vector position);
     void setVelocity(Vector velocity);

@@ -2,9 +2,8 @@
 #include <vector>
 #include "Body.h"
 #include "Integrators.h"
-using namespace std;
 
-std::vector<Body*> Integrators::symplecticEuler(std::vector<Body*> bodies, double dt) {
+std::vector<Body*> Integrators::symplecticEuler(std::vector<Body*> bodies, float dt) {
     for (Body* body : bodies) {
         (*body).calculateAcceleration(bodies);
     }

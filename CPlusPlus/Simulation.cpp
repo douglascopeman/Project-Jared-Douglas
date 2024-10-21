@@ -9,7 +9,7 @@ using namespace std;
 
 void Simulation::run() {
 
-    std::vector<std::vector<std::vector<double>>> sim(N, std::vector<std::vector<double>>(6, std::vector<double>(n)));
+    std::vector<std::vector<std::vector<float>>> sim(N, std::vector<std::vector<float>>(6, std::vector<float>(n)));
     for (int i = 0; i < N; i++) {
         bodies = Integrators::symplecticEuler(bodies, dt);
         for (int bodyNum = 0; bodyNum < n; bodyNum++) {
