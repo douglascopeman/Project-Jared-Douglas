@@ -113,13 +113,28 @@ class Simulation():
             # Checking if stop conditions are met
             if stop_conditions is not None:
                 if t%10 == 0:
+                    body_pairs = list(combinations(bodies, 2))
                     energy_error = (np.abs((kineticEnergy[t]-initialKineticEnergy+potentialEnergy[t]-initialPotentialEnergy)/(initialPotentialEnergy+initialKineticEnergy)))
+                    max_relative_position = max([LA.norm(body1.position - body2.position) for body1, body2 in body_pairs])
+
                     if stop_conditions['energy_error_bound'] < energy_error:
-                        print("Simulation Terminated")
+                        print("Simulation Terminated due to energy error bound exceded")
+                        print("Energy errror is: ", energy_error)
+                        print("Timestep reached: ", t, "\n")
+                        break
+                    if stop_conditions['variable_dt_bound'] > used_dt:
+                        print("Simulation Terminated due to variable timestep bound exceded")
+                        print("Variable Timestep is: ", used_dt)
+                        print("Timestep reached: ", t, "\n")
+                        break
+                    if stop_conditions['distance_bound'] < max_relative_position:
+                        print("Simulation Terminated due to distance bound exceded")
+                        print("Max realtive distance between bodies is: ", max_relative_position)
+                        print("Timestep reached: ", t, "\n")
                         break
             
             # Update position of all bodies
-            bodies = self.kwargs["Integrator"](bodies, self.dt, G, is_variable_dt)
+            bodies, used_dt = self.kwargs["Integrator"](bodies, self.dt, G, is_variable_dt)
 
         simulationSettings = np.array([self.N, self.dt, self.n, self.kwargs["G"]])
 

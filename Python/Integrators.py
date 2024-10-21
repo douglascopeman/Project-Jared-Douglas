@@ -40,7 +40,7 @@ def symplecticEuler(bodies, dt, G=1, variable_dt=False):
         body.velocity += dt * body.acceleration   
         body.position += dt * body.velocity 
         
-    return bodies
+    return bodies, dt
 
 # def symplecticEulerHalfSteps(bodies, dt, G=1, variable_dt = False):
 #     for body in bodies:
@@ -61,7 +61,7 @@ def symplecticEuler(bodies, dt, G=1, variable_dt=False):
 #         body.velocity += dt * body.acceleration
 #         body.position += dt * body.velocity
         
-#     return bodies
+#     return bodies, dt
             
 
 def Euler(bodies, dt, G=1, variable_dt = False):
@@ -75,7 +75,7 @@ def Euler(bodies, dt, G=1, variable_dt = False):
         body.position += dt * body.velocity  
         body.velocity += dt * body.acceleration
             
-    return bodies
+    return bodies, dt
 
 def threeStepLeapFrog(bodies, dt, G=1, variable_dt = False):
     """
@@ -101,7 +101,7 @@ def threeStepLeapFrog(bodies, dt, G=1, variable_dt = False):
     for (i, body)  in enumerate(bodies):
         body.velocity = halfVelocity[i,:] + body.acceleration * dt/2
 
-    return bodies
+    return bodies, dt
 
 def higherOrderHelpers(c, d, bodies, dt):
     for body in bodies:    
@@ -112,7 +112,7 @@ def higherOrderHelpers(c, d, bodies, dt):
 
     for body in bodies:
         body.velocity += d*dt*body.acceleration
-    return bodies
+    return bodies, dt
 
 def yoshida(bodies, dt, G=1, variable_dt = False):
     # Initialising constants
@@ -131,7 +131,7 @@ def yoshida(bodies, dt, G=1, variable_dt = False):
     for i in range(0,4):
         bodies = higherOrderHelpers(Cs[i], Ds[i], bodies, dt)
 
-    return bodies
+    return bodies, dt
 
 def forestRuth(bodies, dt, G=1, variable_dt = False):
     #Initialising constants
@@ -142,4 +142,4 @@ def forestRuth(bodies, dt, G=1, variable_dt = False):
     for i in range(0,4):
         bodies = higherOrderHelpers(Cs[i], Ds[i], bodies, dt)
 
-    return bodies
+    return bodies, dt
