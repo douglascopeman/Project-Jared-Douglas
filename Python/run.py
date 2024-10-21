@@ -18,7 +18,7 @@ else:
     simulation = Simulation.Simulation(N, dt, orbit_examples.circular)
 
     start = time.time()
-    simulation.run()
+    simulation.run_fast()
     end = time.time()
 
     elapsed_time_ms = (end - start) * 1000

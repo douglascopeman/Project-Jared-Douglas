@@ -20,7 +20,7 @@ class Plotter():
                         "animate_orbits":False,
                         "animate_save":False,
                         "animate_fps":30,
-                        "runFast":False
+                        "run_fast":False
                         }
         self.kwargs = defaultKwargs | kwargs
         
@@ -69,10 +69,10 @@ class Plotter():
             self.animate_orbits()
             
     def read_data(self):
-        outputDirectory = os.path.join(os.getcwd(), self.outputDirectory)
+        output_directory = os.path.join(os.getcwd(), self.outputDirectory)
         
         #Start by loading in the simulation settings to determine what to plot
-        with open(os.path.join(outputDirectory, "simulationSettings.csv"), 'r') as f:
+        with open(os.path.join(output_directory, "simulationSettings.csv"), 'r') as f:
             data = np.loadtxt(f, delimiter=",")
             self.N = int(data[0])
             self.dt = data[1]
@@ -80,48 +80,46 @@ class Plotter():
             self.G = float(data[3])
 
         # Setup the time axis for all plots
-        self.timeAxis = np.linspace(0,(self.N * self.dt), self.N)
+        self.time_axis = np.linspace(0,(self.N * self.dt), self.N)
             
         #Then set an array up to hold the correct number of bodies and time steps
         self.bodies = np.zeros((self.N, 6, self.n))
         
         #Then load in the data for each body
         for i in range(self.n):
-            with open(os.path.join(outputDirectory, "output" + str(i) + ".csv"), 'r') as f:
+            with open(os.path.join(output_directory, "output" + str(i) + ".csv"), 'r') as f:
                 data = np.loadtxt(f, delimiter=",")
                 self.bodies[:,:,i] = data
 
         if not self.kwargs["runFast"]:
             if self.kwargs["plot_centre_of_mass"]:
-                self.centreOfMass = np.zeros((self.N, 3), dtype=float)
-                with open(os.path.join(outputDirectory, "centreOfMass.csv"), 'r') as f:
-                    self.centreOfMass[:,:] = np.loadtxt(f, delimiter=",")
+                self.centre_of_mass = np.zeros((self.N, 3), dtype=float)
+                with open(os.path.join(output_directory, "centreOfMass.csv"), 'r') as f:
+                    self.centre_of_mass[:,:] = np.loadtxt(f, delimiter=",")
                     
             if self.kwargs["plot_energy"] or self.kwargs["plot_energy_error"]:
-                self.potentialEnergy = np.zeros((self.N), dtype=float)
-                self.kineticEnergy = np.zeros((self.N), dtype=float)
-                with open(os.path.join(outputDirectory, "potentialEnergy.csv"), 'r') as f:
-                    self.potentialEnergy[:] = np.loadtxt(f, delimiter=",")
-                with open(os.path.join(outputDirectory, "kineticEnergy.csv"), 'r') as f:
-                    self.kineticEnergy = np.loadtxt(f, delimiter=",")
+                self.potential_energy = np.zeros((self.N), dtype=float)
+                self.kinetic_energy = np.zeros((self.N), dtype=float)
+                with open(os.path.join(output_directory, "potentialEnergy.csv"), 'r') as f:
+                    self.potential_energy[:] = np.loadtxt(f, delimiter=",")
+                with open(os.path.join(output_directory, "kineticEnergy.csv"), 'r') as f:
+                    self.kinetic_energy = np.loadtxt(f, delimiter=",")
             
             if self.kwargs["plot_angular_momentum_error"]:
-                self.angularMomentum = np.zeros((self.N, 3), dtype=float)
-                with open(os.path.join(outputDirectory, "angularMomentum.csv"), 'r') as f:
-                    self.angularMomentum = np.loadtxt(f, delimiter=",")
+                self.angular_momentum = np.zeros((self.N, 3), dtype=float)
+                with open(os.path.join(output_directory, "angularMomentum.csv"), 'r') as f:
+                    self.angular_momentum = np.loadtxt(f, delimiter=",")
 
             if self.kwargs["plot_linear_momentum_error"]:
-                self.linearMomentum = np.zeros((self.N, 3), dtype=float)
-                with open(os.path.join(outputDirectory, "linearMomentum.csv"), 'r') as f:
-                    self.linearMomentum = np.loadtxt(f, delimiter=",")
-            
-            
+                self.linear_momentum = np.zeros((self.N, 3), dtype=float)
+                with open(os.path.join(output_directory, "linearMomentum.csv"), 'r') as f:
+                    self.linear_momentum = np.loadtxt(f, delimiter=",") 
+           
     def determine_max_range(self, bodies):
         max_range = np.max(np.abs(np.min(bodies[:,0:3,:], axis=(0,1)), 
                                   np.max(bodies[:,0:3,:], axis=(0,1)))) * 1.1
-        
         return max_range
-        
+  
     def add_orbits(self, fig, ax):
         colors = plt.cm.hsv(np.linspace(0.1, 1, self.n))
         max_range = self.determine_max_range(self.bodies)
@@ -139,17 +137,17 @@ class Plotter():
     
     def add_centre_of_mass(self, fig, ax): 
         if ax.name == '3d':
-            ax.plot(self.centreOfMass[:,0], self.centreOfMass[:,1], self.centreOfMass[:,2], color='grey', alpha=0.25)
-            ax.plot(self.centreOfMass[-1, 0], self.centreOfMass[-1,1], self.centreOfMass[-1,2], 'o', label="Centre of Mass", color='grey')
+            ax.plot(self.centre_of_mass[:,0], self.centre_of_mass[:,1], self.centre_of_mass[:,2], color='grey', alpha=0.25)
+            ax.plot(self.centre_of_mass[-1, 0], self.centre_of_mass[-1,1], self.centre_of_mass[-1,2], 'o', label="Centre of Mass", color='grey')
         else:
-            ax.plot(self.centreOfMass[:,0], self.centreOfMass[:,1], color='grey', alpha=0.25)
-            ax.plot(self.centreOfMass[-1, 0], self.centreOfMass[-1,1], 'o', label="Centre of Mass", color='grey')
+            ax.plot(self.centre_of_mass[:,0], self.centre_of_mass[:,1], color='grey', alpha=0.25)
+            ax.plot(self.centre_of_mass[-1, 0], self.centre_of_mass[-1,1], 'o', label="Centre of Mass", color='grey')
     
     def plot_energy(self):
         fig_energy = plt.figure("Energy")
         ax_energy = fig_energy.add_subplot()
-        total_energy = self.potentialEnergy + self.kineticEnergy
-        ax_energy.plot(self.timeAxis, total_energy)
+        total_energy = self.potential_energy + self.kinetic_energy
+        ax_energy.plot(self.time_axis, total_energy)
         ax_energy.set_xlabel("Time")
         ax_energy.set_ylabel("Total Energy (J)")
         ax_energy.set_title("Total Energy of the System over Time")
@@ -159,10 +157,10 @@ class Plotter():
         fig_energy_error = plt.figure("Energy Error")
         ax_energy_error = fig_energy_error.add_subplot()
 
-        total_energy = self.potentialEnergy + self.kineticEnergy
+        total_energy = self.potential_energy + self.kinetic_energy
         initial_energy = total_energy[0]
         energy_error = [np.abs((total_energy[t] - initial_energy)/initial_energy) for t in range(0,self.N)]
-        ax_energy_error.plot(self.timeAxis, energy_error)
+        ax_energy_error.plot(self.time_axis, energy_error)
         ax_energy_error.set_xlabel("Time")
         ax_energy_error.set_ylabel("Energy (J)")
         ax_energy_error.set_title("Relative Energy Error of the System over Time")
@@ -172,9 +170,9 @@ class Plotter():
         fig_angular_momentum_error = plt.figure("Angular Momentum Error")
         ax_energy_error = fig_angular_momentum_error.add_subplot()
 
-        initial_angular_momentum = self.angularMomentum[0]
-        angular_momentum_error = [np.abs((self.angularMomentum[t] - initial_angular_momentum)/initial_angular_momentum) for t in range(0,self.N)]
-        ax_energy_error.plot(self.timeAxis, angular_momentum_error)
+        initial_angular_momentum = self.angular_momentum[0]
+        angular_momentum_error = [np.abs((self.angular_momentum[t] - initial_angular_momentum)/initial_angular_momentum) for t in range(0,self.N)]
+        ax_energy_error.plot(self.time_axis, angular_momentum_error)
         ax_energy_error.set_xlabel("Time")
         ax_energy_error.set_ylabel("Angular Momentum (kg-m^2/s)")
         ax_energy_error.set_title("Relative Angular Momentum Error of the System over Time")
@@ -184,15 +182,15 @@ class Plotter():
         fig_linear_momentum_error = plt.figure("Linear Momentum Error")
         ax_energy_error = fig_linear_momentum_error.add_subplot()
 
-        initial_linear_momentum = self.linearMomentum[0]
-        linear_momentum_error = [np.abs((self.linearMomentum[t] - initial_linear_momentum)/initial_linear_momentum) for t in range(0, self.N)]
-        ax_energy_error.plot(self.timeAxis, linear_momentum_error)
+        initial_linear_momentum = self.linear_momentum[0]
+        linear_momentum_error = [np.abs((self.linear_momentum[t] - initial_linear_momentum)/initial_linear_momentum) for t in range(0, self.N)]
+        ax_energy_error.plot(self.time_axis, linear_momentum_error)
         ax_energy_error.set_xlabel("Time")
         ax_energy_error.set_ylabel("Linear Momentum (kg ms^-1)")
         ax_energy_error.set_title("Relative Linear Momentum Error of the System over Time")
         return fig_linear_momentum_error
           
-    # The below is generated code
+    # The below is mostly generated code
     def animate_orbits(self):
         # Create a new figure for the animation
         fig = plt.figure()
@@ -268,10 +266,10 @@ class Plotter():
                     point.set_3d_properties(self.bodies[frame, 2, i])
                 # Update the centre of mass line and point up to the current frame
                 if self.kwargs["plot_centre_of_mass"]:
-                    com_line.set_data(self.centreOfMass[:frame, 0], self.centreOfMass[:frame, 1])
-                    com_line.set_3d_properties(self.centreOfMass[:frame, 2])
-                    com_point.set_data(self.centreOfMass[frame, 0], self.centreOfMass[frame, 1])
-                    com_point.set_3d_properties(self.centreOfMass[frame, 2])
+                    com_line.set_data(self.centre_of_mass[:frame, 0], self.centre_of_mass[:frame, 1])
+                    com_line.set_3d_properties(self.centre_of_mass[:frame, 2])
+                    com_point.set_data(self.centre_of_mass[frame, 0], self.centre_of_mass[frame, 1])
+                    com_point.set_3d_properties(self.centre_of_mass[frame, 2])
             else:
                 # Update the lines and points for each body up to the current frame
                 for i, (line, point) in enumerate(zip(lines, points)):
@@ -279,8 +277,8 @@ class Plotter():
                     point.set_data(self.bodies[frame, 0, i], self.bodies[frame, 1, i])
                 # Update the centre of mass line and point up to the current frame
                 if self.kwargs["plot_centre_of_mass"]:
-                    com_line.set_data(self.centreOfMass[:frame, 0], self.centreOfMass[:frame, 1])
-                    com_point.set_data(self.centreOfMass[frame, 0], self.centreOfMass[frame, 1])
+                    com_line.set_data(self.centre_of_mass[:frame, 0], self.centre_of_mass[:frame, 1])
+                    com_point.set_data(self.centre_of_mass[frame, 0], self.centre_of_mass[frame, 1])
             # Return all updated line and point objects
             if self.kwargs["plot_centre_of_mass"]:
                 return lines + points + [com_line, com_point]

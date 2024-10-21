@@ -17,7 +17,7 @@ def get_variable_dt_helper(bodies, variable_dt_constant):
 def get_variable_dt(bodies, variable_dt_constant):
     bodies_copy = copy.deepcopy(bodies)
     temp_dt = get_variable_dt_helper(bodies, variable_dt_constant)  # We find the temporary timestep moving forwards
-    temp_bodies = (threeStepLeapFrog(bodies_copy, temp_dt))   # We find the temporary state moving forwards
+    temp_bodies = (three_step_leapfrog(bodies_copy, temp_dt))   # We find the temporary state moving forwards
 
     temp_dt_backwards = get_variable_dt_helper(temp_bodies, variable_dt_constant)
     average_dt = (temp_dt+temp_dt_backwards)/2
@@ -25,13 +25,13 @@ def get_variable_dt(bodies, variable_dt_constant):
     return average_dt
 
     
-def symplecticEuler(bodies, dt, G=1, variable_dt=False):
+def symplectic_euler(bodies, dt, G=1, variable_dt=False):
     """
     The symplectic euler numerical method, calculates the velocity at timestep n+1 using it along with the n position step to calculate the position at n+1
     """
     # Finding the acceleration of each body
     for body in bodies:
-            body.calculate_acceleration(bodies)
+        body.calculate_acceleration(bodies)
 
     if variable_dt is True:
         dt = get_variable_dt(bodies, dt)
@@ -41,30 +41,9 @@ def symplecticEuler(bodies, dt, G=1, variable_dt=False):
         body.position += dt * body.velocity 
         
     return bodies, dt
-
-# def symplecticEulerHalfSteps(bodies, dt, G=1, variable_dt = False):
-#     for body in bodies:
-#         body.calculate_acceleration(bodies)
-        
-#     if variable_dt_constant is not None:
-#         for body in bodies:
-#             dt = variable_dt_constant * np.linalg.norm(body.position) / np.linalg.norm(body.velocity)
-#             body.velocity += dt/2 * body.acceleration
-#             dt = variable_dt_constant * np.linalg.norm(body.position) / np.linalg.norm(body.velocity)
-#             body.position += dt * body.velocity
-#         for body in bodies:
-#             body.calculate_acceleration(bodies)
-#         for body in bodies:
-#             dt = variable_dt_constant * np.linalg.norm(body.position) / np.linalg.norm(body.velocity)
-#             body.velocity += dt/2 * body.acceleration
-#     else:
-#         body.velocity += dt * body.acceleration
-#         body.position += dt * body.velocity
-        
-#     return bodies, dt
             
 
-def Euler(bodies, dt, G=1, variable_dt = False):
+def euler(bodies, dt, G=1, variable_dt = False):
     """
     The symplectic euler numerical method, calculates the velocity at timestep n+1 using it along with the n position step to calculate the position at n+1
     """
@@ -77,7 +56,7 @@ def Euler(bodies, dt, G=1, variable_dt = False):
             
     return bodies, dt
 
-def threeStepLeapFrog(bodies, dt, G=1, variable_dt = False):
+def three_step_leapfrog(bodies, dt, G=1, variable_dt = False):
     """
     The 3-Step Leapfrog method in "kick-drift-kick" form is both symplectic and can take a variable timestep
     """
@@ -87,23 +66,22 @@ def threeStepLeapFrog(bodies, dt, G=1, variable_dt = False):
     if variable_dt is True:
         dt = get_variable_dt(bodies, dt)
 
-    halfVelocity = np.zeros((len(bodies), 3), dtype=float)
-    for (i, body) in enumerate(bodies):
-        halfVelocity[i, :] = body.velocity + body.acceleration*dt/2
+    half_velocity = np.zeros((len(bodies), 3), dtype=float)
+    for (p, body) in enumerate(bodies):
+        half_velocity[p, :] = body.velocity + body.acceleration * dt/2
 
-    for (i, body )  in enumerate(bodies):
-        body.position += halfVelocity[i,:]*dt
+    for (p, body)  in enumerate(bodies):
+        body.position += half_velocity[p,:] * dt
     
-    # acceleration = calculateAccelerations(bodies, G)
     for body in bodies:
         body.calculate_acceleration(bodies)
 
-    for (i, body)  in enumerate(bodies):
-        body.velocity = halfVelocity[i,:] + body.acceleration * dt/2
+    for (p, body)  in enumerate(bodies):
+        body.velocity = half_velocity[p,:] + body.acceleration * dt/2
 
     return bodies, dt
 
-def higherOrderHelpers(c, d, bodies, dt):
+def higher_order_helper(c, d, bodies, dt):
     for body in bodies:    
         body.position += c*dt*body.velocity
 
@@ -129,17 +107,17 @@ def yoshida(bodies, dt, G=1, variable_dt = False):
     Ds[1] = w0
 
     for i in range(0,4):
-        bodies = higherOrderHelpers(Cs[i], Ds[i], bodies, dt)
+        bodies = higher_order_helper(Cs[i], Ds[i], bodies, dt)
 
     return bodies, dt
 
-def forestRuth(bodies, dt, G=1, variable_dt = False):
+def forest_ruth(bodies, dt, G=1, variable_dt = False):
     #Initialising constants
     x = 1/6 * (2**(1/3) + 2**(-1/3)-1)
     Cs = [x+1/2, -x, -x, x+1/2]
     Ds = [2*x+1, -4*x-1, 2*x+1, 0]
 
     for i in range(0,4):
-        bodies = higherOrderHelpers(Cs[i], Ds[i], bodies, dt)
+        bodies = higher_order_helper(Cs[i], Ds[i], bodies, dt)
 
     return bodies, dt

@@ -30,4 +30,4 @@ class orbit_examples:
     figure_eight_moving = [body0, body1, body2]
     
 if __name__ == "__main__":
-    import run
+    import Testing

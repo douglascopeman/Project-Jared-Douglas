@@ -15,21 +15,20 @@ class Simulation():
         self.dt = dt
         self.focus_body = None
         
-        defaultKwargs = {
-                        "Integrator": Integrators.symplecticEuler,
+        default_kwargs = {
+                        "Integrator": Integrators.symplectic_euler,
                         "G":1,
                         "is_variable_dt":False,
                         "is_focus_on_body": False,
                         "stop_conditions": None
                         }
-        self.kwargs = defaultKwargs | kwargs
+        self.kwargs = default_kwargs | kwargs
 
-###################################################
-# Simulation Calculations
-###################################################
+    ###################################################
+    # Simulation Calculations
+    ###################################################
 
-
-    def linearMomentum(self):
+    def calculate_linear_momentum(self):
         p = [body.mass*body.velocity for body in self.bodies]
         p_norm = [LA.norm(q) for q in p]
 
@@ -42,7 +41,7 @@ class Simulation():
         else:
             return np.sum(p, axis=0)
 
-    def angularMomentum(self):
+    def calculate_angular_momentum(self):
         L = [body.mass * np.cross(body.position, body.velocity) for body in self.bodies]
         L_norm = [LA.norm(q) for q in L]
         if self.kwargs["is_focus_on_body"]:
@@ -54,118 +53,108 @@ class Simulation():
         else:
             return np.sum(L, axis=0)
 
-    def centreOfMassCalc(self, totalMass):
+    def calculate_centre_of_mass(self, totalMass):
         summation = np.sum([body.mass * body.position for body in self.bodies], axis=0) 
         position = (1/totalMass) * summation
         return position
     
-    def calculatePotentialEnergy(self):
-        """
-        Finds the total potential energy of the simulation. Runs at each timestep
-        """
+    def calculate_potential_energy(self):
         G = self.kwargs["G"]
         body_pairs = list(combinations(self.bodies, 2))
         potential_energy = np.sum([-G * body1.mass * body2.mass / LA.norm(body1.position - body2.position) for body1, body2 in body_pairs])
         return potential_energy
 
-    def kineticEnergies(self):
-        '''Calculates the kinetic energy of the body at each timestep and returns the result as a numpy array'''
+    def calculate_kinetic_energy(self):
         kinetic_energy = np.sum([np.dot(body.velocity, body.velocity) * body.mass / 2 for body in self.bodies])
         return kinetic_energy
     
-###################################################
-# Run Model
-###################################################
+    ###################################################
+    # Run Model
+    ###################################################
 
     def run(self):
-        """
-        Builds a 3 dimensional array filled with the 3 axes position data of every body for the length of the simulaiton
-        """
         #-------------------- Initialise variables --------------------#
         stop_conditions = self.kwargs["stop_conditions"]
         bodies = self.bodies
         simulation = np.zeros((self.N, 6, self.n), dtype=float)
-        totalMass = np.sum([body.mass for body in self.bodies])
-        centreOfMass = np.zeros((self.N, 3), dtype=float)
-        potentialEnergy = np.zeros((self.N), dtype=float)
-        kineticEnergy = np.zeros((self.N), dtype=float)
-        angularMomentum = np.zeros((self.N, 3), dtype=float)
-        linearMomentum = np.zeros((self.N,3), dtype=float)
+        total_mass = np.sum([body.mass for body in self.bodies])
+        centre_of_mass = np.zeros((self.N, 3), dtype=float)
+        potential_energy = np.zeros((self.N), dtype=float)
+        kinetic_energy = np.zeros((self.N), dtype=float)
+        angular_momentum = np.zeros((self.N, 3), dtype=float)
+        linear_momentum = np.zeros((self.N,3), dtype=float)
         G = self.kwargs["G"]
         is_variable_dt = self.kwargs["is_variable_dt"]
         
         # Holding Initial Values for Error
-        initialPotentialEnergy = self.calculatePotentialEnergy()
-        initialKineticEnergy = self.kineticEnergies()
-        initialAngularMomentum = self.angularMomentum()
-        initialLinearMomentum = self.linearMomentum()
+        initial_potential_energy = self.calculate_potential_energy()
+        initial_kinetic_energy = self.calculate_kinetic_energy()
+        initial_angular_momentum = self.calculate_angular_momentum()
+        initial_linear_momentum = self.calculate_linear_momentum()
         
         #-------------------- Main Time Loop --------------------#
-        for t in range(0, self.N):
-            centreOfMass[t,:] = self.centreOfMassCalc(totalMass)
-            potentialEnergy[t] = self.calculatePotentialEnergy()
-            kineticEnergy[t] = self.kineticEnergies()
-            angularMomentum[t,:] = self.angularMomentum()
-            linearMomentum[t,:] = self.linearMomentum()
+        for i in range(0, self.N):
+            centre_of_mass[i,:] = self.calculate_centre_of_mass(total_mass)
+            potential_energy[i] = self.calculate_potential_energy()
+            kinetic_energy[i] = self.calculate_kinetic_energy()
+            angular_momentum[i,:] = self.calculate_angular_momentum()
+            linear_momentum[i,:] = self.calculate_linear_momentum()
             for p in range(0,self.n):
-                simulation[t,:,p] = np.concatenate((bodies[p].position, bodies[p].velocity), axis=None)
+                simulation[i,:,p] = np.concatenate((bodies[p].position, bodies[p].velocity), axis=None)
 
             # Checking if stop conditions are met
             if stop_conditions is not None:
-                if t%10 == 1:
+                if i%10 == 1:
                     body_pairs = list(combinations(bodies, 2))
-                    energy_error = (np.abs((kineticEnergy[t]-initialKineticEnergy+potentialEnergy[t]-initialPotentialEnergy)/(initialPotentialEnergy+initialKineticEnergy)))
+                    energy_error = (np.abs((kinetic_energy[i]-initial_kinetic_energy+potential_energy[i]-initial_potential_energy)/(initial_potential_energy+initial_kinetic_energy)))
                     max_relative_position = max([LA.norm(body1.position - body2.position) for body1, body2 in body_pairs])
 
                     if stop_conditions['energy_error_bound'] < energy_error:
                         print("Simulation Terminated due to energy error bound exceded")
                         print("Energy errror is: ", energy_error)
-                        print("Timestep reached: ", t, "\n")
+                        print("Timestep reached: ", i, "\n")
                         break
                     if stop_conditions['variable_dt_bound'] > used_dt:
                         print("Simulation Terminated due to variable timestep bound exceded")
                         print("Variable Timestep is: ", used_dt)
-                        print("Timestep reached: ", t, "\n")
+                        print("Timestep reached: ", i, "\n")
                         break
                     if stop_conditions['distance_bound'] < max_relative_position:
                         print("Simulation Terminated due to distance bound exceded")
                         print("Max realtive distance between bodies is: ", max_relative_position)
-                        print("Timestep reached: ", t, "\n")
+                        print("Timestep reached: ", i, "\n")
                         break
             
             # Update position of all bodies
             bodies, used_dt = self.kwargs["Integrator"](bodies, self.dt, G, is_variable_dt)
 
-        simulationSettings = np.array([self.N, self.dt, self.n, self.kwargs["G"]])
-
-        path = os.path.join(os.getcwd(), "Python\\Outputs")
-        
         #-------------------- Write Data to CSVs --------------------#
+        simulationSettings = np.array([self.N, self.dt, self.n, self.kwargs["G"]])
+        path = os.path.join(os.getcwd(), "Python\\Outputs")
         np.savetxt(os.path.join(path, "simulationSettings.csv"), simulationSettings, delimiter=",")
-        np.savetxt(os.path.join(path, "centreOfMass.csv"), centreOfMass, delimiter=",")
-        np.savetxt(os.path.join(path, "potentialEnergy.csv"), potentialEnergy, delimiter=",")
-        np.savetxt(os.path.join(path, "kineticEnergy.csv"), kineticEnergy, delimiter=",")
-        np.savetxt(os.path.join(path, "angularMomentum.csv"), angularMomentum, delimiter=",")
-        np.savetxt(os.path.join(path, "linearMomentum.csv"), linearMomentum, delimiter=',')
+        np.savetxt(os.path.join(path, "centreOfMass.csv"), centre_of_mass, delimiter=",")
+        np.savetxt(os.path.join(path, "potentialEnergy.csv"), potential_energy, delimiter=",")
+        np.savetxt(os.path.join(path, "kineticEnergy.csv"), kinetic_energy, delimiter=",")
+        np.savetxt(os.path.join(path, "angularMomentum.csv"), angular_momentum, delimiter=",")
+        np.savetxt(os.path.join(path, "linearMomentum.csv"), linear_momentum, delimiter=',')
         for i in range(self.n):
             np.savetxt(os.path.join(path, ("output"+ str(i)+ ".csv")), simulation[:,:,i], delimiter=",")
 
-    def runFast(self):
+    def run_fast(self):
         """
         A bare bones version of run(), only calculates body positions
         """
-        path = os.path.join(os.getcwd(), "Python\\Outputs")
         bodies = self.bodies
         simulation = np.zeros((self.N, 6, self.n), dtype=float)
-        for t in range(0, self.N):
-            #bodies = Integrator(bodies, self.dt)
-            for i, body in enumerate(bodies):
-                simulation[t,:,i] = np.concatenate((body.position, body.velocity), axis=None)
+        for i in range(0, self.N):
+            for p, body in enumerate(bodies):
+                simulation[i,:,p] = np.concatenate((body.position, body.velocity), axis=None)
 
+        path = os.path.join(os.getcwd(), "Python\\Outputs")
         simulationSettings = np.array([self.N, self.dt, self.n, self.kwargs["G"]])
         np.savetxt(os.path.join(path, "simulationSettings.csv"), simulationSettings, delimiter=",")
-        for i in range(self.n):
-            np.savetxt(os.path.join(path, "output" + str(i) + ".csv"), simulation[:,:,i], delimiter=",")
+        for p in range(self.n):
+            np.savetxt(os.path.join(path, "output" + str(p) + ".csv"), simulation[:,:,p], delimiter=",")
         
 if __name__ == "__main__":
     import Testing
