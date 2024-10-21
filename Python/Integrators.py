@@ -10,9 +10,11 @@ class Integrators():
 
         defaultKwargs = {
             "G": 1,
+            "method": self.symplecticEuler,
             "is_variable_dt": False
         }
         self.kwargs = defaultKwargs | kwargs
+
 
     def get_variable_dt_helper(self, bodies, variable_dt_constant):
         """

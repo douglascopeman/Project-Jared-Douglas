@@ -16,7 +16,7 @@ class Simulation():
         self.focus_body = None
         
         defaultKwargs = {
-                        "Integrator":Integrators.symplecticEuler,
+                        "Integrator":Integrators.Integrators(dt),
                         "G":1,
                         "is_variable_dt":False,
                         "is_focus_on_body": False,
@@ -93,7 +93,6 @@ class Simulation():
         linearMomentum = np.zeros((self.N,3), dtype=float)
         G = self.kwargs["G"]
         is_variable_dt = self.kwargs["is_variable_dt"]
-        integrator = Integrators.Integrators(self.dt)
         
         # Holding Initial Values for Error
         initialPotentialEnergy = self.calculatePotentialEnergy()
@@ -122,7 +121,7 @@ class Simulation():
                         break
             
             # Update position of all bodies
-            bodies = self.kwargs["Integrator"](bodies, self.dt, G, is_variable_dt)
+            bodies = self.kwargs["Integrator"].symplecticEuler(bodies)
 
         simulationSettings = np.array([self.N, self.dt, self.n, self.kwargs["G"]])
 
@@ -138,7 +137,7 @@ class Simulation():
         for i in range(self.n):
             np.savetxt(os.path.join(path, ("output"+ str(i)+ ".csv")), simulation[:,:,i], delimiter=",")
 
-    def runFast(self, Integrator=Integrators.symplecticEuler):
+    def runFast(self):
         """
         A bare bones version of run(), only calculates body positions
         """
@@ -146,7 +145,7 @@ class Simulation():
         bodies = self.bodies
         simulation = np.zeros((self.N, 6, self.n), dtype=float)
         for t in range(0, self.N):
-            bodies = Integrator(bodies, self.dt)
+            #bodies = Integrator(bodies, self.dt)
             for i, body in enumerate(bodies):
                 simulation[t,:,i] = np.concatenate((body.position, body.velocity), axis=None)
 

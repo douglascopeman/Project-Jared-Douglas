@@ -13,13 +13,13 @@ dt = 0.05
 simulation = Simulation.Simulation(N, 
                                    dt,
                                    orbit_examples.elliptical,
-                                   Integrator = Integrators.forestRuth,
+                                   #Integrator = Integrators.forestRuth,
                                    is_focus_on_body = False,
-                                   stop_conditions = {
-                                       "energy_error_bound": 1*10**(-9),
-                                        "distance_bound": 1,
-                                        "variable_dt_bound": 1
-                                   }
+                                #    stop_conditions = {
+                                #        "energy_error_bound": 1*10**(-9),
+                                #         "distance_bound": 1,
+                                #         "variable_dt_bound": 1
+                                #    }
                                    )
 
 simulation.run()
