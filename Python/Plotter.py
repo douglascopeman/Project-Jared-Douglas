@@ -91,7 +91,7 @@ class Plotter():
                 data = np.loadtxt(f, delimiter=",")
                 self.bodies[:,:,i] = data
 
-        if not self.kwargs["runFast"]:
+        if not self.kwargs["run_fast"]:
             if self.kwargs["plot_centre_of_mass"]:
                 self.centre_of_mass = np.zeros((self.N, 3), dtype=float)
                 with open(os.path.join(output_directory, "centreOfMass.csv"), 'r') as f:
