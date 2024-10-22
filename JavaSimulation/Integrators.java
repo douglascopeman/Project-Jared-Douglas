@@ -26,7 +26,7 @@ public class Integrators{
         Ds[2] = w1;
         Ds[1] = w0;
 
-        for (int i = 0; i < 5; i++){
+        for (int i = 0; i < 4; i++){
             for (Body body : bodies){
                 body.setPosition(Vector.add(body.getVelocity(), Vector.multiply(body.getVelocity(), dt*Cs[i])));
             }
