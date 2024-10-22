@@ -9,14 +9,14 @@ dt = 0.05
 
 simulation = Simulation.Simulation(N, 
                                    dt,
-                                   orbit_examples.elliptical,
+                                   orbit_examples.figure_eight,
                                    Integrator = Integrators.yoshida,
-                                   is_focus_on_body = False,
-                                   stop_conditions = {
-                                       "energy_error_bound": 1,
-                                        "distance_bound": 10,
-                                        "variable_dt_bound": 1*10**(-8)
-                                   }
+                                   is_focus_on_body = False
+                                #    stop_conditions = {
+                                #        "energy_error_bound": 1,
+                                #         "distance_bound": 10,
+                                #         "variable_dt_bound": 1*10**(-8)
+                                #    }
                                    )
 
 simulation.run()
