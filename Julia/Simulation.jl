@@ -16,7 +16,7 @@ G = 1
 
 Builds a 3 dimensional array filled with the 3 axes position data of every body for the length of the simulaiton
 """
-function runSimulation(bodies, N::Int64, dt::Float64, integrator = symplecticEuler)
+function runSimulation(bodies, N::Int64, dt::Float64, integrator = yoshida)
     nBodies = length(bodies)
     simulation = zeros(Float64, (N, 6, nBodies))  # Simulation length by axes by number of bodies
     path = raw"Julia/Outputs/"

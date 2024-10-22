@@ -21,3 +21,7 @@ N-Body Problem Project
 - 6 constants (1 for ang momentum, 1 for energy, 2 for CoM pos, 2 for CoM vel)
 - solving this would be purely analytical, no numerics needed
 
+**Benchmarking**
+For $N=10000$, $dt=0.2$ using yoshida, elliptical looped simulation 100 times.
+Python = 94934 milliseconds 94934.69746208191
+Julia = 10900 milliseconds

@@ -147,6 +147,7 @@ class Simulation():
         bodies = self.bodies
         simulation = np.zeros((self.N, 6, self.n), dtype=float)
         for i in range(0, self.N):
+            bodies, used_dt = self.kwargs["Integrator"](bodies, self.dt)
             for p, body in enumerate(bodies):
                 simulation[i,:,p] = np.concatenate((body.position, body.velocity), axis=None)
 
