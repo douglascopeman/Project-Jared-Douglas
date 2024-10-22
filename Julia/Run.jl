@@ -4,12 +4,13 @@ include("Simulation.jl")
 include("Body.jl")
 
 using .Simulation
+using Dates
 
 # Defining the model space
-moon = ModelSpace.Body(position = [1,0,0], velocity =[0,0.5,0])
-earth = ModelSpace.Body(position = [-1,0,0], velocity = [0,-0.5,0])
+body0 = ModelSpace.Body(position = [1,0,0], velocity =[0,0.5,0])
+body1 = ModelSpace.Body(position = [-1,0,0], velocity = [0,-0.5,0])
 
-bodies = [moon, earth]
+bodies = [body0, body1]
 simLength = 10000
 dt = 0.01  
 
@@ -18,5 +19,10 @@ if length(ARGS) > 0
     dt = parse(Float64, ARGS[2])
 end
 
-@btime Simulation.runSimulation(bodies, simLength, dt)
+startTime = now()
+Simulation.runSimulation(bodies, simLength, dt)
+endTime = now()
+
+elapsedTime = (endTime - startTime) 
+println("\tTime: ", elapsedTime)
 
