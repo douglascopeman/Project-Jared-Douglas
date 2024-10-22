@@ -13,6 +13,11 @@ public class Integrators{
         return bodies;
     }
 
+    public static Body[] Yoshida(Body[] bodies, double dt) {
+        
+        return bodies;
+    }
+
     //Yet to be tested for functionality
     public static Body[] Euler(Body[] bodies, double dt) {
         for (Body body : bodies) {
