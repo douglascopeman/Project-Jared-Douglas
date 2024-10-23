@@ -25,7 +25,7 @@ public class Simulation {
     public void run(){
         double[][][] simulation = new double[this.N][6][this.n];
         for (int i = 0; i < this.N; i++) {
-            Integrators.SymplecticEuler(this.bodies, this.dt);
+            Integrators.Yoshida(this.bodies, this.dt);
             for (int bodyNum = 0; bodyNum < this.n; bodyNum++) {
                 simulation[i][0][bodyNum] = this.bodies[bodyNum].getPosition().getX();
                 simulation[i][1][bodyNum] = this.bodies[bodyNum].getPosition().getY();

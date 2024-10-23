@@ -17,7 +17,7 @@ def get_variable_dt_helper(bodies, variable_dt_constant):
 def get_variable_dt(bodies, variable_dt_constant):
     bodies_copy = copy.deepcopy(bodies)
     temp_dt = get_variable_dt_helper(bodies, variable_dt_constant)  # We find the temporary timestep moving forwards
-    temp_bodies = (three_step_leapfrog(bodies_copy, temp_dt))   # We find the temporary state moving forwards
+    temp_bodies, dt = (three_step_leapfrog(bodies_copy, temp_dt))   # We find the temporary state moving forwards
 
     temp_dt_backwards = get_variable_dt_helper(temp_bodies, variable_dt_constant)
     average_dt = (temp_dt+temp_dt_backwards)/2
@@ -105,6 +105,7 @@ def yoshida(bodies, dt, G=1, variable_dt = False):
     Ds[0] = w1
     Ds[2] = w1
     Ds[1] = w0
+    
 
     for i in range(0,4):
         bodies = higher_order_helper(Cs[i], Ds[i], bodies, dt)
