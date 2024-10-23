@@ -14,8 +14,8 @@ public class Integrators{
     }
 
     public static Body[] Yoshida(Body[] bodies, double dt) {
-        double w0 = -(Math.pow(2, 1/3))/(2-(Math.pow(2, 1/3)));
-        double w1 = 1/(2-(Math.pow(2,1/3)));
+        double w0 = -(Math.pow(2, 1.0/3))/(2-(Math.pow(2, 1.0/3)));
+        double w1 = 1/(2-(Math.pow(2,1.0/3)));
         double[] Cs = new double[4];
         double[] Ds = new double[4];
         Cs[0] = w1/2;
@@ -28,7 +28,7 @@ public class Integrators{
 
         for (int i = 0; i < 4; i++){
             for (Body body : bodies){
-                body.setPosition(Vector.add(body.getVelocity(), Vector.multiply(body.getVelocity(), dt*Cs[i])));
+                body.setPosition(Vector.add(body.getPosition(), Vector.multiply(body.getVelocity(), dt*Cs[i])));
             }
             for (Body body : bodies) {
                 body.calculateAcceleration(bodies);
