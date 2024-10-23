@@ -23,5 +23,12 @@ N-Body Problem Project
 
 **Benchmarking**
 For $N=10000$, $dt=0.2$ using yoshida, elliptical looped simulation 100 times.
-Python = 94934 milliseconds 94934.69746208191
-Julia = 10900 milliseconds
+1st Run
+Python = 94934ms
+Julia = 10900ms
+Java = 2513ms
+
+2nd Run
+Python = 86025 ms
+Julia = 12056 ms
+Java = 2547ms
