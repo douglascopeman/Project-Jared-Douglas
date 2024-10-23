@@ -291,8 +291,8 @@ class Plotter():
         fig.legend()
         if self.kwargs["animate_save"]:
             video_writer = animation.FFMpegWriter(fps=self.kwargs["animate_fps"], bitrate=5000)
-            ani.save("animation.mp4", writer=video_writer)
-            print("Animation saved as 'animation.mp4'")
+            ani.save("media\\animation.mp4", writer=video_writer)
+            print("Animation saved as 'media\\animation.mp4'")
         else:
             plt.show()
         plt.close()
