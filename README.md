@@ -25,10 +25,10 @@ N-Body Problem Project
 For $N=10000$, $dt=0.2$ using yoshida, elliptical looped simulation 100 times.
 1st Run
 Python = 94934ms
-Julia = 10900ms
-Java = 2513ms
+Julia  = 10900ms
+Java   =  2513ms
 
 2nd Run
 Python = 86025 ms
-Julia = 12056 ms
-Java = 2547ms
+Julia  = 12056 ms
+Java   =  2547 ms
