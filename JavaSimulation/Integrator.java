@@ -19,8 +19,14 @@ public class Integrator implements IntegratorInterface {
             case SYMPLECTIC_EULER -> {
                 return Integrators.SymplecticEuler(bodies, dt, useVariableTimestep);
             }
+            case THREE_STEP_LEAPFROG -> {
+                return Integrators.ThreeStepLeapfrog(bodies, dt, useVariableTimestep);
+            }
             case YOSHIDA -> {
                 return Integrators.Yoshida(bodies, dt, useVariableTimestep);
+            }
+            case FOREST_RUTH -> {
+                return Integrators.ForestRuth(bodies, dt, useVariableTimestep);
             }
             default -> throw new IllegalArgumentException("Unknown integrator type");
         }

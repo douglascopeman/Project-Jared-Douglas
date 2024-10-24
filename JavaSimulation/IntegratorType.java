@@ -4,5 +4,7 @@ package javasimulation;
 public enum IntegratorType {
     EULER,
     SYMPLECTIC_EULER,
-    YOSHIDA
+    THREE_STEP_LEAPFROG,
+    YOSHIDA,
+    FOREST_RUTH
 }

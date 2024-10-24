@@ -9,6 +9,7 @@ public class Simulation {
     private final int n;
     private final int N;
     private final double dt;
+    private final IntegratorType integratorType;
 
     /**
      * @param bodies Array of Body objects
@@ -16,25 +17,37 @@ public class Simulation {
      * @param dt Time step
      * 
      */
-    public Simulation(Body[] bodies, int N, double dt){
+    public Simulation(Body[] bodies, int N, double dt) {
         this.bodies = bodies;
         this.n = bodies.length;
         this.N = N;
         this.dt = dt;
+        this.integratorType = IntegratorType.SYMPLECTIC_EULER;
+        
+    }
+
+    public Simulation(Body[] bodies, int N, double dt, IntegratorType integratorType){
+        this.bodies = bodies;
+        this.n = bodies.length;
+        this.N = N;
+        this.dt = dt;
+        this.integratorType = integratorType;
     }
 
     public void run(){
         double[][][] simulation = new double[this.N][6][this.n];
-        Integrator integrator = new Integrator(IntegratorType.SYMPLECTIC_EULER, false);
+        Integrator integrator = new Integrator(this.integratorType, false);
         for (int i = 0; i < this.N; i++) {
             integrator.Integrate(this.bodies, this.dt);
-            for (int bodyNum = 0; bodyNum < this.n; bodyNum++) {
-                simulation[i][0][bodyNum] = this.bodies[bodyNum].getPosition().getX();
-                simulation[i][1][bodyNum] = this.bodies[bodyNum].getPosition().getY();
-                simulation[i][2][bodyNum] = this.bodies[bodyNum].getPosition().getZ();
-                simulation[i][3][bodyNum] = this.bodies[bodyNum].getVelocity().getX();
-                simulation[i][4][bodyNum] = this.bodies[bodyNum].getVelocity().getY();
-                simulation[i][5][bodyNum] = this.bodies[bodyNum].getVelocity().getZ();
+            for (int p = 0; p < this.n; p++) {
+                Vector position = this.bodies[p].getPosition();
+                Vector velocity = this.bodies[p].getVelocity();
+                simulation[i][0][p] = position.getX();
+                simulation[i][1][p] = position.getY();
+                simulation[i][2][p] = position.getZ();
+                simulation[i][3][p] = velocity.getX();
+                simulation[i][4][p] = velocity.getY();
+                simulation[i][5][p] = velocity.getZ();
             }
         }
 
