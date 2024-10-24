@@ -61,7 +61,7 @@ public class Simulation {
         } catch (FileNotFoundException e) {
             System.err.println("Setting file not found");
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Something went wrong writing to file: " + e.getMessage());
         }
 
         for (int bodyNum = 0; bodyNum < this.n; bodyNum++) {
@@ -85,7 +85,7 @@ public class Simulation {
             } catch (FileNotFoundException e) {
                 System.err.println("Body " + bodyNum +  " file not found");
             } catch (IOException e) {
-                e.printStackTrace();
+                System.err.println("Something went wrong writing to file: " + e.getMessage());
             }
         }
     }
