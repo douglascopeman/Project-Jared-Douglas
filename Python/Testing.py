@@ -39,7 +39,7 @@ pertubation = Pertubation.Pertubation(
 )
 stop_matrix = pertubation.run()
 
-print(stop_matrix)
+print(stop_matrix.min())
 
 
 # plotter = Plotter.Plotter("Python\\Outputs", 

@@ -74,7 +74,7 @@ class Pertubation():
                             print("Timestep reached: ", k, "\n")
                             stop_matrix[i+self.p, j+self.p] = self.N - k
                             break
-                        stop_matrix[i+self.p, j+self.p] = self.N - k
+                    stop_matrix[i+self.p, j+self.p] = self.N - k -1
 
 
 
