@@ -1,4 +1,5 @@
 package javasimulation;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -24,8 +25,9 @@ public class Simulation {
 
     public void run(){
         double[][][] simulation = new double[this.N][6][this.n];
+        Integrator integrator = new Integrator(IntegratorType.SYMPLECTIC_EULER, false);
         for (int i = 0; i < this.N; i++) {
-            Integrators.Yoshida(this.bodies, this.dt);
+            integrator.Integrate(this.bodies, this.dt);
             for (int bodyNum = 0; bodyNum < this.n; bodyNum++) {
                 simulation[i][0][bodyNum] = this.bodies[bodyNum].getPosition().getX();
                 simulation[i][1][bodyNum] = this.bodies[bodyNum].getPosition().getY();
@@ -36,9 +38,15 @@ public class Simulation {
             }
         }
 
+        WriteToFiles(simulation);
+    }
+
+    private void WriteToFiles(double[][][] simulation){
 
         try(FileWriter writer = new FileWriter("JavaSimulation\\Outputs\\simulationSettings.csv")){
             writer.append(this.N + "," + this.dt + "," + this.n + ", 1\n");
+        } catch (FileNotFoundException e) {
+            System.err.println("Setting file not found");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -61,10 +69,12 @@ public class Simulation {
                     .append("\n");
                 }
                 writer.write(sb.toString());
+            } catch (FileNotFoundException e) {
+                System.err.println("Body " + bodyNum +  " file not found");
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-
     }
+
 }
