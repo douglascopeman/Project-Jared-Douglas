@@ -14,3 +14,4 @@ Write-Host "Done!"
 
 Write-Host "Running C++ Simulation"
 & $PSScriptRoot\CppCompileAndRun.ps1 $N $dt
+Write-Host "Done!"
