@@ -71,8 +71,7 @@ public:
         double res[4];
         _mm256_storeu_pd(res, sum);
         double normSquared = res[0] + res[2];
-        double normCubed = normSquared * std::sqrt(normSquared);
-        return normCubed;
+        return normSquared * std::sqrt(normSquared);
     }
 
     // Vector scalarMultiply(double scalar) const;

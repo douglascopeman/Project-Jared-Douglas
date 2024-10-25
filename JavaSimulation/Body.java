@@ -14,7 +14,7 @@ public class Body {
 
     // Getters & Setters
     public double getMass() {
-        return mass;
+        return this.mass;
     }
 
     public void setMass(double mass) {
@@ -22,7 +22,7 @@ public class Body {
     }
 
     public Vector getPosition() {
-        return position;
+        return this.position;
     }
 
     public void setPosition(Vector position) {
@@ -30,7 +30,7 @@ public class Body {
     }
 
     public Vector getVelocity() {
-        return velocity;
+        return this.velocity;
     }
 
     public void setVelocity(Vector velocity) {

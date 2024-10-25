@@ -16,7 +16,7 @@ N-Body Problem Project
 - compare cpu times for different integration algorithms
 - start moving onto 3 body cases
 - add means of perturbing initial conditions (maintiaining total energy and angular momentum as constants - also CoM's pos & vel)
-- keep in plain. vary 2 pos * 2 vel * 3 bodies variables
+- keep in plane. vary 2 pos * 2 vel * 3 bodies variables
 - use symmetries to keep constants constant
 - 6 constants (1 for ang momentum, 1 for energy, 2 for CoM pos, 2 for CoM vel)
 - solving this would be purely analytical, no numerics needed
