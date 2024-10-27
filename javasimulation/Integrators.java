@@ -1,4 +1,6 @@
 package javasimulation;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class Integrators{
 
@@ -118,6 +120,12 @@ public class Integrators{
         double tempTimestepBackwards = getVariableTimestepHelper(futureBodies, variableTimestepConstant);
 
         double averageTimestep = (tempTimestep + tempTimestepBackwards) / 2;
+
+        try (FileWriter writer = new FileWriter("Outputs/timesteps.csv", true)) {
+            writer.append(String.valueOf(averageTimestep)).append("\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         return averageTimestep;
     }

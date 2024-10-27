@@ -130,6 +130,21 @@ public class Simulation {
 
     private void writeSimulationToFiles(){
 
+        // Create the output directory if it doesn't exist, or clear it if it does
+        java.nio.file.Path outputPath = java.nio.file.Paths.get("Outputs");
+        try {
+            if (java.nio.file.Files.exists(outputPath)) {
+            java.nio.file.Files.walk(outputPath)
+                .sorted(java.util.Comparator.reverseOrder())
+                .map(java.nio.file.Path::toFile)
+                .forEach(java.io.File::delete);
+            }
+            java.nio.file.Files.createDirectories(outputPath);
+        } catch (IOException e) {
+            System.err.println("Failed to create or clear output directory: " + e.getMessage());
+        }
+
+        // Start by writing the simulation settings to a file
         try(FileWriter writer = new FileWriter("JavaSimulation\\Outputs\\simulationSettings.csv")){
             writer.append(this.N + "," + this.dt + "," + this.n + ", 1\n");
         } catch (FileNotFoundException e) {
@@ -138,6 +153,7 @@ public class Simulation {
             System.err.println("Something went wrong writing to file: " + e.getMessage());
         }
 
+        // Then write each body to its own file
         for (int p = 0; p < this.n; p++) {
             try (FileWriter writer = new FileWriter("JavaSimulation\\Outputs\\output" + p + ".csv")) {
                 StringBuilder sb = new StringBuilder();
