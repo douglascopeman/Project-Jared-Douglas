@@ -12,13 +12,14 @@ public class Run{
         int N = Integer.parseInt(args[0]);
         double dt = Double.parseDouble(args[1]);
         IntegratorType integratorType = IntegratorType.SYMPLECTIC_EULER;
+        Simulation simulation; 
+
         if (args.length == 3) {
             integratorType = IntegratorType.valueOf(args[2]);
+            simulation = new Simulation(bodies, N, dt, 1, integratorType, false);
+        } else {
+            simulation = new Simulation(bodies, N, dt);
         }
-        
-
-
-        Simulation simulation = new Simulation(bodies, N, dt, integratorType);
 
         long statTime = System.currentTimeMillis();
         simulation.run();

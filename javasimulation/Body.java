@@ -41,11 +41,11 @@ public class Body {
         this.acceleration = new Vector(0, 0, 0);
         for (Body other_body : bodies) {
             if (other_body != this) {
-                Vector positionDifference = this.getPosition().subtract(other_body.getPosition());
+                Vector positionDifference = Vector.subtract(this.getPosition(), other_body.getPosition());
+                double scalingFactor = -G * other_body.getMass() / Math.pow(positionDifference.norm(), 3);
+                Vector accelerationContribution = Vector.multiply(positionDifference, scalingFactor);
 
-                this.acceleration = this.acceleration.add(
-                    positionDifference.multiply(-G * other_body.getMass() / Math.pow(positionDifference.norm(), 3))
-                );
+                this.acceleration = Vector.add(this.acceleration, accelerationContribution);
             }
         }
     }
@@ -58,5 +58,16 @@ public class Body {
         return this.acceleration;
     }
 
+    public double getPotentialEnergy(Body[] bodies, double G) {
+        double kineticEnergy = 0;
+        for (Body body : bodies) {
+            kineticEnergy += -G * this.mass * body.getMass() / Vector.subtract(this.getPosition(), body.getPosition()).norm();
+        }
+        return kineticEnergy;
+    }
+
+    public double getKineticEnergy() {
+        return 0.5 * this.mass * Vector.dot(this.velocity, this.velocity);
+    }
 
 }
