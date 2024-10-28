@@ -2,12 +2,11 @@ import numpy as np
 
 class Body():
     
-    def __init__(self, position=np.zeros(3, dtype=float), velocity=np.zeros(3, dtype=float), mass=1, G=1, plot_colour='w'):
+    def __init__(self, position=np.zeros(3, dtype=float), velocity=np.zeros(3, dtype=float), mass=1, G=1):
         self.mass = mass
         self.position = position
         self.velocity = velocity
         self.acceleration = np.zeros(3, dtype=float)
-        self.plot_colour = plot_colour
         self.G = G
             
     def calculate_acceleration(self, bodies):

@@ -2,7 +2,7 @@ package javasimulation;
 
 public class Integrators{
 
-    public static Body[] Euler(Body[] bodies, double dt) {
+    public static Body[] euler(Body[] bodies, double dt) {
         for (Body body : bodies) {
             body.calculateAcceleration(bodies);
         }
@@ -13,7 +13,7 @@ public class Integrators{
         return bodies;
     }
 
-    public static Body[] SymplecticEuler(Body[] bodies, double dt, boolean useVariableTimestep) {
+    public static Body[] symplecticEuler(Body[] bodies, double dt, boolean useVariableTimestep) {
         if (useVariableTimestep) {
             dt = getVariableTimestep(bodies, 0.1, new Integrator(IntegratorType.SYMPLECTIC_EULER, false));
         }
@@ -28,7 +28,7 @@ public class Integrators{
         return bodies;
     }
 
-    public static Body[] ThreeStepLeapfrog(Body[] bodies, double dt, boolean useVariableTimestep) {
+    public static Body[] threeStepLeapfrog(Body[] bodies, double dt, boolean useVariableTimestep) {
         for (Body body : bodies) {
             body.calculateAcceleration(bodies);
         }
@@ -72,7 +72,7 @@ public class Integrators{
         return bodies;
     }
 
-    public static Body[] Yoshida(Body[] bodies, double dt, boolean useVariableTimestep) {
+    public static Body[] yoshida(Body[] bodies, double dt, boolean useVariableTimestep) {
         double w0 = -(Math.pow(2, 1.0/3))/(2-(Math.pow(2, 1.0/3)));
         double w1 = 1/(2-(Math.pow(2,1.0/3)));
         double[] Cs = new double[4];
@@ -94,7 +94,7 @@ public class Integrators{
         return bodies;
     }
 
-    public static Body[] ForestRuth(Body[] bodies, double dt, boolean useVariableTimestep){
+    public static Body[] forestRuth(Body[] bodies, double dt, boolean useVariableTimestep){
         double x = 1.0/6 * (Math.pow(2, 1.0/3) + Math.pow(2, -1.0/3) - 1);
         double[] Cs = {x + 1.0/2, -x, -x, x + 1.0/2};
         double[] Ds = {2*x+1, -4*x-1, 2*x+1, 0};
@@ -107,6 +107,19 @@ public class Integrators{
         }
 
         return bodies;
+    }
+
+    private static double getVariableTimestep(Body[] bodies, double variableTimestepConstant, Integrator integrator) {
+        Body[] bodiesClone = bodies.clone();
+        double tempTimestep = getVariableTimestepHelper(bodies, variableTimestepConstant);
+
+        Body[] futureBodies = integrator.Integrate(bodiesClone, tempTimestep);
+
+        double tempTimestepBackwards = getVariableTimestepHelper(futureBodies, variableTimestepConstant);
+
+        double averageTimestep = (tempTimestep + tempTimestepBackwards) / 2;
+
+        return averageTimestep;
     }
 
     private static double getVariableTimestepHelper(Body[] bodies, double variableTimestepConstant) {
@@ -130,19 +143,6 @@ public class Integrators{
             }
         }
         return variableTimestepConstant * minPositionDifferenceNorm / maxVelocityDifferenceNorm;
-    }
-
-    private static double getVariableTimestep(Body[] bodies, double variableTimestepConstant, Integrator integrator) {
-        Body[] bodiesClone = bodies.clone();
-        double tempTimestep = getVariableTimestepHelper(bodies, variableTimestepConstant);
-
-        Body[] futureBodies = integrator.Integrate(bodiesClone, tempTimestep);
-
-        double tempTimestepBackwards = getVariableTimestepHelper(futureBodies, variableTimestepConstant);
-
-        double averageTimestep = (tempTimestep + tempTimestepBackwards) / 2;
-
-        return averageTimestep;
     }
 
 }

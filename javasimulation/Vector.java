@@ -4,6 +4,12 @@ public class Vector{
 
     private final double x, y, z;
 
+    public Vector(){
+        this.x = 0;
+        this.y = 0;
+        this.z = 0;
+    }
+
     public Vector(double x, double y, double z){
         this.x = x;
         this.y = y;
@@ -42,12 +48,20 @@ public class Vector{
         return new Vector(Math.abs(a.x), Math.abs(a.y), Math.abs(a.z));
     }
 
+    public static double dot(Vector a, Vector b){
+        return a.x * b.x + a.y * b.y + a.z * b.z;
+    }
+
+    public static Vector cross(Vector a, Vector b){
+        return new Vector(a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x);
+    }
+
     public static double norm(Vector a){
-        return Math.sqrt(a.x * a.x + a.y * a.y + a.z * a.z);
+        return Math.sqrt(dot(a, a));
     }
 
     public double norm(){
-        return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
+        return Math.sqrt(dot(this, this));
     }
 
     public Vector multiply(double b){
@@ -58,7 +72,7 @@ public class Vector{
         return new Vector(a.x * b, a.y * b, a.z * b);
     }
 
-    public static Vector vectorMultiply(Vector a, Vector b){
+    public static Vector multiply(Vector a, Vector b){
         return new Vector(a.x * b.x, a.y * b.y, a.z * b.z);
     }
 
@@ -68,6 +82,10 @@ public class Vector{
 
     public static Vector divide(Vector a, double b){
         return new Vector(a.x / b, a.y / b, a.z / b);
+    }
+
+    public Vector divide(double b){
+        return new Vector(this.x / b, this.y / b, this.z / b);
     }
 
     public static Vector divide(double a, Vector b){
