@@ -30,7 +30,7 @@ dt = 0.1
 # print(time.time() - start)
 
 pertubation = Pertubation.Pertubation(
-  N, dt, orbit_examples.figure_eight, 5, 0.01,
+  N, dt, orbit_examples.figure_eight, 1, 0.01,
                                      stop_conditions = {
                                        "energy_error_bound": 0.001,
                                         "distance_bound": 20,

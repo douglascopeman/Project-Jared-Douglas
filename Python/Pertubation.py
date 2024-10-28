@@ -19,6 +19,12 @@ class Pertubation():
         self.stop_conditions = stop_conditions
 
     
+    def calculate_centre_of_mass(self, bodies):
+        total_mass = np.sum([body.mass for body in bodies])
+        summation = np.sum([body.mass * body.position for body in bodies], axis=0) 
+        position = (1/total_mass) * summation
+        return position
+    
     def calculate_angular_momentum(self, bodies):
         L = [body.mass * np.cross(body.position, body.velocity) for body in bodies]
         L_norm = [LA.norm(q) for q in L]
@@ -48,13 +54,13 @@ class Pertubation():
          
         current_bodies[2].position = self.bodies[2].position + [-i*delta, -j*delta, 0]
 
-        theta = np.arcsin(change_in_angular_momentum/(LA.norm(current_bodies[1].position)*body_1_speed - LA.norm(current_bodies[2].position)*body_2_speed))
+        theta = np.arcsin(LA.norm(change_in_angular_momentum)/(LA.norm(current_bodies[1].position)*body_1_speed - LA.norm(current_bodies[2].position)*body_2_speed))
 
         body_1_position_angle = np.arctan((current_bodies[1].position[1])/(current_bodies[1].position[0]))
         body_2_position_angle = np.arctan((current_bodies[2].position[1])/(current_bodies[2].position[0]))
 
-        current_bodies[1].velocity[0] = (np.cos(theta + body_1_position_angle))*body_1_speed
-        current_bodies[2].velocity[1] = (np.sin(theta + body_2_position_angle))*body_2_speed
+        current_bodies[1].velocity = np.array([(np.cos(theta + body_1_position_angle))*body_1_speed,(np.sin(theta + body_1_position_angle))*body_1_speed,0.0])
+        current_bodies[2].velocity = np.array([(np.cos(theta + body_2_position_angle))*body_2_speed,(np.sin(theta + body_2_position_angle))*body_2_speed,0.0])
 
         return current_bodies
 
@@ -63,14 +69,17 @@ class Pertubation():
         bodies = self.bodies
 
         original_energy = self.calculate_kinetic_energy(bodies) + self.calculate_potential_energy(bodies)
+        original_CoM = self.calculate_centre_of_mass(bodies)
 
         for i in range(-self.p, self.p+1):
             for j in range(-self.p, self.p+1):
                 current_bodies = self.do_pertubation(i,j, self.delta)
                 current_energy = self.calculate_kinetic_energy(current_bodies) + self.calculate_potential_energy(current_bodies)
+                current_CoM = self.calculate_centre_of_mass(current_bodies)
 
                 #assert np.isclose(original_energy, current_energy)
                 print(original_energy - current_energy)
+                assert np.allclose(original_CoM, current_CoM)
 
                 potential_energy = np.zeros((self.N), dtype=float)
                 kinetic_energy = np.zeros((self.N), dtype=float)
