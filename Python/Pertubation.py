@@ -40,13 +40,21 @@ class Pertubation():
     
 
     def do_pertubation(self, i,j,delta, original_energy):
+        '''
+        Performs the pertubation to the right most body of the figure 8, this consists of a shift in the x and y direction.
+        The Center of Mass position and velocity, the energy and the angular momentum is preserved by adjusting the position of
+        the other two bodies and the velocity of all three.
+        '''
         current_bodies = copy.deepcopy(self.bodies)
-        # ------ This is only going to work for figure 8 ---------------
+
+        # Perform the pertubation of body 0 and then adjust body 2 accordingly to preserve CoM positon
         current_bodies[0].position = self.bodies[0].position + [i*delta, j*delta,0]
         current_bodies[2].position = -current_bodies[0].position
 
+        # Find the new magnatude of velocity required to preserve energy
         speed = np.sqrt((1/3)*(original_energy + 5/(2 * LA.norm(current_bodies[0].position))))
 
+        # To preserve angular momentum the velocity of body 1 is x(-2) that of bodies 0 and 1
         current_bodies[0].velocity = (self.bodies[0].velocity / LA.norm(self.bodies[0].velocity))*speed
         current_bodies[2].velocity = (self.bodies[2].velocity / LA.norm(self.bodies[2].velocity))*speed
         current_bodies[1].velocity = (self.bodies[1].velocity / LA.norm(self.bodies[1].velocity))*(-2)*speed
@@ -54,23 +62,30 @@ class Pertubation():
         return current_bodies
 
     def run(self):
-        stop_matrix = np.zeros((2*self.p+1, 2*self.p+1), dtype=float)
+        # The matrix to be populated with the distance from completion of the simulation (0 means it reached the end)
+        stop_matrix = np.zeros((2*self.p+1, 2*self.p+1), dtype=float)   # Always odd number of columns / rows
         bodies = self.bodies
 
+        # Initialising the origianl properties of the simulation to be used for checking in the loops
         original_energy = self.calculate_kinetic_energy(bodies) + self.calculate_potential_energy(bodies)
         original_CoM = self.calculate_centre_of_mass(bodies)
         original_angular_momentum = self.calculate_angular_momentum(bodies)
 
+        # Loop through all the pertubations required
         for i in range(-self.p, self.p+1):
             for j in range(-self.p, self.p+1):
+                # We perform the pertubation on all but the original i=0, j=0 case
                 if (i != 0 or j != 0):
                     current_bodies = self.do_pertubation(i,j, self.delta, original_energy)
                 else:
                     current_bodies = copy.deepcopy(self.bodies)
+                
+                # Calculating the new perturbed properties of the simulaiton
                 current_energy = self.calculate_kinetic_energy(current_bodies) + self.calculate_potential_energy(current_bodies)
                 current_CoM = self.calculate_centre_of_mass(current_bodies)
                 current_angular_momentum = self.calculate_angular_momentum(current_bodies)
 
+                # An assertion error is thrown if the constants are not "equal" to the original simulaiton
                 assert np.isclose(original_energy, current_energy)
                 assert np.allclose(current_angular_momentum, original_angular_momentum)
                 assert np.isclose(np.sum([body.velocity for body in bodies]),0)
@@ -79,6 +94,7 @@ class Pertubation():
                 potential_energy = np.zeros((self.N), dtype=float)
                 kinetic_energy = np.zeros((self.N), dtype=float)
 
+                # The loop for the simulation 
                 for k in range(0,self.N):
                     potential_energy[k] = self.calculate_potential_energy(current_bodies)
                     kinetic_energy[k] = self.calculate_kinetic_energy(current_bodies)
