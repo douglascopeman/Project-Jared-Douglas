@@ -16,8 +16,9 @@ public class Run{
 
         if (args.length == 3) {
             integratorType = IntegratorType.valueOf(args[2]);
-            simulation = new Simulation(bodies, N, dt, 1, integratorType, false);
+            simulation = new Simulation(bodies, N, dt, 1, integratorType, true, true);
         } else {
+            System.out.println("Using default simulation parameters");
             simulation = new Simulation(bodies, N, dt);
         }
 

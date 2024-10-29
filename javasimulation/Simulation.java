@@ -11,7 +11,9 @@ public class Simulation {
     private final double dt;
     private final double G;
     private final IntegratorType integratorType;
+    private final boolean useVariableTimestep;
     private double[][][] simulation;
+
 
     private boolean checkStopConditions = false;
     private double energyErrorBound = 1e-5;
@@ -31,9 +33,10 @@ public class Simulation {
         this.dt = dt;
         this.G = 1;
         this.integratorType = IntegratorType.SYMPLECTIC_EULER;
+        this.useVariableTimestep = false;
     }
 
-    public Simulation(Body[] bodies, int N, double dt, double G, IntegratorType integratorType, boolean checkStopConditions){
+    public Simulation(Body[] bodies, int N, double dt, double G, IntegratorType integratorType, boolean useVariableTimestep, boolean checkStopConditions){
         this.bodies = bodies;
         this.n = bodies.length;
         this.N = N;
@@ -41,6 +44,7 @@ public class Simulation {
         this.G = G;
         this.integratorType = integratorType;
         this.checkStopConditions = checkStopConditions;
+        this.useVariableTimestep = useVariableTimestep;
     }
 
     public void setEnergyErrorBound(double energyErrorBound) {
@@ -57,7 +61,7 @@ public class Simulation {
 
     public void run(){
         double[][][] simulation = new double[this.N][6][this.n];
-        Integrator integrator = new Integrator(this.integratorType, false);
+        Integrator integrator = new Integrator(this.integratorType, useVariableTimestep);
 
         // Set up arrarys for optional calculations
         Vector[] centreOfMass = new Vector[this.N];
@@ -88,7 +92,7 @@ public class Simulation {
             }
 
             // Check if the simulation should stop
-            if (this.checkStopConditions && i % 10 == 0) {
+            if (this.checkStopConditions && i % 10 == 1) {
                 checkStopConditions(potentialEnergy, kineticEnergy, centreOfMass, i);
             }
 
@@ -125,10 +129,28 @@ public class Simulation {
         }
 
         // Check if the timestep size is within the bound
-        // TODO: Implement this
+        double lastTimestep = 0.0;
+        try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader("Outputs/timesteps.csv"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+            lastTimestep = Double.parseDouble(line);
+            }
+        } catch (FileNotFoundException e) {
+            System.err.println("Timesteps file not found");
+        } catch (IOException e) {
+            System.err.println("Something went wrong reading the file: " + e.getMessage());
+        }
+
+        if (lastTimestep < this.timestepSizeBound) {
+            System.out.println("Simulation terminated after exceeding timestep size bound");
+            System.out.println("Timestep size bound: \t" + this.timestepSizeBound);
+            System.out.println("Last timestep size: \t" + lastTimestep);
+            System.out.println("Time reached: \t" + timestep * this.dt);
+            throw new RuntimeException("Timestep size bound exceeded");
+        }
     }
 
-    private void writeSimulationToFiles(){
+        private void writeSimulationToFiles(){
 
         // Create the output directory if it doesn't exist, or clear it if it does
         java.nio.file.Path outputPath = java.nio.file.Paths.get("Outputs");
