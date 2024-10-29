@@ -12,10 +12,12 @@ public class Simulation {
     private final double G;
     private final IntegratorType integratorType;
     private final boolean useVariableTimestep;
+    private double elapsedTime = 0;
+    private Integrator integrator;
     private double[][][] simulation;
 
 
-    private boolean checkStopConditions = false;
+    private final boolean checkStopConditions;
     private double energyErrorBound = 1e-5;
     private double distanceBound = 20;
     private double timestepSizeBound = 1e-6;
@@ -33,7 +35,9 @@ public class Simulation {
         this.dt = dt;
         this.G = 1;
         this.integratorType = IntegratorType.SYMPLECTIC_EULER;
+        this.checkStopConditions = false;
         this.useVariableTimestep = false;
+        this.integrator = new Integrator(integratorType, useVariableTimestep);
     }
 
     public Simulation(Body[] bodies, int N, double dt, double G, IntegratorType integratorType, boolean useVariableTimestep, boolean checkStopConditions){
@@ -45,6 +49,7 @@ public class Simulation {
         this.integratorType = integratorType;
         this.checkStopConditions = checkStopConditions;
         this.useVariableTimestep = useVariableTimestep;
+        this.integrator = new Integrator(integratorType, useVariableTimestep);
     }
 
     public void setEnergyErrorBound(double energyErrorBound) {
@@ -60,29 +65,28 @@ public class Simulation {
     }
 
     public void run(){
-        double[][][] simulation = new double[this.N][6][this.n];
-        Integrator integrator = new Integrator(this.integratorType, useVariableTimestep);
+        double[][][] simulation = new double[N][6][n];
 
         // Set up arrarys for optional calculations
-        Vector[] centreOfMass = new Vector[this.N];
-        double[] potentialEnergy = new double[this.N];
-        double[] kineticEnergy = new double[this.N];
-        Vector[] angularMomentum = new Vector[this.N];
-        Vector[] linearMomentum = new Vector[this.N];
+        Vector[] centreOfMass = new Vector[N];
+        double[] potentialEnergy = new double[N];
+        double[] kineticEnergy = new double[N];
+        Vector[] angularMomentum = new Vector[N];
+        Vector[] linearMomentum = new Vector[N];
 
         // ----- Main Time Loop ----- \\
         for (int i = 0; i < this.N; i++) {
             // Record all optional calculations
-            centreOfMass[i] = this.calculateCentreOfMass();
-            potentialEnergy[i] = this.calculatePotentialEnergy();
-            kineticEnergy[i] = this.calculateKineticEnergy();
-            angularMomentum[i] = this.calculateAngularMomentum();
-            linearMomentum[i] = this.calclateLinearMomentum();
+            centreOfMass[i] = calculateCentreOfMass();
+            potentialEnergy[i] = calculatePotentialEnergy();
+            kineticEnergy[i] = calculateKineticEnergy();
+            angularMomentum[i] = calculateAngularMomentum();
+            linearMomentum[i] = calclateLinearMomentum();
 
             // Record the current timestep of the simulation
             for (int p = 0; p < this.n; p++) {
-                Vector position = this.bodies[p].getPosition();
-                Vector velocity = this.bodies[p].getVelocity();
+                Vector position = bodies[p].getPosition();
+                Vector velocity = bodies[p].getVelocity();
                 simulation[i][0][p] = position.getX();
                 simulation[i][1][p] = position.getY();
                 simulation[i][2][p] = position.getZ();
@@ -91,13 +95,14 @@ public class Simulation {
                 simulation[i][5][p] = velocity.getZ();
             }
 
-            // Check if the simulation should stop
-            if (this.checkStopConditions && i % 10 == 1) {
-                checkStopConditions(potentialEnergy, kineticEnergy, centreOfMass, i);
-            }
-
             // Then update the states of all bodies
-            integrator.Integrate(this.bodies, this.dt);
+            double usedTimestep = integrator.Integrate(bodies, dt);
+            elapsedTime += usedTimestep;
+
+            // Check if the simulation should stop
+            if (checkStopConditions && i % 10 == 1) {
+                checkStopConditions(potentialEnergy, kineticEnergy, centreOfMass, i, usedTimestep, elapsedTime);
+            }
         }
 
         // Write the simulation to a global variable for convenience
@@ -105,7 +110,7 @@ public class Simulation {
         writeSimulationToFiles();
     }
 
-    private void checkStopConditions(double[] potentialEnergy, double[] kineticEnergy, Vector[] centreOfMass, int timestep){
+    private void checkStopConditions(double[] potentialEnergy, double[] kineticEnergy, Vector[] centreOfMass, int timestep, double usedTimestep, double elapsedTime) {
 
         // Check if the energy error is within the bound
         double totalEnergy = potentialEnergy[timestep] + kineticEnergy[timestep];
@@ -114,7 +119,7 @@ public class Simulation {
             System.out.println("Simulation terminated after exceeding energy error bound");
             System.out.println("Energy error bound: \t" + this.energyErrorBound);
             System.out.println("Energy error: \t" + energyError);
-            System.out.println("Time reached: \t" + timestep * this.dt);
+            System.out.println("Time reached: \t" + elapsedTime);
             throw new RuntimeException("Energy error bound exceeded");
         }
 
@@ -124,36 +129,19 @@ public class Simulation {
             System.out.println("Simulation terminated after exceeding distance bound");
             System.out.println("Distance bound: \t" + this.distanceBound);
             System.out.println("Distance: \t" + distance);
-            System.out.println("Time reached: \t" + timestep * this.dt);
+            System.out.println("Time reached: \t" + elapsedTime);
             throw new RuntimeException("Distance bound exceeded");
         }
 
         // Check if the timestep size is within the bound
         if (useVariableTimestep) {
-            checkTimestep(timestep);
-        }
-    }
-
-    private void checkTimestep(double timestep) {
-        double lastTimestep = 0.0;
-        // keep reader open for whole simulation???
-        try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader("Outputs/timesteps.csv"))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-            lastTimestep = Double.parseDouble(line);
+            if (usedTimestep < this.timestepSizeBound) {
+                System.out.println("Simulation terminated after exceeding timestep size bound");
+                System.out.println("Timestep size bound: \t" + this.timestepSizeBound);
+                System.out.println("Timestep size: \t" + usedTimestep);
+                System.out.println("Time reached: \t" + elapsedTime);
+                throw new RuntimeException("Timestep size bound exceeded");
             }
-        } catch (FileNotFoundException e) {
-            System.err.println("Timesteps file not found");
-        } catch (IOException e) {
-            System.err.println("Something went wrong reading the file: " + e.getMessage());
-        }
-
-        if (lastTimestep < this.timestepSizeBound) {
-            System.out.println("Simulation terminated after exceeding timestep size bound");
-            System.out.println("Timestep size bound: \t" + this.timestepSizeBound);
-            System.out.println("Last timestep size: \t" + lastTimestep);
-            System.out.println("Time reached: \t" + timestep * this.dt);
-            throw new RuntimeException("Timestep size bound exceeded");
         }
     }
 
@@ -175,7 +163,7 @@ public class Simulation {
 
         // Start by writing the simulation settings to a file
         try(FileWriter writer = new FileWriter("JavaSimulation\\Outputs\\simulationSettings.csv")){
-            writer.append(this.N + "," + this.dt + "," + this.n + ", 1\n");
+            writer.append(this.N + "," + this.dt + "," + this.n + "," + this.G + "\n");
         } catch (FileNotFoundException e) {
             System.err.println("Setting file not found");
         } catch (IOException e) {

@@ -38,7 +38,7 @@ public class Body {
     }
 
     public void calculateAcceleration(Body[] bodies, double G) {
-        this.acceleration = new Vector(0, 0, 0);
+        this.acceleration = new Vector();
         for (Body other_body : bodies) {
             if (other_body != this) {
                 Vector positionDifference = Vector.subtract(this.getPosition(), other_body.getPosition());

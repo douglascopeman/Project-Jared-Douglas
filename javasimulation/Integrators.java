@@ -1,11 +1,8 @@
 package javasimulation;
-import java.io.FileWriter;
-import java.io.IOException;
-
 
 public class Integrators{
 
-    public static Body[] euler(Body[] bodies, double dt) {
+    public static void euler(Body[] bodies, double dt) {
         for (Body body : bodies) {
             body.calculateAcceleration(bodies);
         }
@@ -13,13 +10,11 @@ public class Integrators{
             body.setPosition(Vector.add(body.getPosition(), Vector.multiply(body.getVelocity(), dt)));
             body.setVelocity(Vector.add(body.getVelocity(), Vector.multiply(body.getAcceleration(), dt)));
         }
-        return bodies;
     }
 
-    public static Body[] symplecticEuler(Body[] bodies, double dt, FileWriter timestepWriter) throws IOException{
-        if (timestepWriter != null) {
+    public static double symplecticEuler(Body[] bodies, double dt, boolean useVariableTimestep) {
+        if (useVariableTimestep) {
             dt = getVariableTimestep(bodies, 0.1, new Integrator(IntegratorType.SYMPLECTIC_EULER, false));
-            timestepWriter.write(dt + "\n");
         }
 
         for (Body body : bodies){
@@ -29,17 +24,16 @@ public class Integrators{
             body.setVelocity(Vector.add(body.getVelocity(), Vector.multiply(body.getAcceleration(), dt)));
             body.setPosition(Vector.add(body.getPosition(), Vector.multiply(body.getVelocity(), dt)));
         }
-        return bodies;
+        return dt;
     }
 
-    public static Body[] threeStepLeapfrog(Body[] bodies, double dt, FileWriter timestepWriter) throws IOException {
+    public static double threeStepLeapfrog(Body[] bodies, double dt, boolean useVariableTimestep) {
         for (Body body : bodies) {
             body.calculateAcceleration(bodies);
         }
 
-        if (timestepWriter != null) {
+        if (useVariableTimestep) {
             dt = getVariableTimestep(bodies, 0.1, new Integrator(IntegratorType.THREE_STEP_LEAPFROG, false));
-            timestepWriter.write(dt + "\n");
         }
 
         Vector[] half_velocity = new Vector[bodies.length];
@@ -59,10 +53,10 @@ public class Integrators{
             bodies[i].setVelocity(Vector.add(half_velocity[i], Vector.multiply(bodies[i].getAcceleration(), dt/2)));
         }
 
-        return bodies;
+        return dt;
     }
 
-    private static Body[] higherOrderHelper(Body[] bodies, double dt, double[] Cs, double[] Ds) {
+    private static void higherOrderHelper(Body[] bodies, double dt, double[] Cs, double[] Ds) {
         for (int i = 0; i < 4; i++){
             for (Body body : bodies){
                 body.setPosition(Vector.add(body.getPosition(), Vector.multiply(body.getVelocity(), dt*Cs[i])));
@@ -74,10 +68,9 @@ public class Integrators{
             body.setVelocity(Vector.add(body.getVelocity(), Vector.multiply(body.getAcceleration(), dt*Ds[i])));
             }
         }
-        return bodies;
     }
 
-    public static Body[] yoshida(Body[] bodies, double dt, FileWriter timestepWriter) throws IOException {
+    public static double yoshida(Body[] bodies, double dt, boolean useVariableTimestep) {
         double w0 = -(Math.pow(2, 1.0/3))/(2-(Math.pow(2, 1.0/3)));
         double w1 = 1/(2-(Math.pow(2,1.0/3)));
         double[] Cs = new double[4];
@@ -90,39 +83,37 @@ public class Integrators{
         Ds[2] = w1;
         Ds[1] = w0;
 
-        if (timestepWriter != null) {
+        if (useVariableTimestep) {
             dt = getVariableTimestep(bodies, 0.1, new Integrator(IntegratorType.YOSHIDA, false));
-            timestepWriter.write(dt + "\n");
         }
 
         higherOrderHelper(bodies, dt, Cs, Ds);
 
-        return bodies;
+        return dt;
     }
 
-    public static Body[] forestRuth(Body[] bodies, double dt, FileWriter timestepWriter) throws IOException {
+    public static double forestRuth(Body[] bodies, double dt, boolean useVariableTimestep) {
         double x = 1.0/6 * (Math.pow(2, 1.0/3) + Math.pow(2, -1.0/3) - 1);
         double[] Cs = {x + 1.0/2, -x, -x, x + 1.0/2};
         double[] Ds = {2*x+1, -4*x-1, 2*x+1, 0};
 
         for(int i = 0; i < 4; i++){
-            if (timestepWriter != null) {
+            if (useVariableTimestep) {
                 dt = getVariableTimestep(bodies, 0.1, new Integrator(IntegratorType.FOREST_RUTH, false));
-                timestepWriter.write(dt + "\n");
             }
             higherOrderHelper(bodies, dt, Cs, Ds);
         }
 
-        return bodies;
+        return dt;
     }
 
     private static double getVariableTimestep(Body[] bodies, double variableTimestepConstant, Integrator integrator) {
         Body[] bodiesClone = bodies.clone();
         double tempTimestep = getVariableTimestepHelper(bodies, variableTimestepConstant);
 
-        Body[] futureBodies = integrator.Integrate(bodiesClone, tempTimestep);
+        integrator.Integrate(bodiesClone, tempTimestep);
 
-        double tempTimestepBackwards = getVariableTimestepHelper(futureBodies, variableTimestepConstant);
+        double tempTimestepBackwards = getVariableTimestepHelper(bodiesClone, variableTimestepConstant);
 
         double averageTimestep = (tempTimestep + tempTimestepBackwards) / 2;
 
