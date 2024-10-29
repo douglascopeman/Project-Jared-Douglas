@@ -1,6 +1,8 @@
 import numpy as np
 from numpy import linalg as LA
 from itertools import combinations
+import matplotlib.pyplot as plt
+import seaborn as sns
 from Body import Body
 import Integrators
 from Plotter import Plotter
@@ -49,15 +51,15 @@ class Pertubation():
 
         # Perform the pertubation of body 0 and then adjust body 2 accordingly to preserve CoM positon
         current_bodies[0].position = self.bodies[0].position + [i*delta, j*delta,0]
-        current_bodies[2].position = -current_bodies[0].position
+        current_bodies[2].position = -copy.deepcopy(current_bodies[0].position)
 
         # Find the new magnatude of velocity required to preserve energy
         speed = np.sqrt((1/3)*(original_energy + 5/(2 * LA.norm(current_bodies[0].position))))
 
         # To preserve angular momentum the velocity of body 1 is x(-2) that of bodies 0 and 1
         current_bodies[0].velocity = (self.bodies[0].velocity / LA.norm(self.bodies[0].velocity))*speed
-        current_bodies[2].velocity = (self.bodies[2].velocity / LA.norm(self.bodies[2].velocity))*speed
-        current_bodies[1].velocity = (self.bodies[1].velocity / LA.norm(self.bodies[1].velocity))*(-2)*speed
+        current_bodies[2].velocity = np.copy(current_bodies[0].velocity)
+        current_bodies[1].velocity = (-2)*np.copy(current_bodies[0].velocity)
 
         return current_bodies
 
@@ -102,6 +104,7 @@ class Pertubation():
                     # Checking if stop conditions are met
                     if k%10 == 1:
                         body_pairs = list(combinations(current_bodies, 2))
+
                         energy_error = (np.abs((kinetic_energy[k]-kinetic_energy[0]+potential_energy[k]-potential_energy[0])/(potential_energy[0]+kinetic_energy[0])))
                         max_relative_position = max([LA.norm(body1.position - body2.position) for body1, body2 in body_pairs])
 
@@ -127,6 +130,10 @@ class Pertubation():
 
                     current_bodies, used_dt = Integrators.yoshida(current_bodies, self.dt)
 
-
+        self.plot_pertubation(stop_matrix)
         return stop_matrix
+    
+    def plot_pertubation(self, stop_matrix):
+        hm = sns.heatmap(data=stop_matrix)
+        plt.show()
 
