@@ -12,6 +12,10 @@ public class Body {
         this.mass = mass;
     }
 
+    public Body(Vector position, Vector velocity) {
+        this(position, velocity, 1);
+    }
+
     // Getters & Setters
     public double getMass() {
         return this.mass;
