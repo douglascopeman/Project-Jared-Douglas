@@ -3,7 +3,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 // Create a class that implements the existing Integrator interface
-public class Integrator implements IntegratorInterface {
+public class Integrator {
     private final IntegratorType type;
     private FileWriter timestepWriter;
     
@@ -21,7 +21,6 @@ public class Integrator implements IntegratorInterface {
         }
     }
     
-    @Override
     public Body[] Integrate(Body[] bodies, double dt) {
         try {
             switch (type) {

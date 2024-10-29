@@ -129,7 +129,14 @@ public class Simulation {
         }
 
         // Check if the timestep size is within the bound
+        if (useVariableTimestep) {
+            checkTimestep(timestep);
+        }
+    }
+
+    private void checkTimestep(double timestep) {
         double lastTimestep = 0.0;
+        // keep reader open for whole simulation???
         try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader("Outputs/timesteps.csv"))) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -150,7 +157,7 @@ public class Simulation {
         }
     }
 
-        private void writeSimulationToFiles(){
+    private void writeSimulationToFiles(){
 
         // Create the output directory if it doesn't exist, or clear it if it does
         java.nio.file.Path outputPath = java.nio.file.Paths.get("Outputs");
