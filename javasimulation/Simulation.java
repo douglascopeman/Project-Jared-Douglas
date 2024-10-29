@@ -11,58 +11,57 @@ public class Simulation {
     private final int N;
     private final double dt;
     private final double G;
-    private final IntegratorType integratorType;
-    private final boolean useVariableTimestep;
     private double elapsedTime = 0;
     private Integrator integrator;
     private double[][][] simulation;
 
     private HashMap<String, Boolean> options = new HashMap<String, Boolean>();
 
-    private final boolean checkStopConditions;
     private double energyErrorBound = 1e-5;
     private double distanceBound = 20;
     private double timestepSizeBound = 1e-6;
 
-    /**
-     * @param bodies Array of Body objects
-     * @param N Number of iterations
-     * @param dt Time step
-     * 
-     */
+    private Vector[] centreOfMass;
+    private double[] potentialEnergy;
+    private double[] kineticEnergy;
+    private Vector[] angularMomentum;
+    private Vector[] linearMomentum;
+
     public Simulation(Body[] bodies, int N, double dt) {
         this.bodies = bodies;
         this.n = bodies.length;
         this.N = N;
         this.dt = dt;
         this.G = 1;
-        this.integratorType = IntegratorType.SYMPLECTIC_EULER;
-        this.checkStopConditions = false;
-        this.useVariableTimestep = false;
-        this.integrator = new Integrator(integratorType, useVariableTimestep);
-    }
 
-    public Simulation(Body[] bodies, int N, double dt, double G, IntegratorType integratorType, boolean useVariableTimestep, boolean checkStopConditions){
-        this.bodies = bodies;
-        this.n = bodies.length;
-        this.N = N;
-        this.dt = dt;
-        this.G = G;
-        this.integratorType = integratorType;
-
-        options.put("checkStopConditions", checkStopConditions);
-        options.put("useVariableTimestep", useVariableTimestep);
+        options.put("checkStopConditions", false);
+        options.put("useVariableTimestep", false);
         options.put("calculateCentreOfMass", false);
-        options.put("calculatePotentialEnergy", false);
-        options.put("calculateKineticEnergy", false);
+        options.put("calcualteEnergies", false);
         options.put("calculateAngularMomentum", false);
         options.put("calclateLinearMomentum", false);
 
+        centreOfMass = new Vector[N];
+        potentialEnergy = new double[N];
+        kineticEnergy = new double[N];
+        angularMomentum = new Vector[N];
+        linearMomentum = new Vector[N];
 
+        this.integrator = new Integrator(IntegratorType.SYMPLECTIC_EULER, options.get("useVariableTimestep"));
+    }
 
-        this.checkStopConditions = checkStopConditions;
-        this.useVariableTimestep = useVariableTimestep;
-        this.integrator = new Integrator(integratorType, useVariableTimestep);
+    public Simulation(Body[] bodies, int N, double dt, double G, IntegratorType integratorType){
+        this(bodies, N, dt);
+        this.integrator = new Integrator(integratorType, options.get("useVariableTimestep"));
+    }
+
+    public HashMap<String, Boolean> getOptions() {
+        return options;
+    }
+
+    public void setOptions(HashMap<String, Boolean> options) {
+        options.putAll(options);
+        integrator.setUseVariableTimestep(options.get("useVariableTimestep"));
     }
 
     public void setEnergyErrorBound(double energyErrorBound) {
@@ -77,24 +76,29 @@ public class Simulation {
         this.timestepSizeBound = timestepSizeBound;
     }
 
-    public void run(){
-        double[][][] simulation = new double[N][6][n];
+    private void doOptionalCalculations(int timestep) {
+        if (options.get("calculateCentreOfMass")) {
+            centreOfMass[timestep] = calculateCentreOfMass();
+        }
+        if (options.get("calcualteEnergies")) {
+            potentialEnergy[timestep] = calculatePotentialEnergy();
+            kineticEnergy[timestep] = calculateKineticEnergy();
+        }
+        if (options.get("calculateAngularMomentum")) {
+            angularMomentum[timestep] = calculateAngularMomentum();
+        }
+        if (options.get("calclateLinearMomentum")) {
+            linearMomentum[timestep] = calclateLinearMomentum();
+        }
+    }
 
-        // Set up arrarys for optional calculations
-        Vector[] centreOfMass = new Vector[N];
-        double[] potentialEnergy = new double[N];
-        double[] kineticEnergy = new double[N];
-        Vector[] angularMomentum = new Vector[N];
-        Vector[] linearMomentum = new Vector[N];
+    public void run(){
+        simulation = new double[N][6][n];
 
         // ----- Main Time Loop ----- \\
         for (int i = 0; i < this.N; i++) {
             // Record all optional calculations
-            centreOfMass[i] = calculateCentreOfMass();
-            potentialEnergy[i] = calculatePotentialEnergy();
-            kineticEnergy[i] = calculateKineticEnergy();
-            angularMomentum[i] = calculateAngularMomentum();
-            linearMomentum[i] = calclateLinearMomentum();
+            doOptionalCalculations(i);
 
             // Record the current timestep of the simulation
             for (int p = 0; p < this.n; p++) {
@@ -109,52 +113,68 @@ public class Simulation {
             }
 
             // Then update the states of all bodies
-            double usedTimestep = integrator.Integrate(bodies, dt);
-            elapsedTime += usedTimestep;
+            double usedTimestepLength = integrator.Integrate(bodies, dt);
+            elapsedTime += usedTimestepLength;
 
             // Check if the simulation should stop
-            if (checkStopConditions) {
-                checkStopConditions(potentialEnergy, kineticEnergy, centreOfMass, i, usedTimestep, elapsedTime);
+            if (options.get("checkStopConditions")) {
+                checkStopConditions(i, usedTimestepLength, elapsedTime);
             }
         }
 
-        // Write the simulation to a global variable for convenience
-        this.simulation = simulation;
         writeSimulationToFiles();
     }
 
-    private void checkStopConditions(double[] potentialEnergy, double[] kineticEnergy, Vector[] centreOfMass, int timestep, double usedTimestep, double elapsedTime) {
-
-        // Check if the energy error is within the bound
-        double totalEnergy = potentialEnergy[timestep] + kineticEnergy[timestep];
-        double energyError = Math.abs((totalEnergy - (potentialEnergy[0] + kineticEnergy[0])) / (potentialEnergy[0] + kineticEnergy[0]));
-        if (energyError < this.energyErrorBound) {
-            System.out.println("Simulation terminated after exceeding energy error bound");
-            System.out.println("Energy error bound: \t" + this.energyErrorBound);
-            System.out.println("Energy error: \t" + energyError);
-            System.out.println("Time reached: \t" + elapsedTime);
-            throw new RuntimeException("Energy error bound exceeded");
+    private void checkStopConditions(int timestep, double usedTimestepLength, double elapsedTime) {
+        if (options.get("calculateEnergies")) {
+            // Check if the energy error is within the bound
+            double totalEnergy = potentialEnergy[timestep] + kineticEnergy[timestep];
+            double energyError = Math.abs((totalEnergy - (potentialEnergy[0] + kineticEnergy[0])) / (potentialEnergy[0] + kineticEnergy[0]));
+            if (energyError < energyErrorBound) {
+                System.out.println("Simulation terminated after exceeding energy error bound");
+                System.out.println("Energy error bound: \t" + energyErrorBound);
+                System.out.println("Energy error: \t" + energyError);
+                System.out.println("Time reached: \t" + elapsedTime);
+                throw new RuntimeException("Energy error bound exceeded");
+            }
         }
 
-        // Check if the distance between the centre of mass and the origin is within the bound
-        double distance = centreOfMass[timestep].norm();
-        if (distance > this.distanceBound) {
-            System.out.println("Simulation terminated after exceeding distance bound");
-            System.out.println("Distance bound: \t" + this.distanceBound);
-            System.out.println("Distance: \t" + distance);
-            System.out.println("Time reached: \t" + elapsedTime);
-            throw new RuntimeException("Distance bound exceeded");
+        if (options.get("calculateCentreOfMass")) {
+            // Check if the distance between the centre of mass and the origin is within the bound
+            double distance = centreOfMass[timestep].norm();
+            if (distance > distanceBound) {
+                System.out.println("Simulation terminated after exceeding distance bound");
+                System.out.println("Distance bound: \t" + distanceBound);
+                System.out.println("Distance: \t" + distance);
+                System.out.println("Time reached: \t" + elapsedTime);
+                throw new RuntimeException("Distance bound exceeded");
+            }
         }
 
         // Check if the timestep size is within the bound
-        if (useVariableTimestep) {
-            if (usedTimestep < this.timestepSizeBound) {
+        if (options.get("useVariableTimestep")) {
+            if (usedTimestepLength < timestepSizeBound) {
                 System.out.println("Simulation terminated after exceeding timestep size bound");
-                System.out.println("Timestep size bound: \t" + this.timestepSizeBound);
-                System.out.println("Timestep size: \t" + usedTimestep);
+                System.out.println("Timestep size bound: \t" + timestepSizeBound);
+                System.out.println("Timestep size: \t" + usedTimestepLength);
                 System.out.println("Time reached: \t" + elapsedTime);
                 throw new RuntimeException("Timestep size bound exceeded");
             }
+        }
+    }
+
+    private void setupDirectories() {
+        java.nio.file.Path outputPath = java.nio.file.Paths.get("Outputs");
+        try {
+            if (java.nio.file.Files.exists(outputPath)) {
+            java.nio.file.Files.walk(outputPath)
+                .sorted(java.util.Comparator.reverseOrder())
+                .map(java.nio.file.Path::toFile)
+                .forEach(java.io.File::delete);
+            }
+            java.nio.file.Files.createDirectories(outputPath);
+        } catch (IOException e) {
+            System.err.println("Failed to create or clear output directory: " + e.getMessage());
         }
     }
 
@@ -163,6 +183,90 @@ public class Simulation {
             writer.append(this.N + "," + this.dt + "," + this.n + "," + this.G + "\n");
         } catch (FileNotFoundException e) {
             System.err.println("Setting file not found");
+        } catch (IOException e) {
+            System.err.println("Something went wrong writing to file: " + e.getMessage());
+        }
+    }
+
+    private enum CalculationType {
+        POTENTIAL_ENERGY,
+        KINETIC_ENERGY,
+        CENTRE_OF_MASS,
+        ANGULAR_MOMENTUM,
+        LINEAR_MOMENTUM
+    }
+
+    private void writeCalculationToFile(CalculationType calculationType) {
+        String fileName = "";
+        switch (calculationType) {
+            case POTENTIAL_ENERGY:
+                fileName = "JavaSimulation\\Outputs\\potentialEnergy.csv";
+                break;
+            case KINETIC_ENERGY:
+                fileName = "JavaSimulation\\Outputs\\kineticEnergy.csv";
+                break;
+            case CENTRE_OF_MASS:
+                fileName = "JavaSimulation\\Outputs\\centreOfMass.csv";
+                break;
+            case ANGULAR_MOMENTUM:
+                fileName = "JavaSimulation\\Outputs\\angularMomentum.csv";
+                break;
+            case LINEAR_MOMENTUM:
+                fileName = "JavaSimulation\\Outputs\\linearMomentum.csv";
+                break;
+            default:
+                break;
+        }
+
+        try (FileWriter writer = new FileWriter(fileName)) {
+            StringBuilder sb = new StringBuilder();
+            switch (calculationType) {
+                case POTENTIAL_ENERGY:
+                    for (int i = 0; i < this.N; i++) {
+                        sb.append(potentialEnergy[i]).append("\n");
+                    }
+                    break;
+                case KINETIC_ENERGY:
+                    for (int i = 0; i < this.N; i++) {
+                        sb.append(kineticEnergy[i]).append("\n");
+                    }
+                    break;
+                case CENTRE_OF_MASS:
+                    for (int i = 0; i < this.N; i++) {
+                        sb.append(centreOfMass[i].getX())
+                        .append(",")
+                        .append(centreOfMass[i].getY())
+                        .append(",")
+                        .append(centreOfMass[i].getZ())
+                        .append("\n");
+                    }
+                    break;
+                case ANGULAR_MOMENTUM:
+                    for (int i = 0; i < this.N; i++) {
+                        sb.append(angularMomentum[i].getX())
+                        .append(",")
+                        .append(angularMomentum[i].getY())
+                        .append(",")
+                        .append(angularMomentum[i].getZ())
+                        .append("\n");
+                    }
+                    break;
+                case LINEAR_MOMENTUM:
+                    for (int i = 0; i < this.N; i++) {
+                        sb.append(linearMomentum[i].getX())
+                        .append(",")
+                        .append(linearMomentum[i].getY())
+                        .append(",")
+                        .append(linearMomentum[i].getZ())
+                        .append("\n");
+                    }
+                    break;
+                default:
+                    break;
+            }
+            writer.write(sb.toString());
+        } catch (FileNotFoundException e) {
+            System.err.println("Calculation file not found");
         } catch (IOException e) {
             System.err.println("Something went wrong writing to file: " + e.getMessage());
         }
@@ -198,24 +302,28 @@ public class Simulation {
     private void writeSimulationToFiles() {
 
         // Create the output directory if it doesn't exist, or clear it if it does
-        java.nio.file.Path outputPath = java.nio.file.Paths.get("Outputs");
-        try {
-            if (java.nio.file.Files.exists(outputPath)) {
-            java.nio.file.Files.walk(outputPath)
-                .sorted(java.util.Comparator.reverseOrder())
-                .map(java.nio.file.Path::toFile)
-                .forEach(java.io.File::delete);
-            }
-            java.nio.file.Files.createDirectories(outputPath);
-        } catch (IOException e) {
-            System.err.println("Failed to create or clear output directory: " + e.getMessage());
-        }
+        setupDirectories();
 
         // Start by writing the simulation settings to a file
         writeSettingsToFile();
 
         // Then write each body to its own file
         writeBodiesToFiles();
+
+        // Then write all optional calculations to files
+        if (options.get("calculateCentreOfMass")) {
+            writeCalculationToFile(CalculationType.CENTRE_OF_MASS);
+        }
+        if (options.get("calcualteEnergies")) {
+            writeCalculationToFile(CalculationType.POTENTIAL_ENERGY);
+            writeCalculationToFile(CalculationType.KINETIC_ENERGY);
+        }
+        if (options.get("calculateAngularMomentum")) {
+            writeCalculationToFile(CalculationType.ANGULAR_MOMENTUM);
+        }
+        if (options.get("calclateLinearMomentum")) {
+            writeCalculationToFile(CalculationType.LINEAR_MOMENTUM);
+        }
     }
 
     // ---------- Simulation optional Calculations ---------- \\
@@ -274,6 +382,5 @@ public class Simulation {
         
         return P;
     }
-
 
 }

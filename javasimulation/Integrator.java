@@ -12,6 +12,13 @@ public class Integrator {
             throw new IllegalArgumentException("Euler integrator does not support variable timestep");
         }
     }
+
+    public void setUseVariableTimestep(boolean useVariableTimestep) {
+        if (type == IntegratorType.EULER && useVariableTimestep) {
+            throw new IllegalArgumentException("Euler integrator does not support variable timestep");
+        }
+        this.useVariableTimestep = useVariableTimestep;
+    }
     
     public double Integrate(Body[] bodies, double dt) {
         switch (type) {

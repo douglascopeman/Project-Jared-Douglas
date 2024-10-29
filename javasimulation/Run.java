@@ -1,31 +1,34 @@
 package javasimulation;
+import java.util.HashMap;
 
 public class Run{
 
     public static void main(String[] args) {
 
-        // Create bodies
-        Body[] bodies = new Body[2];
-        bodies[0] = new Body(new Vector(1, 0, 0), new Vector(0, 0.5, 0), 1);
-        bodies[1] = new Body(new Vector(-1, 0, 0), new Vector(0, -0.5, 0), 1);
-        // Parse command line arguments
-        int N = Integer.parseInt(args[0]);
-        double dt = Double.parseDouble(args[1]);
-        IntegratorType integratorType = IntegratorType.SYMPLECTIC_EULER;
+        Body[] bodies                   = OrbitExamples.figureEight;
+        int N                           = Integer.parseInt(args[0]);
+        double dt                       = Double.parseDouble(args[1]);
+        IntegratorType integratorType   = args.length == 3  ? IntegratorType.valueOf(args[2]) 
+                                                            : IntegratorType.SYMPLECTIC_EULER;
+        boolean useVariableTimestep     = args.length == 4  ? Boolean.parseBoolean(args[3]) 
+                                                            : false;
+        boolean checkStopConditions     = args.length == 5  ? Boolean.parseBoolean(args[4]) 
+                                                            : false;
         Simulation simulation; 
 
-        if (args.length == 3) {
-            integratorType = IntegratorType.valueOf(args[2]);
-            simulation = new Simulation(bodies, N, dt, 1, integratorType, true, true);
-        } else {
-            System.out.println("Using default simulation parameters");
-            simulation = new Simulation(bodies, N, dt);
-        }
+        simulation = new Simulation(bodies, N, dt, 1, integratorType);
+        
+        HashMap<String, Boolean> options = simulation.getOptions();
+        options.replace("useVariableTimestep", useVariableTimestep);
+        options.replace("checkStopConditions", checkStopConditions);
+        simulation.setOptions(options);
+       
 
         long statTime = System.currentTimeMillis();
         simulation.run();
         long endTime = System.currentTimeMillis();
 
         System.out.println("\tTime: " + (endTime - statTime) + "ms");
+
     }
 }
