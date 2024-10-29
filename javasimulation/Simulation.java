@@ -2,6 +2,7 @@ package javasimulation;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
 
 public class Simulation {
 
@@ -16,6 +17,7 @@ public class Simulation {
     private Integrator integrator;
     private double[][][] simulation;
 
+    private HashMap<String, Boolean> options = new HashMap<String, Boolean>();
 
     private final boolean checkStopConditions;
     private double energyErrorBound = 1e-5;
@@ -47,6 +49,17 @@ public class Simulation {
         this.dt = dt;
         this.G = G;
         this.integratorType = integratorType;
+
+        options.put("checkStopConditions", checkStopConditions);
+        options.put("useVariableTimestep", useVariableTimestep);
+        options.put("calculateCentreOfMass", false);
+        options.put("calculatePotentialEnergy", false);
+        options.put("calculateKineticEnergy", false);
+        options.put("calculateAngularMomentum", false);
+        options.put("calclateLinearMomentum", false);
+
+
+
         this.checkStopConditions = checkStopConditions;
         this.useVariableTimestep = useVariableTimestep;
         this.integrator = new Integrator(integratorType, useVariableTimestep);
@@ -100,7 +113,7 @@ public class Simulation {
             elapsedTime += usedTimestep;
 
             // Check if the simulation should stop
-            if (checkStopConditions && i % 10 == 1) {
+            if (checkStopConditions) {
                 checkStopConditions(potentialEnergy, kineticEnergy, centreOfMass, i, usedTimestep, elapsedTime);
             }
         }
@@ -145,23 +158,7 @@ public class Simulation {
         }
     }
 
-    private void writeSimulationToFiles(){
-
-        // Create the output directory if it doesn't exist, or clear it if it does
-        java.nio.file.Path outputPath = java.nio.file.Paths.get("Outputs");
-        try {
-            if (java.nio.file.Files.exists(outputPath)) {
-            java.nio.file.Files.walk(outputPath)
-                .sorted(java.util.Comparator.reverseOrder())
-                .map(java.nio.file.Path::toFile)
-                .forEach(java.io.File::delete);
-            }
-            java.nio.file.Files.createDirectories(outputPath);
-        } catch (IOException e) {
-            System.err.println("Failed to create or clear output directory: " + e.getMessage());
-        }
-
-        // Start by writing the simulation settings to a file
+    private void writeSettingsToFile() {
         try(FileWriter writer = new FileWriter("JavaSimulation\\Outputs\\simulationSettings.csv")){
             writer.append(this.N + "," + this.dt + "," + this.n + "," + this.G + "\n");
         } catch (FileNotFoundException e) {
@@ -169,8 +166,9 @@ public class Simulation {
         } catch (IOException e) {
             System.err.println("Something went wrong writing to file: " + e.getMessage());
         }
+    }
 
-        // Then write each body to its own file
+    private void writeBodiesToFiles() {
         for (int p = 0; p < this.n; p++) {
             try (FileWriter writer = new FileWriter("JavaSimulation\\Outputs\\output" + p + ".csv")) {
                 StringBuilder sb = new StringBuilder();
@@ -195,6 +193,29 @@ public class Simulation {
                 System.err.println("Something went wrong writing to file: " + e.getMessage());
             }
         }
+    }
+
+    private void writeSimulationToFiles() {
+
+        // Create the output directory if it doesn't exist, or clear it if it does
+        java.nio.file.Path outputPath = java.nio.file.Paths.get("Outputs");
+        try {
+            if (java.nio.file.Files.exists(outputPath)) {
+            java.nio.file.Files.walk(outputPath)
+                .sorted(java.util.Comparator.reverseOrder())
+                .map(java.nio.file.Path::toFile)
+                .forEach(java.io.File::delete);
+            }
+            java.nio.file.Files.createDirectories(outputPath);
+        } catch (IOException e) {
+            System.err.println("Failed to create or clear output directory: " + e.getMessage());
+        }
+
+        // Start by writing the simulation settings to a file
+        writeSettingsToFile();
+
+        // Then write each body to its own file
+        writeBodiesToFiles();
     }
 
     // ---------- Simulation optional Calculations ---------- \\
