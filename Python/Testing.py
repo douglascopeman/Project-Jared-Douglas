@@ -6,7 +6,7 @@ import Integrators
 import Pertubation
 import time
 
-N = 10000 #rename to N
+N = 5000 #rename to N
 dt = 0.1
 
 # simulation = Simulation.Simulation(N,
@@ -30,16 +30,16 @@ dt = 0.1
 # print(time.time() - start)
 
 pertubation = Pertubation.Pertubation(
-  N, dt, orbit_examples.figure_eight, 5, 0.01,
+  N, dt, orbit_examples.figure_eight, 8, 0.01,
                                      stop_conditions = {
                                        "energy_error_bound": 0.001,
                                         "distance_bound": 20,
                                         "variable_dt_bound": 1*10**(-6)
                                    }
 )
-stop_matrix = pertubation.run()
+pertubation.run()
 
-print(stop_matrix.min())
+
 
 
 # plotter = Plotter.Plotter("Python\\Outputs", 
