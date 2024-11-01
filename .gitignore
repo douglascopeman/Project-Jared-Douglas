@@ -1,9 +1,10 @@
 */Outputs/
 Python/__pycache__/
+Plotting/PlotJava.py
 Python/PlotJava.py
 animation.mp4
 .vscode/
 ManimPlotting/
 media/
 javasimulation/javasimulation/
-
+Plotting/
