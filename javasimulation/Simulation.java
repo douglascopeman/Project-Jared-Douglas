@@ -12,12 +12,13 @@ public class Simulation {
     private final double dt;
     private final double G;
     private double elapsedTime = 0;
-    private Integrator integrator;
+    // private Integrator integrator;
+    private IntegratorFunction integratorFunction;
     private double[][][] simulation;
 
     private HashMap<String, Boolean> options = new HashMap<String, Boolean>();
 
-    private double energyErrorBound = 1e-5;
+    private double energyErrorBound = 1e-1;
     private double distanceBound = 20;
     private double timestepSizeBound = 1e-6;
 
@@ -27,7 +28,36 @@ public class Simulation {
     private Vector[] angularMomentum;
     private Vector[] linearMomentum;
 
-    public Simulation(Body[] bodies, int N, double dt) {
+    // public Simulation(Body[] bodies, int N, double dt) {
+    //     this.bodies = bodies;
+    //     this.n = bodies.length;
+    //     this.N = N;
+    //     this.dt = dt;
+    //     this.G = 1;
+
+    //     options.put("checkStopConditions", false);
+    //     options.put("useVariableTimestep", false);
+    //     options.put("calculateCentreOfMass", false);
+    //     options.put("calculateEnergies", false);
+    //     options.put("calculateAngularMomentum", false);
+    //     options.put("calculateLinearMomentum", false);
+
+    //     centreOfMass = new Vector[N];
+    //     potentialEnergy = new double[N];
+    //     kineticEnergy = new double[N];
+    //     angularMomentum = new Vector[N];
+    //     linearMomentum = new Vector[N];
+
+    //     this.integrator = new Integrator(IntegratorType.SYMPLECTIC_EULER, options.get("useVariableTimestep"));
+    // }
+
+    // public Simulation(Body[] bodies, int N, double dt, double G, IntegratorType integratorType){
+    //     this(bodies, N, dt);
+    //     this.integrator = new Integrator(integratorType, options.get("useVariableTimestep"));
+    // }
+
+    public Simulation(Body[] bodies, int N, double dt, double G, IntegratorFunction integrator)
+    {
         this.bodies = bodies;
         this.n = bodies.length;
         this.N = N;
@@ -37,9 +67,9 @@ public class Simulation {
         options.put("checkStopConditions", false);
         options.put("useVariableTimestep", false);
         options.put("calculateCentreOfMass", false);
-        options.put("calcualteEnergies", false);
+        options.put("calculateEnergies", false);
         options.put("calculateAngularMomentum", false);
-        options.put("calclateLinearMomentum", false);
+        options.put("calculateLinearMomentum", false);
 
         centreOfMass = new Vector[N];
         potentialEnergy = new double[N];
@@ -47,12 +77,8 @@ public class Simulation {
         angularMomentum = new Vector[N];
         linearMomentum = new Vector[N];
 
-        this.integrator = new Integrator(IntegratorType.SYMPLECTIC_EULER, options.get("useVariableTimestep"));
-    }
 
-    public Simulation(Body[] bodies, int N, double dt, double G, IntegratorType integratorType){
-        this(bodies, N, dt);
-        this.integrator = new Integrator(integratorType, options.get("useVariableTimestep"));
+        this.integratorFunction = integrator;
     }
 
     public HashMap<String, Boolean> getOptions() {
@@ -61,7 +87,7 @@ public class Simulation {
 
     public void setOptions(HashMap<String, Boolean> options) {
         options.putAll(options);
-        integrator.setUseVariableTimestep(options.get("useVariableTimestep"));
+        // integrator.setUseVariableTimestep(options.get("useVariableTimestep"));
     }
 
     public void setEnergyErrorBound(double energyErrorBound) {
@@ -80,14 +106,14 @@ public class Simulation {
         if (options.get("calculateCentreOfMass")) {
             centreOfMass[timestep] = calculateCentreOfMass();
         }
-        if (options.get("calcualteEnergies")) {
+        if (options.get("calculateEnergies")) {
             potentialEnergy[timestep] = calculatePotentialEnergy();
             kineticEnergy[timestep] = calculateKineticEnergy();
         }
         if (options.get("calculateAngularMomentum")) {
             angularMomentum[timestep] = calculateAngularMomentum();
         }
-        if (options.get("calclateLinearMomentum")) {
+        if (options.get("calculateLinearMomentum")) {
             linearMomentum[timestep] = calclateLinearMomentum();
         }
     }
@@ -113,7 +139,7 @@ public class Simulation {
             }
 
             // Then update the states of all bodies
-            double usedTimestepLength = integrator.Integrate(bodies, dt);
+            double usedTimestepLength = integratorFunction.Integrate(bodies, dt, options.get("useVariableTimestep"));
             elapsedTime += usedTimestepLength;
 
             // Check if the simulation should stop
@@ -130,7 +156,7 @@ public class Simulation {
             // Check if the energy error is within the bound
             double totalEnergy = potentialEnergy[timestep] + kineticEnergy[timestep];
             double energyError = Math.abs((totalEnergy - (potentialEnergy[0] + kineticEnergy[0])) / (potentialEnergy[0] + kineticEnergy[0]));
-            if (energyError < energyErrorBound) {
+            if (energyError > energyErrorBound) {
                 System.out.println("Simulation terminated after exceeding energy error bound");
                 System.out.println("Energy error bound: \t" + energyErrorBound);
                 System.out.println("Energy error: \t" + energyError);
@@ -314,14 +340,14 @@ public class Simulation {
         if (options.get("calculateCentreOfMass")) {
             writeCalculationToFile(CalculationType.CENTRE_OF_MASS);
         }
-        if (options.get("calcualteEnergies")) {
+        if (options.get("calculateEnergies")) {
             writeCalculationToFile(CalculationType.POTENTIAL_ENERGY);
             writeCalculationToFile(CalculationType.KINETIC_ENERGY);
         }
         if (options.get("calculateAngularMomentum")) {
             writeCalculationToFile(CalculationType.ANGULAR_MOMENTUM);
         }
-        if (options.get("calclateLinearMomentum")) {
+        if (options.get("calculateLinearMomentum")) {
             writeCalculationToFile(CalculationType.LINEAR_MOMENTUM);
         }
     }
@@ -330,8 +356,8 @@ public class Simulation {
 
     public double calculatePotentialEnergy(){
         double potentialEnergy = 0.0;
-        for (int p = 0; p < this.n; p++) {
-            potentialEnergy += this.bodies[p].getPotentialEnergy(this.bodies, this.G);
+        for (int p = 0; p < n; p++) {
+            potentialEnergy += bodies[p].getPotentialEnergy(bodies, G);
         }
         return potentialEnergy;
     }

@@ -18,7 +18,7 @@ public class Body {
 
     // Getters & Setters
     public double getMass() {
-        return this.mass;
+        return mass;
     }
 
     public void setMass(double mass) {
@@ -26,7 +26,7 @@ public class Body {
     }
 
     public Vector getPosition() {
-        return this.position;
+        return position;
     }
 
     public void setPosition(Vector position) {
@@ -34,7 +34,7 @@ public class Body {
     }
 
     public Vector getVelocity() {
-        return this.velocity;
+        return velocity;
     }
 
     public void setVelocity(Vector velocity) {
@@ -45,11 +45,11 @@ public class Body {
         this.acceleration = new Vector();
         for (Body other_body : bodies) {
             if (other_body != this) {
-                Vector positionDifference = Vector.subtract(this.getPosition(), other_body.getPosition());
+                Vector positionDifference = Vector.subtract(getPosition(), other_body.getPosition());
                 double scalingFactor = -G * other_body.getMass() / Math.pow(positionDifference.norm(), 3);
                 Vector accelerationContribution = Vector.multiply(positionDifference, scalingFactor);
 
-                this.acceleration = Vector.add(this.acceleration, accelerationContribution);
+                this.acceleration = Vector.add(acceleration, accelerationContribution);
             }
         }
     }
@@ -65,13 +65,15 @@ public class Body {
     public double getPotentialEnergy(Body[] bodies, double G) {
         double kineticEnergy = 0;
         for (Body body : bodies) {
-            kineticEnergy += -G * this.mass * body.getMass() / Vector.subtract(this.getPosition(), body.getPosition()).norm();
+            if (body != this) {
+                kineticEnergy += -G * mass * body.getMass() / Vector.subtract(getPosition(), body.getPosition()).norm();
+            }
         }
         return kineticEnergy;
     }
 
     public double getKineticEnergy() {
-        return 0.5 * this.mass * Vector.dot(this.velocity, this.velocity);
+        return 0.5 * mass * Vector.dot(velocity, velocity);
     }
 
 }

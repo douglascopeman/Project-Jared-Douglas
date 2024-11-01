@@ -1,6 +1,6 @@
 package javasimulation;
 
-// Create a class that implements the existing Integrator interface
+@Deprecated
 public class Integrator {
     private final IntegratorType type;
     private boolean useVariableTimestep;
@@ -23,7 +23,7 @@ public class Integrator {
     public double Integrate(Body[] bodies, double dt) {
         switch (type) {
             case EULER -> {
-                Integrators.euler(bodies, dt);
+                Integrators.euler(bodies, dt, useVariableTimestep);
                 return dt;
             }
             case SYMPLECTIC_EULER -> {

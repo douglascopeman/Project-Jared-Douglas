@@ -1,8 +1,22 @@
 package javasimulation;
 
+import java.util.HashMap;
+
 public class Integrators{
 
-    public static void euler(Body[] bodies, double dt) {
+    public static HashMap<String, IntegratorFunction> integratorMap = new HashMap<>() {{
+        put("euler", Integrators::euler);
+        put("symplecticEuler", Integrators::symplecticEuler);
+        put("threeStepLeapfrog", Integrators::threeStepLeapfrog);
+        put("yoshida", Integrators::yoshida);
+        put("forestRuth", Integrators::forestRuth);
+    }};
+
+    public static double euler(Body[] bodies, double dt, boolean useVariableTimestep) {
+        if (useVariableTimestep) {
+            System.err.println("Euler integrator does not support variable timestep");
+        }
+
         for (Body body : bodies) {
             body.calculateAcceleration(bodies);
         }
@@ -10,11 +24,12 @@ public class Integrators{
             body.setPosition(Vector.add(body.getPosition(), Vector.multiply(body.getVelocity(), dt)));
             body.setVelocity(Vector.add(body.getVelocity(), Vector.multiply(body.getAcceleration(), dt)));
         }
+        return dt;
     }
 
     public static double symplecticEuler(Body[] bodies, double dt, boolean useVariableTimestep) {
         if (useVariableTimestep) {
-            dt = getVariableTimestep(bodies, 0.1, new Integrator(IntegratorType.SYMPLECTIC_EULER, false));
+            dt = getVariableTimestep(bodies, 0.1, integratorMap.get("symplecticEuler"));
         }
 
         for (Body body : bodies){
@@ -33,7 +48,7 @@ public class Integrators{
         }
 
         if (useVariableTimestep) {
-            dt = getVariableTimestep(bodies, 0.1, new Integrator(IntegratorType.THREE_STEP_LEAPFROG, false));
+            dt = getVariableTimestep(bodies, 0.1, integratorMap.get("threeStepLeapfrog"));
         }
 
         Vector[] half_velocity = new Vector[bodies.length];
@@ -84,7 +99,7 @@ public class Integrators{
         Ds[1] = w0;
 
         if (useVariableTimestep) {
-            dt = getVariableTimestep(bodies, 0.1, new Integrator(IntegratorType.YOSHIDA, false));
+            dt = getVariableTimestep(bodies, 0.1, integratorMap.get("yoshida"));
         }
 
         higherOrderHelper(bodies, dt, Cs, Ds);
@@ -99,7 +114,7 @@ public class Integrators{
 
         for(int i = 0; i < 4; i++){
             if (useVariableTimestep) {
-                dt = getVariableTimestep(bodies, 0.1, new Integrator(IntegratorType.FOREST_RUTH, false));
+                dt = getVariableTimestep(bodies, 0.1, integratorMap.get("forestRuth"));
             }
             higherOrderHelper(bodies, dt, Cs, Ds);
         }
@@ -107,11 +122,11 @@ public class Integrators{
         return dt;
     }
 
-    private static double getVariableTimestep(Body[] bodies, double variableTimestepConstant, Integrator integrator) {
+    private static double getVariableTimestep(Body[] bodies, double variableTimestepConstant, IntegratorFunction integrator) {
         Body[] bodiesClone = bodies.clone();
         double tempTimestep = getVariableTimestepHelper(bodies, variableTimestepConstant);
 
-        integrator.Integrate(bodiesClone, tempTimestep);
+        integrator.Integrate(bodiesClone, tempTimestep, false);
 
         double tempTimestepBackwards = getVariableTimestepHelper(bodiesClone, variableTimestepConstant);
 
