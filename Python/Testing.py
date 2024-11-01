@@ -50,7 +50,8 @@ plotter = Plotter.Plotter("Python\\Outputs",
                           plot_angular_momentum_error = True, 
                           plot_linear_momentum_error=False, 
                           plot_3D=False,
-                          x_label="Time"
+                          x_label="Time",
+                          save_plots=True
                           )
 
 plotter.plot()

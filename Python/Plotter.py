@@ -22,6 +22,7 @@ class Plotter():
                         "animate_fps":30,
                         "run_fast":False,
                         "x_label":"Time",
+                        "save_plots":False
                         }
         self.kwargs = defaultKwargs | kwargs
         
@@ -63,6 +64,10 @@ class Plotter():
             fig_linear_momentum_error = self.plot_linear_momentum_error()
             fig_linear_momentum_error.canvas.mpl_connect('close_event', close_all)
     
+        if self.kwargs["save_plots"]:
+            fig_energy_error.savefig("Python/Outputs/Energy Error.png")
+            fig_angular_momentum_error.savefig("Python/Outputs/Angular Momentum Error.png")
+            fig_orbits.savefig("Python/Outputs/Orbits.png")
         plt.show()
         
         #Animation
