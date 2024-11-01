@@ -12,7 +12,6 @@ public class Simulation {
     private final double dt;
     private final double G;
     private double elapsedTime = 0;
-    // private Integrator integrator;
     private IntegratorFunction integratorFunction;
     private double[][][] simulation;
 
@@ -27,34 +26,6 @@ public class Simulation {
     private double[] kineticEnergy;
     private Vector[] angularMomentum;
     private Vector[] linearMomentum;
-
-    // public Simulation(Body[] bodies, int N, double dt) {
-    //     this.bodies = bodies;
-    //     this.n = bodies.length;
-    //     this.N = N;
-    //     this.dt = dt;
-    //     this.G = 1;
-
-    //     options.put("checkStopConditions", false);
-    //     options.put("useVariableTimestep", false);
-    //     options.put("calculateCentreOfMass", false);
-    //     options.put("calculateEnergies", false);
-    //     options.put("calculateAngularMomentum", false);
-    //     options.put("calculateLinearMomentum", false);
-
-    //     centreOfMass = new Vector[N];
-    //     potentialEnergy = new double[N];
-    //     kineticEnergy = new double[N];
-    //     angularMomentum = new Vector[N];
-    //     linearMomentum = new Vector[N];
-
-    //     this.integrator = new Integrator(IntegratorType.SYMPLECTIC_EULER, options.get("useVariableTimestep"));
-    // }
-
-    // public Simulation(Body[] bodies, int N, double dt, double G, IntegratorType integratorType){
-    //     this(bodies, N, dt);
-    //     this.integrator = new Integrator(integratorType, options.get("useVariableTimestep"));
-    // }
 
     public Simulation(Body[] bodies, int N, double dt, double G, IntegratorFunction integrator)
     {
@@ -122,12 +93,12 @@ public class Simulation {
         simulation = new double[N][6][n];
 
         // ----- Main Time Loop ----- \\
-        for (int i = 0; i < this.N; i++) {
+        for (int i = 0; i < N; i++) {
             // Record all optional calculations
             doOptionalCalculations(i);
 
             // Record the current timestep of the simulation
-            for (int p = 0; p < this.n; p++) {
+            for (int p = 0; p < n; p++) {
                 Vector position = bodies[p].getPosition();
                 Vector velocity = bodies[p].getVelocity();
                 simulation[i][0][p] = position.getX();
@@ -139,7 +110,8 @@ public class Simulation {
             }
 
             // Then update the states of all bodies
-            double usedTimestepLength = integratorFunction.Integrate(bodies, dt, options.get("useVariableTimestep"));
+            boolean useVariableTimestep = options.get("useVariableTimestep");
+            double usedTimestepLength = integratorFunction.Integrate(bodies, dt, useVariableTimestep);
             elapsedTime += usedTimestepLength;
 
             // Check if the simulation should stop
@@ -364,8 +336,8 @@ public class Simulation {
 
     public double calculateKineticEnergy() {
         double kineticEnergy = 0.0;
-        for (int p = 0; p < this.n; p++) {
-            kineticEnergy += this.bodies[p].getKineticEnergy();
+        for (int p = 0; p < n; p++) {
+            kineticEnergy += bodies[p].getKineticEnergy();
         }
             
         return kineticEnergy;
@@ -373,8 +345,8 @@ public class Simulation {
 
     public double calculateTotalMass() {
         double totalMass = 0;
-        for (int i = 0; i < this.n; i++) {
-            totalMass += this.bodies[i].getMass();
+        for (int i = 0; i < n; i++) {
+            totalMass += bodies[i].getMass();
         }
         return totalMass;
 
@@ -382,28 +354,26 @@ public class Simulation {
 
     public Vector calculateCentreOfMass() {
         Vector centreOfMass = new Vector();
-        for (int p = 0; p < this.n; p++) {
-            centreOfMass = centreOfMass.add(Vector.multiply(this.bodies[p].getPosition(), this.bodies[p].getMass()));
+        for (int p = 0; p < n; p++) {
+            centreOfMass = centreOfMass.add(Vector.multiply(bodies[p].getPosition(), bodies[p].getMass()));
         }
-        centreOfMass.divide(this.calculateTotalMass());
+        centreOfMass.divide(calculateTotalMass());
         
         return centreOfMass;
     }
 
     public Vector calculateAngularMomentum() {
         Vector L = new Vector();
-        for (int p = 0; p < this.n; p++) {
-            Vector pos_vel_cross = Vector.cross(this.bodies[p].getPosition(), this.bodies[p].getVelocity());
-
-            L.add(Vector.multiply(pos_vel_cross, this.bodies[p].getMass()));
+        for (int p = 0; p < n; p++) {
+            L.add(bodies[p].calculateAngularMomentum());
         }
         return L;
     }
 
     public Vector calclateLinearMomentum() {
         Vector P = new Vector();
-        for (int p = 0; p < this.n; p++) {
-            P.add(Vector.multiply(this.bodies[p].getVelocity(), this.bodies[p].getMass()));
+        for (int p = 0; p < n; p++) {
+            P.add(bodies[p].calculateLinearMomentum());
         }
         
         return P;

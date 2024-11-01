@@ -1,4 +1,7 @@
-package javasimulation;
+package javasimulation.Deprecated;
+
+import javasimulation.Body;
+import javasimulation.Integrators;
 
 @Deprecated
 public class Integrator {

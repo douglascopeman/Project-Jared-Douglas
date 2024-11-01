@@ -76,4 +76,13 @@ public class Body {
         return 0.5 * mass * Vector.dot(velocity, velocity);
     }
 
+    public Vector calculateAngularMomentum() {
+        Vector pos_vel_cross = Vector.cross(position, velocity);
+        return Vector.multiply(pos_vel_cross, mass);
+    }
+
+    public Vector calculateLinearMomentum() {
+        return Vector.multiply(velocity, mass);
+    }
+
 }
