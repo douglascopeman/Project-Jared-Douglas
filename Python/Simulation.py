@@ -20,7 +20,8 @@ class Simulation():
                         "G":1,
                         "is_variable_dt":False,
                         "is_focus_on_body": False,
-                        "stop_conditions": None
+                        "stop_conditions": None,
+                        "is_orbit_duration":False
                         }
         self.kwargs = default_kwargs | kwargs
 
@@ -85,6 +86,8 @@ class Simulation():
         linear_momentum = np.zeros((self.N,3), dtype=float)
         G = self.kwargs["G"]
         is_variable_dt = self.kwargs["is_variable_dt"]
+        initial_position = np.concatenate([np.copy(body.position) for body in self.bodies])
+        orbit_duration = 0
         
         # Holding Initial Values for Error
         initial_potential_energy = self.calculate_potential_energy()
@@ -127,9 +130,15 @@ class Simulation():
             
             # Update position of all bodies
             bodies, used_dt = self.kwargs["Integrator"](bodies, self.dt, G, is_variable_dt)
+            
+            if self.kwargs["is_orbit_duration"]:
+                current_positions = np.concatenate([body.position for body in self.bodies])
+
+                if orbit_duration == 0 and LA.norm(current_positions-initial_position) < 0.08 and i>10:
+                    orbit_duration = i
 
         #-------------------- Write Data to CSVs --------------------#
-        simulationSettings = np.array([self.N, self.dt, self.n, self.kwargs["G"]])
+        simulationSettings = np.array([self.N, self.dt, self.n, self.kwargs["G"], orbit_duration])
         path = os.path.join(os.getcwd(), "Python\\Outputs")
         np.savetxt(os.path.join(path, "simulationSettings.csv"), simulationSettings, delimiter=",")
         np.savetxt(os.path.join(path, "centreOfMass.csv"), centre_of_mass, delimiter=",")
@@ -139,6 +148,8 @@ class Simulation():
         np.savetxt(os.path.join(path, "linearMomentum.csv"), linear_momentum, delimiter=',')
         for i in range(self.n):
             np.savetxt(os.path.join(path, ("output"+ str(i)+ ".csv")), simulation[:,:,i], delimiter=",")
+
+        print(orbit_duration)
 
     def run_fast(self):
         """
