@@ -1,4 +1,4 @@
-package Compare.HelloWorld;
+package HelloWorld;
 
 public class HelloJava {
     public static void main(String[] args) {
