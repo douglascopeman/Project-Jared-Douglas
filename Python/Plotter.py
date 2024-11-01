@@ -20,7 +20,8 @@ class Plotter():
                         "animate_orbits":False,
                         "animate_save":False,
                         "animate_fps":30,
-                        "run_fast":False
+                        "run_fast":False,
+                        "x_label":"Time",
                         }
         self.kwargs = defaultKwargs | kwargs
         
@@ -78,9 +79,12 @@ class Plotter():
             self.dt = data[1]
             self.n = int(data[2])
             self.G = float(data[3])
+            self.orbit_duration = int(data[4])
 
         # Setup the time axis for all plots
         self.time_axis = np.linspace(0,(self.N * self.dt), self.N)
+        if self.orbit_duration != 0.0:
+            self.time_axis = self.time_axis / (self.orbit_duration*self.dt)
             
         #Then set an array up to hold the correct number of bodies and time steps
         self.bodies = np.zeros((self.N, 6, self.n))
@@ -148,7 +152,7 @@ class Plotter():
         ax_energy = fig_energy.add_subplot()
         total_energy = self.potential_energy + self.kinetic_energy
         ax_energy.plot(self.time_axis, total_energy)
-        ax_energy.set_xlabel("Time")
+        ax_energy.set_xlabel(self.kwargs["x_label"])
         ax_energy.set_ylabel("Total Energy (J)")
         ax_energy.set_title("Total Energy of the System over Time")
         return fig_energy
@@ -161,7 +165,7 @@ class Plotter():
         initial_energy = total_energy[0]
         energy_error = [np.abs((total_energy[t] - initial_energy)/initial_energy) for t in range(0,self.N)]
         ax_energy_error.plot(self.time_axis, energy_error)
-        ax_energy_error.set_xlabel("Time")
+        ax_energy_error.set_xlabel(self.kwargs["x_label"])
         ax_energy_error.set_ylabel("Energy (J)")
         ax_energy_error.set_title("Relative Energy Error of the System over Time")
         return fig_energy_error
@@ -173,7 +177,7 @@ class Plotter():
         initial_angular_momentum = self.angular_momentum[0]
         angular_momentum_error = [np.abs((self.angular_momentum[t] - initial_angular_momentum)/initial_angular_momentum) for t in range(0,self.N)]
         ax_energy_error.plot(self.time_axis, angular_momentum_error)
-        ax_energy_error.set_xlabel("Time")
+        ax_energy_error.set_xlabel(self.kwargs["x_label"])
         ax_energy_error.set_ylabel("Angular Momentum (kg-m^2/s)")
         ax_energy_error.set_title("Relative Angular Momentum Error of the System over Time")
         return fig_angular_momentum_error
@@ -185,7 +189,7 @@ class Plotter():
         initial_linear_momentum = self.linear_momentum[0]
         linear_momentum_error = [np.abs((self.linear_momentum[t] - initial_linear_momentum)/initial_linear_momentum) for t in range(0, self.N)]
         ax_energy_error.plot(self.time_axis, linear_momentum_error)
-        ax_energy_error.set_xlabel("Time")
+        ax_energy_error.set_xlabel(self.kwargs["x_label"])
         ax_energy_error.set_ylabel("Linear Momentum (kg ms^-1)")
         ax_energy_error.set_title("Relative Linear Momentum Error of the System over Time")
         return fig_linear_momentum_error
