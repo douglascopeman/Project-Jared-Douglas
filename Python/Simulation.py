@@ -134,7 +134,7 @@ class Simulation():
             if self.kwargs["is_orbit_duration"]:
                 current_positions = np.concatenate([body.position for body in self.bodies])
 
-                if orbit_duration == 0 and LA.norm(current_positions-initial_position) < 0.05 and i>10:
+                if orbit_duration == 0 and LA.norm(current_positions-initial_position) < 0.08 and i>10:
                     orbit_duration = i
 
         #-------------------- Write Data to CSVs --------------------#
