@@ -26,6 +26,7 @@ public class Simulation {
     private double[] kineticEnergy;
     private Vector[] angularMomentum;
     private Vector[] linearMomentum;
+    private double orbitLength;
 
     public Simulation(Body[] bodies, int N, double dt, double G, IntegratorFunction integrator)
     {
@@ -41,13 +42,13 @@ public class Simulation {
         options.put("calculateEnergies", false);
         options.put("calculateAngularMomentum", false);
         options.put("calculateLinearMomentum", false);
+        options.put("findOrbitLength", false);
 
         centreOfMass = new Vector[N];
         potentialEnergy = new double[N];
         kineticEnergy = new double[N];
         angularMomentum = new Vector[N];
         linearMomentum = new Vector[N];
-
 
         this.integratorFunction = integrator;
     }
@@ -58,7 +59,6 @@ public class Simulation {
 
     public void setOptions(HashMap<String, Boolean> options) {
         options.putAll(options);
-        // integrator.setUseVariableTimestep(options.get("useVariableTimestep"));
     }
 
     public void setEnergyErrorBound(double energyErrorBound) {
@@ -118,9 +118,30 @@ public class Simulation {
             if (options.get("checkStopConditions")) {
                 checkStopConditions(i, usedTimestepLength, elapsedTime);
             }
+
+            if (options.get("findOrbitLength") && (i > 10) && (orbitLength != 0.0)) {
+                findOrbitLength();
+            }
+
         }
 
         writeSimulationToFiles();
+    }
+
+    // check my logic in this method... It might be wrong
+    private void findOrbitLength() {
+        boolean hasMadeFullOrbit = true;
+        for (int p = 0; p < n; p++) {
+            Vector diff = bodies[p].getPosition().subtract(bodies[p].getInitialPosition());
+            double distance = diff.norm();
+            if (distance > 0.1) {
+                hasMadeFullOrbit = false;
+                break;
+            }
+        }
+        if (hasMadeFullOrbit) {
+            orbitLength = elapsedTime;
+        }
     }
 
     private void checkStopConditions(int timestep, double usedTimestepLength, double elapsedTime) {
@@ -178,7 +199,11 @@ public class Simulation {
 
     private void writeSettingsToFile() {
         try(FileWriter writer = new FileWriter("JavaSimulation\\Outputs\\simulationSettings.csv")){
-            writer.append(this.N + "," + this.dt + "," + this.n + "," + this.G + "\n");
+            writer.append(this.N + "," + this.dt + "," + this.n + "," + this.G);
+            if (options.get("findOrbitLength")) {
+                writer.append("," + orbitLength);
+            }
+            writer.append("\n");
         } catch (FileNotFoundException e) {
             System.err.println("Setting file not found");
         } catch (IOException e) {
