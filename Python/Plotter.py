@@ -22,7 +22,8 @@ class Plotter():
                         "animate_fps":30,
                         "run_fast":False,
                         "x_label":"Time",
-                        "save_plots":False
+                        "save_plots":False,
+                        "is_orbit_duration":False,
                         }
         self.kwargs = defaultKwargs | kwargs
         
@@ -84,7 +85,10 @@ class Plotter():
             self.dt = data[1]
             self.n = int(data[2])
             self.G = float(data[3])
-            self.orbit_duration = int(data[4])
+            if self.kwargs["is_orbit_duration"]:
+                self.orbit_duration = int(data[4])
+            else:
+                self.orbit_duration = 0.0
 
         # Setup the time axis for all plots
         self.time_axis = np.linspace(0,(self.N * self.dt), self.N)
