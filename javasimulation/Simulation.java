@@ -35,9 +35,9 @@ public class Simulation {
         this.N = N;
         this.dt = dt;
         this.G = 1;
-
-        options.put("checkStopConditions", false);
+        
         options.put("useVariableTimestep", false);
+        options.put("checkStopConditions", false);
         options.put("calculateCentreOfMass", false);
         options.put("calculateEnergies", false);
         options.put("calculateAngularMomentum", false);
