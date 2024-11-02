@@ -3,7 +3,7 @@ import Plotter
 import Simulation
 from orbit_examples import orbit_examples
 import Integrators
-import Pertubation
+import Perturbation
 import time
 
 N = 50000 #rename to N
