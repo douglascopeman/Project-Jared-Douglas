@@ -3,11 +3,13 @@ package javasimulation;
 public class Body {
     private double mass;
     private Vector position;
+    private final Vector initialPosition;
     private Vector velocity;
     private Vector acceleration;
 
     public Body(Vector position, Vector velocity, double mass) {
         this.position = position;
+        this.initialPosition = position;
         this.velocity = velocity;
         this.mass = mass;
     }
@@ -31,6 +33,10 @@ public class Body {
 
     public void setPosition(Vector position) {
         this.position = position;
+    }
+
+    public Vector getInitialPosition() {
+        return initialPosition;
     }
 
     public Vector getVelocity() {
