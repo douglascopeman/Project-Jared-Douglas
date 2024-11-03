@@ -9,7 +9,7 @@ from Plotter import Plotter
 import copy
 import os
 
-class Pertubation():
+class Perturbation():
 
     def __init__(self, N, dt, bodies, p, delta, stop_conditions):
         self.bodies = bodies
@@ -41,15 +41,15 @@ class Pertubation():
         return kinetic_energy
     
 
-    def do_pertubation(self, i,j,delta, original_energy):
+    def do_perturbation(self, i,j,delta, original_energy):
         '''
-        Performs the pertubation to the right most body of the figure 8, this consists of a shift in the x and y direction.
+        Performs the perturbation to the right most body of the figure 8, this consists of a shift in the x and y direction.
         The Center of Mass position and velocity, the energy and the angular momentum is preserved by adjusting the position of
         the other two bodies and the velocity of all three.
         '''
         current_bodies = copy.deepcopy(self.bodies)
 
-        # Perform the pertubation of body 0 and then adjust body 2 accordingly to preserve CoM positon
+        # Perform the perturbation of body 0 and then adjust body 2 accordingly to preserve CoM positon
         current_bodies[0].position = self.bodies[0].position + [i*delta, j*delta,0]
         current_bodies[2].position = -copy.deepcopy(current_bodies[0].position)
 
@@ -73,12 +73,12 @@ class Pertubation():
         original_CoM = self.calculate_centre_of_mass(bodies)
         original_angular_momentum = self.calculate_angular_momentum(bodies)
 
-        # Loop through all the pertubations required
+        # Loop through all the perturbations required
         for i in range(-self.p, self.p+1):
             for j in range(-self.p, self.p+1):
-                # We perform the pertubation on all but the original i=0, j=0 case
+                # We perform the perturbation on all but the original i=0, j=0 case
                 if (i != 0 or j != 0):
-                    current_bodies = self.do_pertubation(i,j, self.delta, original_energy)
+                    current_bodies = self.do_perturbation(i,j, self.delta, original_energy)
                 else:
                     current_bodies = copy.deepcopy(self.bodies)
                 
@@ -130,10 +130,10 @@ class Pertubation():
 
                     current_bodies, used_dt = Integrators.yoshida(current_bodies, self.dt)
 
-        pertubation_settings = np.array([self.N, self.dt, self.n, self.delta, self.p])
+        perturbation_settings = np.array([self.N, self.dt, self.n, self.delta, self.p])
         path = os.path.join(os.getcwd(), "Python\\Outputs")
-        np.savetxt(os.path.join(path, "pertubationSettings.csv"), pertubation_settings, delimiter=",")
-        np.savetxt(os.path.join(path, "pertubationMatrix.csv"), stop_matrix, delimiter=",")
+        np.savetxt(os.path.join(path, "perturbationSettings.csv"), perturbation_settings, delimiter=",")
+        np.savetxt(os.path.join(path, "perturbationMatrix.csv"), stop_matrix, delimiter=",")
 
     
 

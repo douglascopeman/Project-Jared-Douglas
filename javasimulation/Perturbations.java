@@ -39,8 +39,12 @@ public class Perturbations {
         // Finally, preserve the angular momentum by setting the velocity of body 1 to (-2) times that of bodies 0 and 2
 
         perturbedBodies[0].setVelocity(bodies[0].getVelocity().normalise().multiply(newVelocity));
-        perturbedBodies[2].setVelocity(perturbedBodies[0].getVelocity().negate());
+        perturbedBodies[2].setVelocity(perturbedBodies[0].getVelocity());
         perturbedBodies[1].setVelocity(perturbedBodies[0].getVelocity().multiply(-2.0));
+
+        System.out.println(perturbedBodies[0].getVelocity());
+        System.out.println(perturbedBodies[1].getVelocity());
+        System.out.println(perturbedBodies[2].getVelocity());
 
         return perturbedBodies;
     }
@@ -48,6 +52,9 @@ public class Perturbations {
     public double[][] run() {
         // Initialise the stop matrix populated with the time at which the simulation stops
         double[][] stopMatrix = new double[2 * halfGridSize + 1][2 * halfGridSize + 1];
+
+        // Save the perturbation settings
+        OutputWriter.writePerturbationSettingsToFile(N, dt, N, delta, halfGridSize);
 
         // Iterate over the grid of perturbations
         for (int i = -halfGridSize; i <= halfGridSize; i++) {
