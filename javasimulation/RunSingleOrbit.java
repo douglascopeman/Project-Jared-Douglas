@@ -13,51 +13,7 @@ public class RunSingleOrbit {
     private boolean calculateAngularMomentum = false;
     private boolean calculateLinearMomentum = false;
     private boolean findOrbitLength = false;
-
-    private void setOptions(String[] customOptions) {
-        for (String option : customOptions) {
-            switch (option) {
-                case "-useVariableTimestep":
-                    System.out.println("using variable timestep");
-                    useVariableTimestep = true;
-                    break;
-                case "-checkStopConditions":
-                    System.out.println("checking stop conditions");
-                    checkStopConditions = true;
-                    break;
-                case "-calculateCentreOfMass":
-                    System.out.println("calculating centre of mass");
-                    calculateCentreOfMass = true;
-                    break;
-                case "-calculateEnergies":
-                    System.out.println("calculating energies");
-                    calculateEnergies = true;
-                    break;
-                case "-calculateAngularMomentum":
-                    System.out.println("calculating angular momentum");
-                    calculateAngularMomentum = true;
-                    break;
-                case "-calculateLinearMomentum":
-                    System.out.println("calculating linear momentum");
-                    calculateLinearMomentum = true;
-                    break;
-                case "-findOrbitLength":
-                    System.out.println("finding orbit length");
-                    findOrbitLength = true;
-                    break;
-                default:
-                    String possibleIntegrator = option.substring(12, option.length());
-                    if (Integrators.integratorMap.containsKey(possibleIntegrator)) {
-                        System.out.println("integrator: " + possibleIntegrator);
-                        integrator = Integrators.integratorMap.get(possibleIntegrator);
-                    } else {
-                        System.err.println("Invalid option: " + option);
-                    }
-                    break;
-            }
-        }
-
-    }
+    private Simulation simulation;
     
     public RunSingleOrbit(Body[] bodies, int N, double dt, String[] customOptions) {
 
@@ -68,8 +24,62 @@ public class RunSingleOrbit {
         setOptions(customOptions);
     }
 
+    public RunSingleOrbit(Body[] bodies, int N, double dt) {
+        this(bodies, N, dt, new String[0]);
+    }
+
+    public double getElapsedTime() {
+        return simulation.getElapsedTime();
+    }
+
+    private void setOptions(String[] customOptions) {
+        for (String option : customOptions) {
+            switch (option) {
+                case "-useVariableTimestep":
+                    // System.out.println("using variable timestep");
+                    useVariableTimestep = true;
+                    break;
+                case "-checkStopConditions":
+                    // System.out.println("checking stop conditions");
+                    checkStopConditions = true;
+                    break;
+                case "-calculateCentreOfMass":
+                    // System.out.println("calculating centre of mass");
+                    calculateCentreOfMass = true;
+                    break;
+                case "-calculateEnergies":
+                    // System.out.println("calculating energies");
+                    calculateEnergies = true;
+                    break;
+                case "-calculateAngularMomentum":
+                    // System.out.println("calculating angular momentum");
+                    calculateAngularMomentum = true;
+                    break;
+                case "-calculateLinearMomentum":
+                    // System.out.println("calculating linear momentum");
+                    calculateLinearMomentum = true;
+                    break;
+                case "-findOrbitLength":
+                    // System.out.println("finding orbit length");
+                    findOrbitLength = true;
+                    break;
+                default:
+                    String possibleIntegrator = option.substring(12, option.length());
+                    if (Integrators.integratorMap.containsKey(possibleIntegrator)) {
+                        // System.out.println("integrator: " + possibleIntegrator);
+                        integrator = Integrators.integratorMap.get(possibleIntegrator);
+                    } else {
+                        System.err.println("Invalid option: " + option);
+                    }
+                    break;
+            }
+        }
+
+    }
+
     public void run() {
         Simulation simulation = new Simulation(bodies, N, dt, 1, integrator);
+        this.simulation = simulation;
 
         HashMap<String, Boolean> options = simulation.getOptions();
         options.replace("useVariableTimestep", useVariableTimestep);

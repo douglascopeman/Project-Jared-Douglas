@@ -28,6 +28,10 @@ public class Vector {
         return this.z;
     }
 
+    public Vector negate() {
+        return new Vector(-this.x, -this.y, -this.z);
+    }
+
     public Vector add(Vector other) {
         return new Vector(this.x + other.x, this.y + other.y, this.z + other.z);
     }
@@ -64,6 +68,10 @@ public class Vector {
         return Math.sqrt(dot(this, this));
     }
 
+    public Vector normalise() {
+        return divide(norm());
+    }
+
     public Vector multiply(double b) {
         return new Vector(this.x * b, this.y * b, this.z * b);
     }
@@ -90,6 +98,14 @@ public class Vector {
 
     public static Vector divide(double a, Vector b) {
         return new Vector(a / b.x, a / b.y, a / b.z);
+    }
+
+    public Vector copy() {
+        return new Vector(this.x, this.y, this.z);
+    }
+
+    public static Vector copy(Vector a) {
+        return new Vector(a.x, a.y, a.z);
     }
 
     @Override

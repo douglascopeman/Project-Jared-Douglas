@@ -17,7 +17,7 @@ public class Simulation {
 
     private HashMap<String, Boolean> options = new HashMap<String, Boolean>();
 
-    private double energyErrorBound = 1e-1;
+    private double energyErrorBound = 1e-3;
     private double distanceBound = 20;
     private double timestepSizeBound = 1e-6;
 
@@ -71,6 +71,10 @@ public class Simulation {
 
     public void setTimestepSizeBound(double timestepSizeBound) {
         this.timestepSizeBound = timestepSizeBound;
+    }
+
+    public double getElapsedTime() {
+        return elapsedTime;
     }
 
     private void doOptionalCalculations(int timestep) {
@@ -147,8 +151,8 @@ public class Simulation {
     private void checkStopConditions(int timestep, double usedTimestepLength, double elapsedTime) {
         if (options.get("calculateEnergies")) {
             // Check if the energy error is within the bound
-            double totalEnergy = potentialEnergy[timestep] + kineticEnergy[timestep];
-            double energyError = Math.abs((totalEnergy - (potentialEnergy[0] + kineticEnergy[0])) / (potentialEnergy[0] + kineticEnergy[0]));
+            double energyDiff = kineticEnergy[timestep] - kineticEnergy[0] + potentialEnergy[timestep] - potentialEnergy[0];
+            double energyError = Math.abs(energyDiff / (kineticEnergy[0] + potentialEnergy[0]));
             if (energyError > energyErrorBound) {
                 System.out.println("Simulation terminated after exceeding energy error bound");
                 System.out.println("Energy error bound: \t" + energyErrorBound);

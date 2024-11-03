@@ -91,4 +91,8 @@ public class Body {
         return Vector.multiply(velocity, mass);
     }
 
+    public Body copy() {
+        return new Body(position.copy(), velocity.copy(), mass);
+    }
+
 }
