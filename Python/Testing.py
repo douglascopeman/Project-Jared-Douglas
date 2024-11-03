@@ -4,7 +4,7 @@ import Simulation
 from orbit_examples import orbit_examples
 import Integrators
 import Perturbation
-import PertubationPlot
+import PerturbationPlot
 import time
 
 N = 10000 #rename to N
@@ -30,15 +30,15 @@ dt = 0.1
 #   simulation.run_fast()
 # print(time.time() - start)
 
-# pertubation = Perturbation.Pertubation(
-#   N, dt, orbit_examples.figure_eight, 4, 0.01,
-#                                      stop_conditions = {
-#                                        "energy_error_bound": 0.001,
-#                                         "distance_bound": 20,
-#                                         "variable_dt_bound": 1*10**(-6)
-#                                    }
-# )
-# pertubation.run()
+perturbation = Perturbation.Perturbation(
+  N, dt, orbit_examples.figure_eight, 4, 0.01,
+                                     stop_conditions = {
+                                       "energy_error_bound": 0.001,
+                                        "distance_bound": 20,
+                                        "variable_dt_bound": 1*10**(-6)
+                                   }
+)
+perturbation.run()
 
 
 
@@ -57,5 +57,5 @@ dt = 0.1
 
 # plotter.plot()
 
-pertubation_plot = PertubationPlot.PertubationPlot("Python\\Outputs")
-pertubation_plot.plot()
+# perturbation_plot = PerturbationPlot.PerturbationPlot("Java\\Outputs")
+# perturbation_plot.plot()
