@@ -138,8 +138,8 @@ public class OutputWriter {
         }
     }
 
-    public static void writePermutationSettingsToFile(int N, double dt, int n, double delta, int halfGridSize) {
-        try(FileWriter writer = new FileWriter("Outputs\\permutationSettings.csv")){
+    public static void writePerturbationSettingsToFile(int N, double dt, int n, double delta, int halfGridSize) {
+        try(FileWriter writer = new FileWriter("Outputs\\perturbation.csv")){
             writer.append(N + "," + dt + "," + n + "," + delta + "," + halfGridSize);
             writer.append("\n");
         } catch (FileNotFoundException e) {

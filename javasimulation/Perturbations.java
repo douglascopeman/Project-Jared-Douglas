@@ -49,8 +49,8 @@ public class Perturbations {
         // Initialise the stop matrix populated with the time at which the simulation stops
         double[][] stopMatrix = new double[2 * halfGridSize + 1][2 * halfGridSize + 1];
 
-        // Save the pertubation settings
-        OutputWriter.writePermutationSettingsToFile(N, dt, N, delta, halfGridSize);
+        // Save the perturbation settings
+        OutputWriter.writePerturbationSettingsToFile(N, dt, N, delta, halfGridSize);
 
         // Iterate over the grid of perturbations
         for (int i = -halfGridSize; i <= halfGridSize; i++) {
