@@ -47,3 +47,6 @@ class PertubationPlot():
             data = np.loadtxt(f, delimiter=",")
             self.M = np.zeros((self.plot_size, self.plot_size), dtype=float)
             self.M[:,:] = data
+
+            assert np.shape(self.M)[0] % 2 != 0, "Matrix is not of odd dimension"
+            assert np.shape(self.M)[0] == np.shape(self.M)[1], "Matrix is not square"
