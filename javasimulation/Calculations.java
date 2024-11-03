@@ -1,15 +1,20 @@
 package javasimulation;
 
-public class SimulationCalculations {
-    public static double calculatePotentialEnergy(Body[] bodies, double G) {
-        double potentialEnergy = 0.0;
-        for (int p = 0; p < bodies.length; p++) {
-            potentialEnergy += bodies[p].getPotentialEnergy(bodies, G);
+public class Calculations {
+    public static double potentialEnergy(Body[] bodies, double G) {
+        double potentialEnergy = 0;
+        for (Body body : bodies) {
+            for (Body other_body : bodies) {
+                if (body != other_body) {
+                    Vector positionDifference = Vector.subtract(body.getPosition(), other_body.getPosition());
+                    potentialEnergy += -G * body.getMass() * other_body.getMass() / positionDifference.norm();
+                }
+            }
         }
         return potentialEnergy;
     }
 
-    public static double calculateKineticEnergy(Body[] bodies) {
+    public static double kineticEnergy(Body[] bodies) {
         double kineticEnergy = 0.0;
         for (int p = 0; p < bodies.length; p++) {
             kineticEnergy += bodies[p].getKineticEnergy();
@@ -18,11 +23,11 @@ public class SimulationCalculations {
         return kineticEnergy;
     }
 
-    public static double calculateTotalEnergy(Body[] bodies, double G) {
-        return calculateKineticEnergy(bodies) + calculatePotentialEnergy(bodies, G);
+    public static double totalEnergy(Body[] bodies, double G) {
+        return kineticEnergy(bodies) + potentialEnergy(bodies, G);
     }
 
-    public static double calculateTotalMass(Body[] bodies) {
+    public static double totalMass(Body[] bodies) {
         double totalMass = 0;
         for (int i = 0; i < bodies.length; i++) {
             totalMass += bodies[i].getMass();
@@ -31,17 +36,17 @@ public class SimulationCalculations {
 
     }
 
-    public static Vector calculateCentreOfMass(Body[] bodies) {
+    public static Vector centreOfMass(Body[] bodies) {
         Vector centreOfMass = new Vector();
         for (int p = 0; p < bodies.length; p++) {
             centreOfMass = centreOfMass.add(Vector.multiply(bodies[p].getPosition(), bodies[p].getMass()));
         }
-        centreOfMass.divide(calculateTotalMass(bodies));
+        centreOfMass.divide(totalMass(bodies));
         
         return centreOfMass;
     }
 
-    public static Vector calculateAngularMomentum(Body[] bodies) {
+    public static Vector angularMomentum(Body[] bodies) {
         Vector L = new Vector();
         for (int p = 0; p < bodies.length; p++) {
             L.add(bodies[p].calculateAngularMomentum());
@@ -49,7 +54,7 @@ public class SimulationCalculations {
         return L;
     }
 
-    public static Vector calclateLinearMomentum(Body[] bodies) {
+    public static Vector linearMomentum(Body[] bodies) {
         Vector P = new Vector();
         for (int p = 0; p < bodies.length; p++) {
             P.add(bodies[p].calculateLinearMomentum());
