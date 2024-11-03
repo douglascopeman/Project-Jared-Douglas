@@ -308,9 +308,6 @@ class Plotter():
             plt.show()
         plt.close()
 
-    def plot_heatmap(stop_matrix):
-        hm = sns.heatmap(data=stop_matrix)
-        plt.show()
         
         
         
