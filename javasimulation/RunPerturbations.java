@@ -12,7 +12,7 @@ public class RunPerturbations {
     private final Vector originalAngularMomentum;
 
     public RunPerturbations(Body[] bodies, int N, double dt, int halfGridSize, double delta) {
-        this.bodies = SimulationCalculations.copyBodies(bodies);
+        this.bodies = Calculations.copyBodies(bodies);
         this.N = N;
         this.dt = dt;
         if (halfGridSize % 2 == 0) {
@@ -20,13 +20,13 @@ public class RunPerturbations {
         }
         this.halfGridSize = halfGridSize;
         this.delta = delta;
-        this.originalEnergy = SimulationCalculations.calculateTotalEnergy(bodies, 1);
-        this.originalCentreOfMass = SimulationCalculations.calculateCentreOfMass(bodies);
-        this.originalAngularMomentum = SimulationCalculations.calculateAngularMomentum(bodies);
+        this.originalEnergy = Calculations.totalEnergy(bodies, 1);
+        this.originalCentreOfMass = Calculations.centreOfMass(bodies);
+        this.originalAngularMomentum = Calculations.angularMomentum(bodies);
     }
 
     private Body[] perturbBodies(int i, int j, double delta) {
-        Body[] perturbedBodies = SimulationCalculations.copyBodies(bodies);
+        Body[] perturbedBodies = Calculations.copyBodies(bodies);
         
         // Perturn body 0 and adjust body 2 accordingly
         Vector perturbedPosition = Vector.add(bodies[0].getPosition(), new Vector(i * delta, j * delta, 0));
@@ -57,13 +57,17 @@ public class RunPerturbations {
                 System.out.println("Perturbing bodies (" + i + ", " + j + ")");
                 Body[] perturbedBodies = perturbBodies(i, j, delta);
 
-                // double perturbedEnergy = SimulationCalculations.calculateTotalEnergy(perturbedBodies, 1);
-                // Vector perturbedCentreOfMass = SimulationCalculations.calculateCentreOfMass(perturbedBodies);
-                // Vector perturbedAngularMomentum = SimulationCalculations.calculateAngularMomentum(perturbedBodies);
 
-                // assert Math.abs(perturbedEnergy - originalEnergy) < 1e-10;
-                // assert perturbedCentreOfMass.subtract(originalCentreOfMass).norm() < 1e-10;
-                // assert perturbedAngularMomentum.subtract(originalAngularMomentum).norm() < 1e-10;
+                // Sanity checks to be removed later
+                double perturbedEnergy = Calculations.totalEnergy(perturbedBodies, 1);
+                Vector perturbedCentreOfMass = Calculations.centreOfMass(perturbedBodies);
+                Vector perturbedAngularMomentum = Calculations.angularMomentum(perturbedBodies);
+
+                assert Math.abs(perturbedEnergy - originalEnergy) < 1e-10;
+                assert perturbedCentreOfMass.subtract(originalCentreOfMass).norm() < 1e-10;
+                assert perturbedAngularMomentum.subtract(originalAngularMomentum).norm() < 1e-10;
+
+                
 
                 // Run the simulation
                 // Simulation simulation = new Simulation(perturbedBodies, N, dt, 1, Integrators::yoshida);

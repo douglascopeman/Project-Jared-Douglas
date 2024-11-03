@@ -79,17 +79,17 @@ public class Simulation {
 
     private void doOptionalCalculations(int timestep) {
         if (options.get("calculateCentreOfMass")) {
-            centreOfMass[timestep] = calculateCentreOfMass();
+            centreOfMass[timestep] = Calculations.centreOfMass(bodies);
         }
         if (options.get("calculateEnergies")) {
-            potentialEnergy[timestep] = calculatePotentialEnergy();
-            kineticEnergy[timestep] = calculateKineticEnergy();
+            potentialEnergy[timestep] = Calculations.potentialEnergy(bodies, G);
+            kineticEnergy[timestep] = Calculations.kineticEnergy(bodies);
         }
         if (options.get("calculateAngularMomentum")) {
-            angularMomentum[timestep] = calculateAngularMomentum();
+            angularMomentum[timestep] = Calculations.angularMomentum(bodies);
         }
         if (options.get("calculateLinearMomentum")) {
-            linearMomentum[timestep] = calclateLinearMomentum();
+            linearMomentum[timestep] = Calculations.linearMomentum(bodies);
         }
     }
 
@@ -126,13 +126,27 @@ public class Simulation {
             if (options.get("findOrbitLength") && (i > 10) && (orbitLength != 0.0)) {
                 findOrbitLength();
             }
-
         }
 
         writeSimulationToFiles();
     }
 
-    // check my logic in this method... It might be wrong
+    public void writeSimulationToFiles() {
+
+        // Create the output directory if it doesn't exist, or clear it if it does
+        OutputWriter.setupDirectories();
+
+        // Start by writing the simulation settings to a file
+        OutputWriter.writeSettingsToFile(N, dt, n, G, options.get("findOrbitLength"), orbitLength);
+
+        // Then write each body to its own file
+        OutputWriter.writeBodiesToFiles(simulation, N, n);
+
+        // Finally, write all optional calculations to files
+        OutputWriter.writeOptionsToFiles(options, centreOfMass, potentialEnergy, kineticEnergy, angularMomentum, linearMomentum);
+
+    }
+
     private void findOrbitLength() {
         boolean hasMadeFullOrbit = true;
         for (int p = 0; p < n; p++) {
@@ -184,228 +198,6 @@ public class Simulation {
                 throw new RuntimeException("Timestep size bound exceeded");
             }
         }
-    }
-
-    private void setupDirectories() {
-        java.nio.file.Path outputPath = java.nio.file.Paths.get("Outputs");
-        try {
-            if (java.nio.file.Files.exists(outputPath)) {
-            java.nio.file.Files.walk(outputPath)
-                .sorted(java.util.Comparator.reverseOrder())
-                .map(java.nio.file.Path::toFile)
-                .forEach(java.io.File::delete);
-            }
-            java.nio.file.Files.createDirectories(outputPath);
-        } catch (IOException e) {
-            System.err.println("Failed to create or clear output directory: " + e.getMessage());
-        }
-    }
-
-    private void writeSettingsToFile() {
-        try(FileWriter writer = new FileWriter("JavaSimulation\\Outputs\\simulationSettings.csv")){
-            writer.append(this.N + "," + this.dt + "," + this.n + "," + this.G);
-            if (options.get("findOrbitLength")) {
-                writer.append("," + orbitLength);
-            }
-            writer.append("\n");
-        } catch (FileNotFoundException e) {
-            System.err.println("Setting file not found");
-        } catch (IOException e) {
-            System.err.println("Something went wrong writing to file: " + e.getMessage());
-        }
-    }
-
-    private enum CalculationType {
-        POTENTIAL_ENERGY,
-        KINETIC_ENERGY,
-        CENTRE_OF_MASS,
-        ANGULAR_MOMENTUM,
-        LINEAR_MOMENTUM
-    }
-
-    private void writeCalculationToFile(CalculationType calculationType) {
-        String fileName = "";
-        switch (calculationType) {
-            case POTENTIAL_ENERGY:
-                fileName = "JavaSimulation\\Outputs\\potentialEnergy.csv";
-                break;
-            case KINETIC_ENERGY:
-                fileName = "JavaSimulation\\Outputs\\kineticEnergy.csv";
-                break;
-            case CENTRE_OF_MASS:
-                fileName = "JavaSimulation\\Outputs\\centreOfMass.csv";
-                break;
-            case ANGULAR_MOMENTUM:
-                fileName = "JavaSimulation\\Outputs\\angularMomentum.csv";
-                break;
-            case LINEAR_MOMENTUM:
-                fileName = "JavaSimulation\\Outputs\\linearMomentum.csv";
-                break;
-            default:
-                break;
-        }
-
-        try (FileWriter writer = new FileWriter(fileName)) {
-            StringBuilder sb = new StringBuilder();
-            switch (calculationType) {
-                case POTENTIAL_ENERGY:
-                    for (int i = 0; i < this.N; i++) {
-                        sb.append(potentialEnergy[i]).append("\n");
-                    }
-                    break;
-                case KINETIC_ENERGY:
-                    for (int i = 0; i < this.N; i++) {
-                        sb.append(kineticEnergy[i]).append("\n");
-                    }
-                    break;
-                case CENTRE_OF_MASS:
-                    for (int i = 0; i < this.N; i++) {
-                        sb.append(centreOfMass[i].getX())
-                        .append(",")
-                        .append(centreOfMass[i].getY())
-                        .append(",")
-                        .append(centreOfMass[i].getZ())
-                        .append("\n");
-                    }
-                    break;
-                case ANGULAR_MOMENTUM:
-                    for (int i = 0; i < this.N; i++) {
-                        sb.append(angularMomentum[i].getX())
-                        .append(",")
-                        .append(angularMomentum[i].getY())
-                        .append(",")
-                        .append(angularMomentum[i].getZ())
-                        .append("\n");
-                    }
-                    break;
-                case LINEAR_MOMENTUM:
-                    for (int i = 0; i < this.N; i++) {
-                        sb.append(linearMomentum[i].getX())
-                        .append(",")
-                        .append(linearMomentum[i].getY())
-                        .append(",")
-                        .append(linearMomentum[i].getZ())
-                        .append("\n");
-                    }
-                    break;
-                default:
-                    break;
-            }
-            writer.write(sb.toString());
-        } catch (FileNotFoundException e) {
-            System.err.println("Calculation file not found");
-        } catch (IOException e) {
-            System.err.println("Something went wrong writing to file: " + e.getMessage());
-        }
-    }
-
-    private void writeBodiesToFiles() {
-        for (int p = 0; p < this.n; p++) {
-            try (FileWriter writer = new FileWriter("JavaSimulation\\Outputs\\output" + p + ".csv")) {
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < this.N; i++) {
-                    sb.append(simulation[i][0][p])
-                    .append(",")
-                    .append(simulation[i][1][p])
-                    .append(",")
-                    .append(simulation[i][2][p])
-                    .append(",")
-                    .append(simulation[i][3][p])
-                    .append(",")
-                    .append(simulation[i][4][p])
-                    .append(",")
-                    .append(simulation[i][5][p])
-                    .append("\n");
-                }
-                writer.write(sb.toString());
-            } catch (FileNotFoundException e) {
-                System.err.println("Body " + p +  " file not found");
-            } catch (IOException e) {
-                System.err.println("Something went wrong writing to file: " + e.getMessage());
-            }
-        }
-    }
-
-    private void writeSimulationToFiles() {
-
-        // Create the output directory if it doesn't exist, or clear it if it does
-        setupDirectories();
-
-        // Start by writing the simulation settings to a file
-        writeSettingsToFile();
-
-        // Then write each body to its own file
-        writeBodiesToFiles();
-
-        // Then write all optional calculations to files
-        if (options.get("calculateCentreOfMass")) {
-            writeCalculationToFile(CalculationType.CENTRE_OF_MASS);
-        }
-        if (options.get("calculateEnergies")) {
-            writeCalculationToFile(CalculationType.POTENTIAL_ENERGY);
-            writeCalculationToFile(CalculationType.KINETIC_ENERGY);
-        }
-        if (options.get("calculateAngularMomentum")) {
-            writeCalculationToFile(CalculationType.ANGULAR_MOMENTUM);
-        }
-        if (options.get("calculateLinearMomentum")) {
-            writeCalculationToFile(CalculationType.LINEAR_MOMENTUM);
-        }
-    }
-
-    // ---------- Simulation optional Calculations ---------- \\
-
-    public double calculatePotentialEnergy(){
-        double potentialEnergy = 0.0;
-        for (int p = 0; p < n; p++) {
-            potentialEnergy += bodies[p].getPotentialEnergy(bodies, G);
-        }
-        return potentialEnergy;
-    }
-
-    public double calculateKineticEnergy() {
-        double kineticEnergy = 0.0;
-        for (int p = 0; p < n; p++) {
-            kineticEnergy += bodies[p].getKineticEnergy();
-        }
-            
-        return kineticEnergy;
-    }
-
-    public double calculateTotalMass() {
-        double totalMass = 0;
-        for (int i = 0; i < n; i++) {
-            totalMass += bodies[i].getMass();
-        }
-        return totalMass;
-
-    }
-
-    public Vector calculateCentreOfMass() {
-        Vector centreOfMass = new Vector();
-        for (int p = 0; p < n; p++) {
-            centreOfMass = centreOfMass.add(Vector.multiply(bodies[p].getPosition(), bodies[p].getMass()));
-        }
-        centreOfMass.divide(calculateTotalMass());
-        
-        return centreOfMass;
-    }
-
-    public Vector calculateAngularMomentum() {
-        Vector L = new Vector();
-        for (int p = 0; p < n; p++) {
-            L.add(bodies[p].calculateAngularMomentum());
-        }
-        return L;
-    }
-
-    public Vector calclateLinearMomentum() {
-        Vector P = new Vector();
-        for (int p = 0; p < n; p++) {
-            P.add(bodies[p].calculateLinearMomentum());
-        }
-        
-        return P;
-    }
+    } 
 
 }

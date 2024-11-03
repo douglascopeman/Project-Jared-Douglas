@@ -123,7 +123,7 @@ public class Integrators{
     }
 
     private static double getVariableTimestep(Body[] bodies, double variableTimestepConstant, IntegratorFunction integrator) {
-        Body[] bodiesClone = SimulationCalculations.copyBodies(bodies);
+        Body[] bodiesClone = Calculations.copyBodies(bodies);
         double tempTimestep = getVariableTimestepHelper(bodies, variableTimestepConstant);
 
         integrator.Integrate(bodiesClone, tempTimestep, false);
