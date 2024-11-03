@@ -151,5 +151,24 @@ public class OutputWriter {
         } catch (IOException e) {
             System.err.println("Failed to create or clear output directory: " + e.getMessage());
         }
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            System.err.println("Sleep interrupted: " + e.getMessage());
+        }
+    }
+
+    public static void saveMatrix(double[][] matrix) {
+        try (FileWriter writer = new FileWriter("Outputs\\stopMatrix.csv")) {
+            for (int i = 0; i < matrix.length; i++) {
+                for (int j = 0; j < matrix[i].length; j++) {
+                    writer.write(matrix[i][j] + ",");
+                }
+                writer.write("\n");
+            }
+            
+        } catch (Exception e) {
+            System.out.println("Error writing stop matrix to file");
+        }
     }
 }

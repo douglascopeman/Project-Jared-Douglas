@@ -58,7 +58,7 @@ public class RunPerturbations {
                 Body[] perturbedBodies = perturbBodies(i, j, delta);
 
 
-                // Sanity checks to be removed later
+                // #region Sanity checks to be removed later
                 double perturbedEnergy = Calculations.totalEnergy(perturbedBodies, 1);
                 Vector perturbedCentreOfMass = Calculations.centreOfMass(perturbedBodies);
                 Vector perturbedAngularMomentum = Calculations.angularMomentum(perturbedBodies);
@@ -66,9 +66,8 @@ public class RunPerturbations {
                 assert Math.abs(perturbedEnergy - originalEnergy) < 1e-10;
                 assert perturbedCentreOfMass.subtract(originalCentreOfMass).norm() < 1e-10;
                 assert perturbedAngularMomentum.subtract(originalAngularMomentum).norm() < 1e-10;
-
+                // #endregion
                 
-
                 // Run the simulation
                 // Simulation simulation = new Simulation(perturbedBodies, N, dt, 1, Integrators::yoshida);
                 Simulation simulation = new Simulation(perturbedBodies, 10000, 0.01, new String[] {"-integrator yoshida", "-checkStopConditions", "-calculateEnergies", "-calculateCentreOfMass", "-useVariableTimestep"});
@@ -76,30 +75,14 @@ public class RunPerturbations {
                 try {
                     simulation.run();
                 } catch (Exception e) {
-                    System.err.println("Error running simulation for perturbation (" + i + ", " + j + ")");
-                    System.out.println("Time elapsed: " + simulation.getElapsedTime());
-                    e.printStackTrace();
                 } finally {
                     stopMatrix[i + halfGridSize][j + halfGridSize] = simulation.getCurrentTimestep();
+                    System.out.println();
                 }
             }
         }
 
         return stopMatrix;
-    }
-
-    public void saveStopMatrix(double[][] stopMatrix) {
-        try (FileWriter writer = new FileWriter("Outputs\\stopMatrix.csv")) {
-            for (int i = 0; i < stopMatrix.length; i++) {
-                for (int j = 0; j < stopMatrix[i].length; j++) {
-                    writer.write(stopMatrix[i][j] + ",");
-                }
-                writer.write("\n");
-            }
-            
-        } catch (Exception e) {
-            System.out.println("Error writing stop matrix to file");
-        }
     }
 
 }
