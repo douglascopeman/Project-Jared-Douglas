@@ -30,15 +30,15 @@ dt = 0.1
 #   simulation.run_fast()
 # print(time.time() - start)
 
-perturbation = Perturbation.Perturbation(
-  N, dt, orbit_examples.figure_eight, 4, 0.01,
-                                     stop_conditions = {
-                                       "energy_error_bound": 0.001,
-                                        "distance_bound": 20,
-                                        "variable_dt_bound": 1*10**(-6)
-                                   }
-)
-perturbation.run()
+# perturbation = Perturbation.Perturbation(
+#   N, dt, orbit_examples.figure_eight, 4, 0.01,
+#                                      stop_conditions = {
+#                                        "energy_error_bound": 0.001,
+#                                         "distance_bound": 20,
+#                                         "variable_dt_bound": 1*10**(-6)
+#                                    }
+# )
+# perturbation.run()
 
 
 
@@ -57,5 +57,5 @@ perturbation.run()
 
 # plotter.plot()
 
-# perturbation_plot = PerturbationPlot.PerturbationPlot("Java\\Outputs")
-# perturbation_plot.plot()
+perturbation_plot = PerturbationPlot.PerturbationPlot("JavaSimulation\\Outputs")
+perturbation_plot.plot()

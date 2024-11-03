@@ -33,7 +33,7 @@ class PerturbationPlot():
         output_directory = os.path.join(os.getcwd(), self.output_directory)
 
         # Reading the Perturbation settings, csv file must contain 6 lines of numerical values
-        with open(os.path.join(output_directory, "PerturbationSettings.csv"), 'r') as f:
+        with open(os.path.join(output_directory, "perturbationSettings.csv"), 'r') as f:
             data = np.loadtxt(f, delimiter=",")
             self.N = int(data[0])
             self.dt = float(data[1])
@@ -43,7 +43,7 @@ class PerturbationPlot():
             self.plot_size = 2*self.p + 1
 
         # Reading the perturbation matrix
-        with open(os.path.join(output_directory, "PerturbationMatrix.csv"), 'r') as f:
+        with open(os.path.join(output_directory, "perturbationMatrix.csv"), 'r') as f:
             data = np.loadtxt(f, delimiter=",")
             self.M = np.zeros((self.plot_size, self.plot_size), dtype=float)
             self.M[:,:] = data
