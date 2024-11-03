@@ -5,6 +5,7 @@ import numpy as np
 import os
 import Body
 import seaborn as sns
+import pandas as pd
 
 
 class PerturbationPlot():
@@ -15,11 +16,14 @@ class PerturbationPlot():
     def plot(self):
         self.read_data()
 
-        print(self.delta)
-
         self.axis_labels = np.round(np.arange((-self.p*self.delta), (self.p*self.delta+self.delta), self.delta), decimals=4)
+        self.df = pd.DataFrame(self.M, columns=self.axis_labels, index=self.axis_labels)
 
-        sns.heatmap(self.M, xticklabels=self.axis_labels, yticklabels=self.axis_labels)
+        skip_no_labels = np.size(self.axis_labels)//10
+        print(skip_no_labels)
+
+
+        sns.heatmap(self.df, xticklabels=skip_no_labels, yticklabels=skip_no_labels)
         plt.title("Perturbation Plot")
         plt.xlabel("Delta x")
         plt.ylabel("Delta y")
