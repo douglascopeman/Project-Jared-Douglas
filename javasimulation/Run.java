@@ -13,7 +13,7 @@ public class Run{
 
         if (tempOverride) {
             OutputWriter.setupDirectories();
-            RunPerturbations runPerturbations = new RunPerturbations(OrbitExamples.orbitExampleMap.get("figureEight"), 1000, 0.01, 1, 0.01);
+            Perturbations runPerturbations = new Perturbations(OrbitExamples.orbitExampleMap.get("figureEight"), 10000, 0.01, 3, 0.01);
             double[][] stopMatrix = runPerturbations.run();
             OutputWriter.saveMatrix(stopMatrix);
             scanner.close();
