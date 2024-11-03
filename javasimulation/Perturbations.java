@@ -39,8 +39,12 @@ public class Perturbations {
         // Finally, preserve the angular momentum by setting the velocity of body 1 to (-2) times that of bodies 0 and 2
 
         perturbedBodies[0].setVelocity(bodies[0].getVelocity().normalise().multiply(newVelocity));
-        perturbedBodies[2].setVelocity(perturbedBodies[0].getVelocity().negate());
+        perturbedBodies[2].setVelocity(perturbedBodies[0].getVelocity());
         perturbedBodies[1].setVelocity(perturbedBodies[0].getVelocity().multiply(-2.0));
+
+        System.out.println(perturbedBodies[0].getVelocity());
+        System.out.println(perturbedBodies[1].getVelocity());
+        System.out.println(perturbedBodies[2].getVelocity());
 
         return perturbedBodies;
     }

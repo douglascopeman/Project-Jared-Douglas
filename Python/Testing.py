@@ -43,16 +43,16 @@ dt = 0.1
 
 
 
-# plotter = Plotter.Plotter("Python\\Outputs", 
-#                           run_fast=False, 
-#                           plot_centre_of_mass=True, 
+# plotter = Plotter.Plotter("Javasimulation\\Outputs", 
+#                           run_fast=True, 
+#                           plot_centre_of_mass=False, 
 #                           plot_energy=False, 
-#                           plot_energy_error=True, 
-#                           plot_angular_momentum_error = True, 
+#                           plot_energy_error=False, 
+#                           plot_angular_momentum_error = False, 
 #                           plot_linear_momentum_error=False, 
 #                           plot_3D=False,
 #                           x_label="Time",
-#                           save_plots=True
+#                           save_plots=False
 #                           )
 
 # plotter.plot()
