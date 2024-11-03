@@ -79,17 +79,17 @@ public class Simulation {
 
     private void doOptionalCalculations(int timestep) {
         if (options.get("calculateCentreOfMass")) {
-            centreOfMass[timestep] = calculateCentreOfMass();
+            centreOfMass[timestep] = Calculations.centreOfMass(bodies);
         }
         if (options.get("calculateEnergies")) {
-            potentialEnergy[timestep] = calculatePotentialEnergy();
-            kineticEnergy[timestep] = calculateKineticEnergy();
+            potentialEnergy[timestep] = Calculations.potentialEnergy(bodies, G);
+            kineticEnergy[timestep] = Calculations.kineticEnergy(bodies);
         }
         if (options.get("calculateAngularMomentum")) {
-            angularMomentum[timestep] = calculateAngularMomentum();
+            angularMomentum[timestep] = Calculations.angularMomentum(bodies);
         }
         if (options.get("calculateLinearMomentum")) {
-            linearMomentum[timestep] = calclateLinearMomentum();
+            linearMomentum[timestep] = Calculations.linearMomentum(bodies);
         }
     }
 
@@ -355,6 +355,7 @@ public class Simulation {
 
     // ---------- Simulation optional Calculations ---------- \\
 
+    @Deprecated
     public double calculatePotentialEnergy(){
         double potentialEnergy = 0.0;
         for (int p = 0; p < n; p++) {
