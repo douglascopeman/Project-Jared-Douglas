@@ -34,7 +34,7 @@ public class OutputWriter {
 
     public static void writeBodiesToFiles(double[][][] simulation, int N, int n) {
         for (int p = 0; p < n; p++) {
-            try (FileWriter writer = new FileWriter("JavaSimulation\\Outputs\\output" + p + ".csv")) {
+            try (FileWriter writer = new FileWriter("Outputs\\output" + p + ".csv")) {
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < N; i++) {
                     sb.append(simulation[i][0][p])
@@ -63,10 +63,10 @@ public class OutputWriter {
         String fileName = "";
         switch (calculationType) {
             case POTENTIAL_ENERGY:
-                fileName = "JavaSimulation\\Outputs\\potentialEnergy.csv";
+                fileName = "Outputs\\potentialEnergy.csv";
                 break;
             case KINETIC_ENERGY:
-                fileName = "JavaSimulation\\Outputs\\kineticEnergy.csv";
+                fileName = "Outputs\\kineticEnergy.csv";
                 break;
             default:
                 break;
@@ -92,13 +92,13 @@ public class OutputWriter {
         String fileName = "";
         switch (calculationType) {
             case CENTRE_OF_MASS:
-                fileName = "JavaSimulation\\Outputs\\centreOfMass.csv";
+                fileName = "Outputs\\centreOfMass.csv";
                 break;
             case ANGULAR_MOMENTUM:
-                fileName = "JavaSimulation\\Outputs\\angularMomentum.csv";
+                fileName = "Outputs\\angularMomentum.csv";
                 break;
             case LINEAR_MOMENTUM:
-                fileName = "JavaSimulation\\Outputs\\linearMomentum.csv";
+                fileName = "Outputs\\linearMomentum.csv";
                 break;
             default:
                 break;
@@ -125,7 +125,7 @@ public class OutputWriter {
     }
 
     public static void writeSettingsToFile(int N, double dt, int n, double G, boolean findOrbitLength, double orbitLength) {
-        try(FileWriter writer = new FileWriter("JavaSimulation\\Outputs\\simulationSettings.csv")){
+        try(FileWriter writer = new FileWriter("Outputs\\simulationSettings.csv")){
             writer.append(N + "," + dt + "," + n + "," + G);
             if (findOrbitLength) {
                 writer.append("," + orbitLength);
@@ -151,20 +151,15 @@ public class OutputWriter {
         } catch (IOException e) {
             System.err.println("Failed to create or clear output directory: " + e.getMessage());
         }
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            System.err.println("Sleep interrupted: " + e.getMessage());
-        }
     }
 
     public static void saveMatrix(double[][] matrix) {
         try (FileWriter writer = new FileWriter("Outputs\\stopMatrix.csv")) {
             for (int i = 0; i < matrix.length; i++) {
-                for (int j = 0; j < matrix[i].length; j++) {
+                for (int j = 0; j < matrix[i].length - 1; j++) {
                     writer.write(matrix[i][j] + ",");
                 }
-                writer.write("\n");
+                writer.write(matrix[i][matrix[i].length-1] + "\n");
             }
             
         } catch (Exception e) {
