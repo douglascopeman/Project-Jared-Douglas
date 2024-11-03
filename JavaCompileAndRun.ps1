@@ -24,7 +24,7 @@ param ([Parameter(
         [Parameter(Mandatory=$False)]
         [switch] $checkStopConditions,
         [Parameter(Mandatory=$False)]
-        [switch] $calculateCenterOfMass,
+        [switch] $calculateCentreOfMass,
         [Parameter(Mandatory=$False)]
         [switch] $calculateEnergies,
         [Parameter(Mandatory=$False)]
@@ -65,7 +65,7 @@ if ($findOrbitLength) {
 Set-Location .\javasimulation
 javac .\*.java -d .\
 Copy-Item -Path .\Outputs\* -Destination .\javasimulation\Outputs -Recurse -Force
-java javasimulation/Run $javaArgs
+java -cp . javasimulation/Run $javaArgs
 Copy-Item -Path .\javasimulation\Outputs\* -Destination .\Outputs -Recurse -Force
 Set-Location ..
 write-host "Done!"
