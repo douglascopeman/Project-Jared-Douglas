@@ -1,7 +1,4 @@
 package javasimulation;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.HashMap;
 
 public class Simulation {
@@ -17,7 +14,7 @@ public class Simulation {
 
     private HashMap<String, Boolean> options = new HashMap<String, Boolean>();
 
-    private double energyErrorBound = 1e-3;
+    private double energyErrorBound = 1e-2;
     private double distanceBound = 20;
     private double timestepSizeBound = 1e-6;
 
@@ -27,9 +24,9 @@ public class Simulation {
     private Vector[] angularMomentum;
     private Vector[] linearMomentum;
     private double orbitLength;
+    private int currentTimestep;
 
-    public Simulation(Body[] bodies, int N, double dt, double G, IntegratorFunction integrator)
-    {
+    public Simulation(Body[] bodies, int N, double dt) {
         this.bodies = bodies;
         this.n = bodies.length;
         this.N = N;
@@ -50,7 +47,36 @@ public class Simulation {
         angularMomentum = new Vector[N];
         linearMomentum = new Vector[N];
 
-        this.integratorFunction = integrator;
+        this.integratorFunction = Integrators::symplecticEuler;
+    }
+
+    public Simulation(Body[] bodies, int N, double dt, String[] customOptions)
+    {
+        this(bodies, N, dt);
+
+        setCommandlineOptions(customOptions);
+    }
+
+
+    // #region Getters and Setters
+
+    private void setCommandlineOptions(String[] options) {
+        for (String option: options) {
+            option = option.substring(1);
+            if (this.options.containsKey(option)) {
+                this.options.put(option, true);
+            } else if (option.substring(0, 10).equals("integrator")) {
+                this.integratorFunction = Integrators.integratorMap.get(option.substring(11));
+            } else {
+                System.out.println(option.substring(12));
+                throw new IllegalArgumentException("Invalid option: " + option);
+            }
+        }
+
+    }
+
+    public int getCurrentTimestep() {
+        return currentTimestep;
     }
 
     public HashMap<String, Boolean> getOptions() {
@@ -77,6 +103,8 @@ public class Simulation {
         return elapsedTime;
     }
 
+    // #endregion
+
     private void doOptionalCalculations(int timestep) {
         if (options.get("calculateCentreOfMass")) {
             centreOfMass[timestep] = Calculations.centreOfMass(bodies);
@@ -94,10 +122,14 @@ public class Simulation {
     }
 
     public void run(){
+        long startTime = System.currentTimeMillis();
+
         simulation = new double[N][6][n];
 
         // ----- Main Time Loop ----- \\
         for (int i = 0; i < N; i++) {
+            this.currentTimestep = i;
+
             // Record all optional calculations
             doOptionalCalculations(i);
 
@@ -127,6 +159,9 @@ public class Simulation {
                 findOrbitLength();
             }
         }
+
+        long endTime = System.currentTimeMillis();
+        System.out.println("Time taken: " + (endTime - startTime) + "ms");
 
         writeSimulationToFiles();
     }
