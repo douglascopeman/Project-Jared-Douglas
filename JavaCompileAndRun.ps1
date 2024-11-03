@@ -64,8 +64,8 @@ if ($findOrbitLength) {
 
 Set-Location .\javasimulation
 javac .\*.java -d .\
-Copy-Item -Path .\Outputs\* -Destination .\javasimulation\Outputs -Recurse -Force
+# Copy-Item -Path .\Outputs\* -Destination .\javasimulation\Outputs -Recurse -Force
 java -cp . javasimulation/Run $javaArgs
-Copy-Item -Path .\javasimulation\Outputs\* -Destination .\Outputs -Recurse -Force
+# Copy-Item -Path .\javasimulation\Outputs\* -Destination .\Outputs -Recurse -Force
 Set-Location ..
 write-host "Done!"
