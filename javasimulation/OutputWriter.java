@@ -138,6 +138,17 @@ public class OutputWriter {
         }
     }
 
+    public static void writePermutationSettingsToFile(int N, double dt, int n, double delta, int halfGridSize) {
+        try(FileWriter writer = new FileWriter("Outputs\\permutationSettings.csv")){
+            writer.append(N + "," + dt + "," + n + "," + delta + "," + halfGridSize);
+            writer.append("\n");
+        } catch (FileNotFoundException e) {
+            System.err.println("Setting file not found");
+        } catch (IOException e) {
+            System.err.println("Something went wrong writing to file: " + e.getMessage());
+        }
+    }
+
     public static void setupDirectories() {
         java.nio.file.Path outputPath = java.nio.file.Paths.get("Outputs");
         try {
@@ -154,7 +165,7 @@ public class OutputWriter {
     }
 
     public static void saveMatrix(double[][] matrix) {
-        try (FileWriter writer = new FileWriter("Outputs\\stopMatrix.csv")) {
+        try (FileWriter writer = new FileWriter("Outputs\\pertubationMatrix.csv")) {
             for (int i = 0; i < matrix.length; i++) {
                 for (int j = 0; j < matrix[i].length - 1; j++) {
                     writer.write(matrix[i][j] + ",");
