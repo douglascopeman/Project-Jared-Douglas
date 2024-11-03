@@ -14,9 +14,7 @@ public class Perturbations {
         this.bodies = Calculations.copyBodies(bodies);
         this.N = N;
         this.dt = dt;
-        if (halfGridSize % 2 == 0) {
-            throw new IllegalArgumentException("halfGridSize must be an odd number");
-        }
+
         this.halfGridSize = halfGridSize;
         this.delta = delta;
         this.originalEnergy = Calculations.totalEnergy(bodies, 1);
