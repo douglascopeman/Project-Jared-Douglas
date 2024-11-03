@@ -151,19 +151,21 @@ class Simulation():
 
         print(orbit_duration)
 
+
     def run_fast(self):
         """
         A bare bones version of run(), only calculates body positions
         """
         bodies = self.bodies
         simulation = np.zeros((self.N, 6, self.n), dtype=float)
+        orbit_duration = 0.0
         for i in range(0, self.N):
             bodies, used_dt = self.kwargs["Integrator"](bodies, self.dt)
             for p, body in enumerate(bodies):
                 simulation[i,:,p] = np.concatenate((body.position, body.velocity), axis=None)
 
         path = os.path.join(os.getcwd(), "Python\\Outputs")
-        simulationSettings = np.array([self.N, self.dt, self.n, self.kwargs["G"]])
+        simulationSettings = np.array([self.N, self.dt, self.n, self.kwargs["G"], orbit_duration])
         np.savetxt(os.path.join(path, "simulationSettings.csv"), simulationSettings, delimiter=",")
         for p in range(self.n):
             np.savetxt(os.path.join(path, "output" + str(p) + ".csv"), simulation[:,:,p], delimiter=",")
