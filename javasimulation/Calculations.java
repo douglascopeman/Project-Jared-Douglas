@@ -3,8 +3,11 @@ package javasimulation;
 public class Calculations {
     public static double potentialEnergy(Body[] bodies, double G) {
         double potentialEnergy = 0;
-        for (Body body : bodies) {
-            for (Body other_body : bodies) {
+        // Weird indexing is to prevent overcounting
+        for (int i = 0; i < bodies.length; i++) {
+            for (int j = i + 1; j < bodies.length; j++) {
+                Body body = bodies[i];
+                Body other_body = bodies[j];
                 if (body != other_body) {
                     Vector positionDifference = Vector.subtract(body.getPosition(), other_body.getPosition());
                     potentialEnergy += -G * body.getMass() * other_body.getMass() / positionDifference.norm();
