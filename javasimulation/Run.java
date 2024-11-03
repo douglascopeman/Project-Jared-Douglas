@@ -12,9 +12,10 @@ public class Run{
         boolean tempOverride = scanner.nextBoolean();
 
         if (tempOverride) {
-            RunPerturbations runPerturbations = new RunPerturbations(OrbitExamples.orbitExampleMap.get("figureEight"), 1000, 0.01, 5, 0.01);
+            OutputWriter.setupDirectories();
+            RunPerturbations runPerturbations = new RunPerturbations(OrbitExamples.orbitExampleMap.get("figureEight"), 1000, 0.01, 1, 0.01);
             double[][] stopMatrix = runPerturbations.run();
-            runPerturbations.saveStopMatrix(stopMatrix);
+            OutputWriter.saveMatrix(stopMatrix);
             scanner.close();
             return;
         }
