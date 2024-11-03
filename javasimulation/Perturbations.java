@@ -1,5 +1,4 @@
 package javasimulation;
-import java.io.FileWriter;
 
 public class Perturbations {
     private final Body[] bodies;
@@ -69,8 +68,13 @@ public class Perturbations {
                 // #endregion
                 
                 // Run the simulation
-                // Simulation simulation = new Simulation(perturbedBodies, N, dt, 1, Integrators::yoshida);
-                Simulation simulation = new Simulation(perturbedBodies, 10000, 0.01, new String[] {"-integrator yoshida", "-checkStopConditions", "-calculateEnergies", "-calculateCentreOfMass", "-useVariableTimestep", "-skipSaveToCSV"});
+                String[] options = new String[] {"-integrator yoshida", 
+                                                "-checkStopConditions", 
+                                                "-calculateEnergies", 
+                                                "-calculateCentreOfMass", 
+                                                "-useVariableTimestep", 
+                                                "-skipSaveToCSV"};
+                Simulation simulation = new Simulation(perturbedBodies, N, dt, options);
 
                 try {
                     simulation.run();
