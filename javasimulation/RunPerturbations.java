@@ -71,7 +71,7 @@ public class RunPerturbations {
 
                 // Run the simulation
                 // Simulation simulation = new Simulation(perturbedBodies, N, dt, 1, Integrators::yoshida);
-                RunSingleOrbit simulation = new RunSingleOrbit(perturbedBodies, 10000, 0.01, new String[] {"-integrator yoshida", "-checkStopConditions", "-calculateEnergies", "-calculateCentreOfMass", "-useVariableTimestep"});
+                Simulation simulation = new Simulation(perturbedBodies, 10000, 0.01, new String[] {"-integrator yoshida", "-checkStopConditions", "-calculateEnergies", "-calculateCentreOfMass", "-useVariableTimestep"});
 
                 try {
                     simulation.run();
@@ -80,7 +80,7 @@ public class RunPerturbations {
                     System.out.println("Time elapsed: " + simulation.getElapsedTime());
                     e.printStackTrace();
                 } finally {
-                    stopMatrix[i + halfGridSize][j + halfGridSize] = simulation.getElapsedTime();
+                    stopMatrix[i + halfGridSize][j + halfGridSize] = simulation.getCurrentTimestep();
                 }
             }
         }
