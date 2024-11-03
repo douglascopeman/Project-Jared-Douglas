@@ -40,10 +40,6 @@ public class Perturbations {
         perturbedBodies[2].setVelocity(perturbedBodies[0].getVelocity());
         perturbedBodies[1].setVelocity(perturbedBodies[0].getVelocity().multiply(-2.0));
 
-        System.out.println(perturbedBodies[0].getVelocity());
-        System.out.println(perturbedBodies[1].getVelocity());
-        System.out.println(perturbedBodies[2].getVelocity());
-
         return perturbedBodies;
     }
 
