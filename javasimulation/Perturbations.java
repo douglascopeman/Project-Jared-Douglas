@@ -1,7 +1,7 @@
 package javasimulation;
 import java.io.FileWriter;
 
-public class RunPerturbations {
+public class Perturbations {
     private final Body[] bodies;
     private int N;
     private double dt;
@@ -11,7 +11,7 @@ public class RunPerturbations {
     private final Vector originalCentreOfMass;
     private final Vector originalAngularMomentum;
 
-    public RunPerturbations(Body[] bodies, int N, double dt, int halfGridSize, double delta) {
+    public Perturbations(Body[] bodies, int N, double dt, int halfGridSize, double delta) {
         this.bodies = Calculations.copyBodies(bodies);
         this.N = N;
         this.dt = dt;
@@ -70,7 +70,7 @@ public class RunPerturbations {
                 
                 // Run the simulation
                 // Simulation simulation = new Simulation(perturbedBodies, N, dt, 1, Integrators::yoshida);
-                Simulation simulation = new Simulation(perturbedBodies, 10000, 0.01, new String[] {"-integrator yoshida", "-checkStopConditions", "-calculateEnergies", "-calculateCentreOfMass", "-useVariableTimestep"});
+                Simulation simulation = new Simulation(perturbedBodies, 10000, 0.01, new String[] {"-integrator yoshida", "-checkStopConditions", "-calculateEnergies", "-calculateCentreOfMass", "-useVariableTimestep", "-skipSaveToCSV"});
 
                 try {
                     simulation.run();
