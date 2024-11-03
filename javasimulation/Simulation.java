@@ -14,7 +14,7 @@ public class Simulation {
 
     private HashMap<String, Boolean> options = new HashMap<String, Boolean>();
 
-    private double energyErrorBound = 1e-2;
+    private double energyErrorBound = 1e-3;
     private double distanceBound = 20;
     private double timestepSizeBound = 1e-6;
 
