@@ -1,11 +1,9 @@
 import matplotlib.pyplot as plt
 from matplotlib import animation
-from mpl_toolkits import mplot3d
-from itertools import combinations
 import numpy as np
 import os
-import Body
 from matplotlib.animation import FuncAnimation
+import seaborn as sns
 
 class Plotter():
     def __init__(self, outputDirectory, **kwargs):
@@ -310,7 +308,9 @@ class Plotter():
             plt.show()
         plt.close()
 
-
+    def plot_heatmap(stop_matrix):
+        hm = sns.heatmap(data=stop_matrix)
+        plt.show()
         
         
         
