@@ -68,14 +68,15 @@ public class Body {
         return this.acceleration;
     }
 
+    @Deprecated
     public double getPotentialEnergy(Body[] bodies, double G) {
-        double kineticEnergy = 0;
+        double potentialEnergy = 0;
         for (Body body : bodies) {
             if (body != this) {
-                kineticEnergy += -G * mass * body.getMass() / Vector.subtract(getPosition(), body.getPosition()).norm();
+                potentialEnergy += -G * mass * body.getMass() / Vector.subtract(getPosition(), body.getPosition()).norm();
             }
         }
-        return kineticEnergy;
+        return potentialEnergy;
     }
 
     public double getKineticEnergy() {
