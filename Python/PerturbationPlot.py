@@ -16,7 +16,8 @@ class PerturbationPlot():
     def plot(self):
         self.read_data()
 
-        self.axis_labels = np.round(np.arange((-self.p*self.delta), (self.p*self.delta+self.delta), self.delta), decimals=4)
+        self.axis_labels = np.round(np.arange((-self.p*self.delta), (self.p*self.delta+(self.delta*0.5)), self.delta), decimals=4)
+        print(self.axis_labels)
         self.df = pd.DataFrame(self.M, columns=self.axis_labels, index=self.axis_labels)
 
         skip_no_labels = np.size(self.axis_labels)//10
