@@ -130,10 +130,10 @@ class Pertubation():
 
                     current_bodies, used_dt = Integrators.yoshida(current_bodies, self.dt)
 
-        self.plot_pertubation(stop_matrix)
-        return stop_matrix
+        pertubation_settings = np.array([self.N, self.dt, self.n, self.delta, self.p])
+        path = os.path.join(os.getcwd(), "Python\\Outputs")
+        np.savetxt(os.path.join(path, "pertubationSettings.csv"), pertubation_settings, delimiter=",")
+        np.savetxt(os.path.join(path, "pertubationMatrix.csv"), stop_matrix, delimiter=",")
+
     
-    def plot_pertubation(self, stop_matrix):
-        hm = sns.heatmap(data=stop_matrix)
-        plt.show()
 
