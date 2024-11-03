@@ -54,10 +54,8 @@ public class Simulation {
     public Simulation(Body[] bodies, int N, double dt, String[] customOptions)
     {
         this(bodies, N, dt);
-
         setCommandlineOptions(customOptions);
     }
-
 
     // #region Getters and Setters
 
@@ -210,6 +208,7 @@ public class Simulation {
                 System.out.println("Energy error bound: \t" + energyErrorBound);
                 System.out.println("Energy error: \t" + energyError);
                 System.out.println("Time reached: \t" + elapsedTime);
+                System.out.println("Timestep reached: \t" + timestep);
                 throw new RuntimeException("Energy error bound exceeded");
             }
         }
