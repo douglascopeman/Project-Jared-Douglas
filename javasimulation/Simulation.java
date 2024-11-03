@@ -40,6 +40,7 @@ public class Simulation {
         options.put("calculateAngularMomentum", false);
         options.put("calculateLinearMomentum", false);
         options.put("findOrbitLength", false);
+        options.put("skipSaveToCSV", false);
 
         centreOfMass = new Vector[N];
         potentialEnergy = new double[N];
@@ -163,7 +164,9 @@ public class Simulation {
         long endTime = System.currentTimeMillis();
         System.out.println("Time taken: " + (endTime - startTime) + "ms");
 
-        writeSimulationToFiles();
+        if (!options.get("skipSaveToCSV"))  {
+            writeSimulationToFiles();       
+        }
     }
 
     public void writeSimulationToFiles() {
