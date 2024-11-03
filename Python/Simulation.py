@@ -133,9 +133,9 @@ class Simulation():
             
             if self.kwargs["is_orbit_duration"]:
                 current_positions = np.concatenate([body.position for body in self.bodies])
-
-                if orbit_duration == 0 and LA.norm(current_positions-initial_position) < 0.08 and i>10:
-                    orbit_duration = i
+                orbit_error_bound = 0.08    # The maximum distance between bodies and their initial position that determins if it's an "orbit"
+                if orbit_duration == 0 and LA.norm(current_positions-initial_position) < orbit_error_bound and i>10:
+                    orbit_duration = i  # Set the orbit if one is not already set
 
         #-------------------- Write Data to CSVs --------------------#
         simulationSettings = np.array([self.N, self.dt, self.n, self.kwargs["G"], orbit_duration])
