@@ -32,7 +32,13 @@ param ([Parameter(
         [Parameter(Mandatory=$False)]
         [switch] $calculateLinearMomentum,
         [Parameter(Mandatory=$False)]
-        [switch] $findOrbitLength
+        [switch] $findOrbitLength,
+        [Parameter(Mandatory=$False)]
+        [switch] $perturbate,
+        [Parameter(Mandatory=$False)]
+        [float] $delta = 0.01,
+        [Parameter(Mandatory=$False)]
+        [int] $halfGridSize = 1
 )
 
 $javaArgs = @($Orbit, $N, $dt)
@@ -60,6 +66,15 @@ if ($calculateLinearMomentum) {
 }
 if ($findOrbitLength) {
         $javaArgs += "-findOrbitLength"
+}
+if ($perturbate) {
+        $javaArgs += "-perturbate"
+}
+if ($delta) {
+        $javaArgs += "-delta " + $delta
+}
+if ($halfGridSize) {
+        $javaArgs += "-halfGridSize " + $halfGridSize
 }
 
 Set-Location .\javasimulation
