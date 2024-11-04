@@ -63,7 +63,6 @@ public class Perturbations {
                 final int columnIndex = j;
                 executor.submit(() -> {
 
-
                 // Perturb the bodies
                 Body[] perturbedBodies = perturbBodies(rowIndex, columnIndex, delta);
 
@@ -88,16 +87,16 @@ public class Perturbations {
 
                 Simulation simulation = new Simulation(perturbedBodies, N, dt, options);
                 Thread simulationThread = new Thread(simulation);
-
-                System.out.println("Thread " + simulationThread.threadId() + ": Perturbing bodies (" + rowIndex + ", " + columnIndex + ")");
+                simulationThread.setName("(" + rowIndex + ", " + columnIndex + ")");
 
                 try {
                     simulationThread.start();
                     simulationThread.join();
-                } catch (RuntimeException e) {
                 } catch (Exception e) {
                 } finally {
                     stopMatrix[rowIndex + halfGridSize][columnIndex + halfGridSize] = simulation.getCurrentTimestep();
+                    char stopCode = simulation.getStopCode();
+                    System.out.println("Thread " + simulationThread.getName() + "\t " + stopCode);
                 }
                 });
             }

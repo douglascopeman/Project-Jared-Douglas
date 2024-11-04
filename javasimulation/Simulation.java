@@ -25,6 +25,7 @@ public class Simulation implements Runnable {
     private Vector[] linearMomentum;
     private double orbitLength;
     private int currentTimestep;
+    private char stopCode = '.';
 
     public Simulation(Body[] bodies, int N, double dt) {
         this.bodies = bodies;
@@ -72,6 +73,10 @@ public class Simulation implements Runnable {
             }
         }
 
+    }
+
+    public char getStopCode() {
+        return stopCode;
     }
 
     public int getCurrentTimestep() {
@@ -208,6 +213,7 @@ public class Simulation implements Runnable {
                 // System.out.println("Time reached: \t" + elapsedTime);
                 // System.out.println("Timestep reached: \t" + timestep);
                 // throw new RuntimeException("Energy error bound exceeded");
+                stopCode = 'E';
                 return true;
             }
         }
@@ -221,6 +227,7 @@ public class Simulation implements Runnable {
                 // System.out.println("Distance: \t" + distance);
                 // System.out.println("Time reached: \t" + elapsedTime);
                 // throw new RuntimeException("Distance bound exceeded");
+                stopCode = 'C';
                 return true;
             }
         }
@@ -233,6 +240,7 @@ public class Simulation implements Runnable {
                 // System.out.println("Timestep size: \t" + usedTimestepLength);
                 // System.out.println("Time reached: \t" + elapsedTime);
                 // throw new RuntimeException("Timestep size bound exceeded");
+                stopCode = 'V';
                 return true;
             }
         }
