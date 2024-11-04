@@ -1,5 +1,10 @@
 package javasimulation;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+
 public class Perturbations {
     private final Body[] bodies;
     private int N;
@@ -46,6 +51,7 @@ public class Perturbations {
     public double[][] run() {
         // Initialise the stop matrix populated with the time at which the simulation stops
         double[][] stopMatrix = new double[2 * halfGridSize + 1][2 * halfGridSize + 1];
+        ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
         // Save the perturbation settings
         OutputWriter.writePerturbationSettingsToFile(N, dt, N, delta, halfGridSize);
@@ -53,9 +59,13 @@ public class Perturbations {
         // Iterate over the grid of perturbations
         for (int i = -halfGridSize; i <= halfGridSize; i++) {
             for (int j = -halfGridSize; j <= halfGridSize; j++) {
+                final int rowIndex = i;
+                final int columnIndex = j;
+                executor.submit(() -> {
+
+
                 // Perturb the bodies
-                System.out.println("Perturbing bodies (" + i + ", " + j + ")");
-                Body[] perturbedBodies = perturbBodies(i, j, delta);
+                Body[] perturbedBodies = perturbBodies(rowIndex, columnIndex, delta);
 
 
                 // #region Sanity checks to be removed later
@@ -75,16 +85,30 @@ public class Perturbations {
                                                 "-calculateCentreOfMass", 
                                                 "-useVariableTimestep", 
                                                 "-skipSaveToCSV"};
+
                 Simulation simulation = new Simulation(perturbedBodies, N, dt, options);
+                Thread simulationThread = new Thread(simulation);
+
+                System.out.println("Thread " + simulationThread.threadId() + ": Perturbing bodies (" + rowIndex + ", " + columnIndex + ")");
 
                 try {
-                    simulation.run();
+                    simulationThread.start();
+                    simulationThread.join();
+                } catch (RuntimeException e) {
                 } catch (Exception e) {
                 } finally {
-                    stopMatrix[i + halfGridSize][j + halfGridSize] = simulation.getCurrentTimestep();
-                    System.out.println();
+                    stopMatrix[rowIndex + halfGridSize][columnIndex + halfGridSize] = simulation.getCurrentTimestep();
                 }
+                });
             }
+        }
+
+        executor.shutdown();
+        try {
+            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+        } catch (InterruptedException e) {
+        } catch (RuntimeException e) {
+            // System.err.println("Error in executor.awaitTermination");
         }
 
         return stopMatrix;

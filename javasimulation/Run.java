@@ -13,7 +13,7 @@ public class Run{
 
         if (tempOverride) {
             OutputWriter.setupDirectories();
-            Perturbations runPerturbations = new Perturbations(OrbitExamples.orbitExampleMap.get("figureEight"), 10000, 0.01, 3, 0.01);
+            Perturbations runPerturbations = new Perturbations(OrbitExamples.orbitExampleMap.get("figureEight"), 10000, 0.01, 201, 0.001);
             double[][] stopMatrix = runPerturbations.run();
             OutputWriter.saveMatrix(stopMatrix);
             scanner.close();
@@ -31,7 +31,5 @@ public class Run{
         Simulation simulation = new Simulation(bodies, N, dt, commandlineOptions);
         simulation.run();
 
-        // RunSingleOrbit runSingleOrbit = new RunSingleOrbit(bodies, N, dt, customOptions);
-        // runSingleOrbit.run();
     }
 }

@@ -1,7 +1,7 @@
 package javasimulation;
 import java.util.HashMap;
 
-public class Simulation {
+public class Simulation implements Runnable {
 
     private final Body[] bodies;
     private final int n;
@@ -121,7 +121,6 @@ public class Simulation {
     }
 
     public void run(){
-        long startTime = System.currentTimeMillis();
 
         simulation = new double[N][6][n];
 
@@ -151,16 +150,15 @@ public class Simulation {
 
             // Check if the simulation should stop
             if (options.get("checkStopConditions")) {
-                checkStopConditions(i, usedTimestepLength, elapsedTime);
+                if (checkStopConditions(i, usedTimestepLength, elapsedTime)) {
+                    break;
+                }
             }
 
             if (options.get("findOrbitLength") && (i > 10) && (orbitLength != 0.0)) {
                 findOrbitLength();
             }
         }
-
-        long endTime = System.currentTimeMillis();
-        System.out.println("Time taken: " + (endTime - startTime) + "ms");
 
         if (!options.get("skipSaveToCSV"))  {
             writeSimulationToFiles();       
@@ -198,18 +196,19 @@ public class Simulation {
         }
     }
 
-    private void checkStopConditions(int timestep, double usedTimestepLength, double elapsedTime) {
+    private boolean checkStopConditions(int timestep, double usedTimestepLength, double elapsedTime) {
         if (options.get("calculateEnergies")) {
             // Check if the energy error is within the bound
             double energyDiff = kineticEnergy[timestep] - kineticEnergy[0] + potentialEnergy[timestep] - potentialEnergy[0];
             double energyError = Math.abs(energyDiff / (kineticEnergy[0] + potentialEnergy[0]));
             if (energyError > energyErrorBound) {
-                System.out.println("Simulation terminated after exceeding energy error bound");
-                System.out.println("Energy error bound: \t" + energyErrorBound);
-                System.out.println("Energy error: \t" + energyError);
-                System.out.println("Time reached: \t" + elapsedTime);
-                System.out.println("Timestep reached: \t" + timestep);
-                throw new RuntimeException("Energy error bound exceeded");
+                // System.out.println("Simulation terminated after exceeding energy error bound");
+                // System.out.println("Energy error bound: \t" + energyErrorBound);
+                // System.out.println("Energy error: \t" + energyError);
+                // System.out.println("Time reached: \t" + elapsedTime);
+                // System.out.println("Timestep reached: \t" + timestep);
+                // throw new RuntimeException("Energy error bound exceeded");
+                return true;
             }
         }
 
@@ -217,24 +216,27 @@ public class Simulation {
             // Check if the distance between the centre of mass and the origin is within the bound
             double distance = centreOfMass[timestep].norm();
             if (distance > distanceBound) {
-                System.out.println("Simulation terminated after exceeding distance bound");
-                System.out.println("Distance bound: \t" + distanceBound);
-                System.out.println("Distance: \t" + distance);
-                System.out.println("Time reached: \t" + elapsedTime);
-                throw new RuntimeException("Distance bound exceeded");
+                // System.out.println("Simulation terminated after exceeding distance bound");
+                // System.out.println("Distance bound: \t" + distanceBound);
+                // System.out.println("Distance: \t" + distance);
+                // System.out.println("Time reached: \t" + elapsedTime);
+                // throw new RuntimeException("Distance bound exceeded");
+                return true;
             }
         }
 
         // Check if the timestep size is within the bound
         if (options.get("useVariableTimestep")) {
             if (usedTimestepLength < timestepSizeBound) {
-                System.out.println("Simulation terminated after exceeding timestep size bound");
-                System.out.println("Timestep size bound: \t" + timestepSizeBound);
-                System.out.println("Timestep size: \t" + usedTimestepLength);
-                System.out.println("Time reached: \t" + elapsedTime);
-                throw new RuntimeException("Timestep size bound exceeded");
+                // System.out.println("Simulation terminated after exceeding timestep size bound");
+                // System.out.println("Timestep size bound: \t" + timestepSizeBound);
+                // System.out.println("Timestep size: \t" + usedTimestepLength);
+                // System.out.println("Time reached: \t" + elapsedTime);
+                // throw new RuntimeException("Timestep size bound exceeded");
+                return true;
             }
         }
+        return false;
     } 
 
 }
