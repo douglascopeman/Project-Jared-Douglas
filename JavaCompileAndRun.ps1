@@ -36,24 +36,24 @@ param ([Parameter(
         [Parameter(Mandatory=$False)]
         [switch] $perturbate,
         [Parameter(Mandatory=$False)]
-        [float] $delta = 0.01,
+        [float] $delta,
         [Parameter(Mandatory=$False)]
-        [int] $halfGridSize = 1
+        [int] $halfGridSize
 )
 
 $javaArgs = @($Orbit, $N, $dt)
 if ($integrator){
-        $javaArgs += "-integrator " + $integrator
+        $javaArgs += "-integrator " 
+        $javaArgs += $integrator
 }
-
 if ($useVariableTimestep) {
         $javaArgs += "-useVariableTimestep"
 }
 if ($checkStopConditions) {
         $javaArgs += "-checkStopConditions"
 }
-if ($calculateCenterOfMass) {
-        $javaArgs += "-calculateCenterOfMass"
+if ($calculateCentreOfMass) {
+        $javaArgs += "-calculateCentreOfMass"
 }
 if ($calculateEnergies) {
         $javaArgs += "-calculateEnergies"
@@ -71,10 +71,12 @@ if ($perturbate) {
         $javaArgs += "-perturbate"
 }
 if ($delta) {
-        $javaArgs += "-delta " + $delta
+        $javaArgs += "-delta " 
+        $javaArgs += $delta
 }
 if ($halfGridSize) {
-        $javaArgs += "-halfGridSize " + $halfGridSize
+        $javaArgs += "-halfGridSize " 
+        $javaArgs += $halfGridSize
 }
 
 Set-Location .\javasimulation
