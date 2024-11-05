@@ -78,7 +78,8 @@ public class Perturbations {
                 // #endregion
                 
                 // Run the simulation
-                String[] options = new String[] {"-integrator yoshida", 
+                String[] options = new String[] {"-integrator",
+                                                "yoshida",
                                                 "-checkStopConditions", 
                                                 "-calculateEnergies", 
                                                 "-calculateCentreOfMass", 
@@ -107,7 +108,7 @@ public class Perturbations {
             executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
         } catch (InterruptedException e) {
         } catch (RuntimeException e) {
-            // System.err.println("Error in executor.awaitTermination");
+            System.err.println("Error in executor.awaitTermination");
         }
 
         return stopMatrix;

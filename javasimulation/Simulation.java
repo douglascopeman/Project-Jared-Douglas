@@ -62,13 +62,13 @@ public class Simulation implements Runnable {
 
     private void setCommandlineOptions(String[] options) {
         for (String option: options) {
-            option = option.substring(1);
-            if (this.options.containsKey(option)) {
-                this.options.put(option, true);
-            } else if (option.substring(0, 10).equals("integrator")) {
-                this.integratorFunction = Integrators.integratorMap.get(option.substring(11));
-            } else {
-                System.out.println(option.substring(12));
+            option = option.strip();
+            if (this.options.containsKey(option.substring(1))) {
+                this.options.put(option.substring(1), true);
+            } else if (option.equals("-integrator")) {
+                int integratorFlagIndex = option.indexOf("-integrator");
+                this.integratorFunction = Integrators.integratorMap.get(options[integratorFlagIndex + 1].strip());
+            } else if (option.startsWith("-")) {
                 throw new IllegalArgumentException("Invalid option: " + option);
             }
         }

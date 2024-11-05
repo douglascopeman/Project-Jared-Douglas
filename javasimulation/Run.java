@@ -1,6 +1,4 @@
 package javasimulation;
-import java.util.HashMap;
-import java.util.Scanner;
 import java.util.List;
 
 public class Run{
@@ -11,19 +9,20 @@ public class Run{
         int N = Integer.parseInt(args[1]);
         double dt = Double.parseDouble(args[2]);
         String[] commandlineOptions = java.util.Arrays.copyOfRange(args, 3, args.length);
+        
         List<String> clOptionsList = java.util.Arrays.asList(commandlineOptions);
 
         if (clOptionsList.contains("-perturbate")) {
             // This definitely needs to be refactored
             int halfGridSize = clOptionsList.stream()
-                                            .filter(s -> s.startsWith("-halfGridSize "))
-                                            .map(s -> s.split(" ")[1])
+                                            .filter(s -> s.strip().equals("-halfGridSize"))
+                                            .map(s -> clOptionsList.get(clOptionsList.indexOf(s) + 1))
                                             .mapToInt(Integer::parseInt)
                                             .findFirst()
                                             .orElseThrow(() -> new IllegalArgumentException("Missing -halfGridSize option"));
             double delta = clOptionsList.stream()
-                                        .filter(s -> s.startsWith("-delta "))
-                                        .map(s -> s.split(" ")[1])
+                                        .filter(s -> s.strip().equals("-delta"))
+                                        .map(s -> clOptionsList.get(clOptionsList.indexOf(s) + 1))
                                         .mapToDouble(Double::parseDouble)
                                         .findFirst()
                                         .orElseThrow(() -> new IllegalArgumentException("Missing -delta option"));
