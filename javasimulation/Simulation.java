@@ -53,11 +53,15 @@ public class Simulation implements Runnable {
         this.integratorFunction = Integrators::symplecticEuler;
     }
 
-    public Simulation(Body[] bodies, int N, double dt, List<String> customOptions)
-    {
+    public Simulation(Body[] bodies, int N, double dt, List<String> customOptions) {
         this(bodies, N, dt);
         // setCommandlineOptions(customOptions);
         SimulationIO.setSimulationOptions(this, customOptions);
+    }
+
+    public Simulation(Body[] bodies, int N, double dt, HashMap<String, Boolean> customOptions) {
+        this(bodies, N, dt);
+        this.options.putAll(customOptions);
     }
 
     // #region Getters and Setters
