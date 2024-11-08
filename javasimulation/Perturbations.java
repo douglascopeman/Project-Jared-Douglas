@@ -63,46 +63,7 @@ public class Perturbations {
             for (int j = -halfGridSize; j <= halfGridSize; j++) {
                 final int rowIndex = i;
                 final int columnIndex = j;
-                executor.submit(() -> {
-
-                // Perturb the bodies
-                Body[] perturbedBodies = perturbBodies(rowIndex, columnIndex, delta);
-
-
-                // #region Sanity checks to be removed later
-                double perturbedEnergy = Calculations.totalEnergy(perturbedBodies, 1);
-                Vector perturbedCentreOfMass = Calculations.centreOfMass(perturbedBodies);
-                Vector perturbedAngularMomentum = Calculations.angularMomentum(perturbedBodies);
-
-                assert Math.abs(perturbedEnergy - originalEnergy) < 1e-10;
-                assert perturbedCentreOfMass.subtract(originalCentreOfMass).norm() < 1e-10;
-                assert perturbedAngularMomentum.subtract(originalAngularMomentum).norm() < 1e-10;
-                // #endregion
-                
-                // Run the simulation
-                String[] options = new String[] {"-integrator",
-                                                "yoshida",
-                                                "-checkStopConditions", 
-                                                "-calculateEnergies", 
-                                                "-calculateCentreOfMass", 
-                                                "-useVariableTimestep", 
-                                                "-skipSaveToCSV"};
-                List<String> clOptionsList = Arrays.asList(options);
-
-                Simulation simulation = new Simulation(perturbedBodies, N, dt, clOptionsList);
-                Thread simulationThread = new Thread(simulation);
-                simulationThread.setName("(" + rowIndex + ", " + columnIndex + ")");
-
-                try {
-                    simulationThread.start();
-                    simulationThread.join();
-                } catch (Exception e) {
-                } finally {
-                    stopMatrix[rowIndex + halfGridSize][columnIndex + halfGridSize] = simulation.getCurrentTimestep();
-                    char stopCode = simulation.getStopCode();
-                    System.out.println("Thread " + simulationThread.getName() + "\t " + stopCode);
-                }
-                });
+                executor.submit(() -> simulationThread(rowIndex, columnIndex, stopMatrix));
             }
         }
 
@@ -115,6 +76,47 @@ public class Perturbations {
         }
 
         return stopMatrix;
+    }
+
+    private void simulationThread(int rowIndex, int columnIndex, double[][] stopMatrix) {
+        // Perturb the bodies
+        Body[] perturbedBodies = perturbBodies(rowIndex, columnIndex, delta);
+
+
+        // #region Sanity checks to be removed later
+        double perturbedEnergy = Calculations.totalEnergy(perturbedBodies, 1);
+        Vector perturbedCentreOfMass = Calculations.centreOfMass(perturbedBodies);
+        Vector perturbedAngularMomentum = Calculations.angularMomentum(perturbedBodies);
+
+        assert Math.abs(perturbedEnergy - originalEnergy) < 1e-10;
+        assert perturbedCentreOfMass.subtract(originalCentreOfMass).norm() < 1e-10;
+        assert perturbedAngularMomentum.subtract(originalAngularMomentum).norm() < 1e-10;
+        // #endregion
+        
+        // Run the simulation
+        String[] options = new String[] {"-integrator",
+                                        "yoshida",
+                                        "-checkStopConditions", 
+                                        "-calculateEnergies", 
+                                        "-calculateCentreOfMass", 
+                                        "-useVariableTimestep", 
+                                        "-skipSaveToCSV"};
+        List<String> clOptionsList = Arrays.asList(options);
+
+        Simulation simulation = new Simulation(perturbedBodies, N, dt, clOptionsList);
+        Thread simulationThread = new Thread(simulation);
+        simulationThread.setName("(" + rowIndex + ", " + columnIndex + ")");
+
+        try {
+            simulationThread.start();
+            simulationThread.join();
+        } catch (Exception e) {
+        } finally {
+            stopMatrix[rowIndex + halfGridSize][columnIndex + halfGridSize] = simulation.getCurrentTimestep();
+            char stopCode = simulation.getStopCode();
+            System.out.println("Thread " + simulationThread.getName() + "\t " + stopCode);
+        }
+
     }
 
 }
