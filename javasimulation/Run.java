@@ -28,10 +28,10 @@ public class Run{
                                         .orElseThrow(() -> new IllegalArgumentException("Missing -delta option"));
 
             System.out.println("Perturbating with halfGridSize: " + halfGridSize + " and delta: " + delta);
-            OutputWriter.setupDirectories();
+            SimulationIO.setupDirectories();
             Perturbations runPerturbations = new Perturbations(bodies, N, dt, halfGridSize, delta);
             double[][] stopMatrix = runPerturbations.run();
-            OutputWriter.saveMatrix(stopMatrix);
+            SimulationIO.saveMatrix(stopMatrix);
         } else {
 
             Simulation simulation = new Simulation(bodies, N, dt, commandlineOptions);

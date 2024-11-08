@@ -173,16 +173,16 @@ public class Simulation implements Runnable {
     public void writeSimulationToFiles() {
 
         // Create the output directory if it doesn't exist, or clear it if it does
-        OutputWriter.setupDirectories();
+        SimulationIO.setupDirectories();
 
         // Start by writing the simulation settings to a file
-        OutputWriter.writeSettingsToFile(N, dt, n, G, options.get("findOrbitLength"), orbitLength);
+        SimulationIO.writeSettingsToFile(N, dt, n, G, options.get("findOrbitLength"), orbitLength);
 
         // Then write each body to its own file
-        OutputWriter.writeBodiesToFiles(simulation, N, n);
+        SimulationIO.writeBodiesToFiles(simulation, N, n);
 
         // Finally, write all optional calculations to files
-        OutputWriter.writeOptionsToFiles(options, centreOfMass, potentialEnergy, kineticEnergy, angularMomentum, linearMomentum);
+        SimulationIO.writeOptionsToFiles(options, centreOfMass, potentialEnergy, kineticEnergy, angularMomentum, linearMomentum);
 
     }
 

@@ -54,7 +54,7 @@ public class Perturbations {
         ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
         // Save the perturbation settings
-        OutputWriter.writePerturbationSettingsToFile(N, dt, N, delta, halfGridSize);
+        SimulationIO.writePerturbationSettingsToFile(N, dt, N, delta, halfGridSize);
 
         // Iterate over the grid of perturbations
         for (int i = -halfGridSize; i <= halfGridSize; i++) {
