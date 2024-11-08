@@ -3,6 +3,8 @@ package javasimulation;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.Arrays;
+import java.util.List;
 
 
 public class Perturbations {
@@ -85,8 +87,9 @@ public class Perturbations {
                                                 "-calculateCentreOfMass", 
                                                 "-useVariableTimestep", 
                                                 "-skipSaveToCSV"};
+                List<String> clOptionsList = Arrays.asList(options);
 
-                Simulation simulation = new Simulation(perturbedBodies, N, dt, options);
+                Simulation simulation = new Simulation(perturbedBodies, N, dt, clOptionsList);
                 Thread simulationThread = new Thread(simulation);
                 simulationThread.setName("(" + rowIndex + ", " + columnIndex + ")");
 

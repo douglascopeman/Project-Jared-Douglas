@@ -1,5 +1,6 @@
 package javasimulation;
 import java.util.HashMap;
+import java.util.List;
 
 public class Simulation implements Runnable {
 
@@ -52,28 +53,14 @@ public class Simulation implements Runnable {
         this.integratorFunction = Integrators::symplecticEuler;
     }
 
-    public Simulation(Body[] bodies, int N, double dt, String[] customOptions)
+    public Simulation(Body[] bodies, int N, double dt, List<String> customOptions)
     {
         this(bodies, N, dt);
-        setCommandlineOptions(customOptions);
+        // setCommandlineOptions(customOptions);
+        SimulationIO.setSimulationOptions(this, customOptions);
     }
 
     // #region Getters and Setters
-
-    private void setCommandlineOptions(String[] options) {
-        for (String option: options) {
-            option = option.strip();
-            if (this.options.containsKey(option.substring(1))) {
-                this.options.put(option.substring(1), true);
-            } else if (option.equals("-integrator")) {
-                int integratorFlagIndex = option.indexOf("-integrator");
-                this.integratorFunction = Integrators.integratorMap.get(options[integratorFlagIndex + 1].strip());
-            } else if (option.startsWith("-")) {
-                throw new IllegalArgumentException("Invalid option: " + option);
-            }
-        }
-
-    }
 
     public char getStopCode() {
         return stopCode;
@@ -105,6 +92,10 @@ public class Simulation implements Runnable {
 
     public double getElapsedTime() {
         return elapsedTime;
+    }
+
+    public void setIntegratorFunction(IntegratorFunction integratorFunction) {
+        this.integratorFunction = integratorFunction;
     }
 
     // #endregion

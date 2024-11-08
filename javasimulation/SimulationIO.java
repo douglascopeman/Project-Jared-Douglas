@@ -4,8 +4,27 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 
 public class SimulationIO {
+
+    public static void setSimulationOptions(Simulation simulation, List<String> clOptions) {
+        HashMap<String, Boolean> simOptions = simulation.getOptions();
+        clOptions.replaceAll(String::strip);
+        clOptions.replaceAll(s -> s.startsWith("-") ? s.substring(1) : s);
+
+        for (String option : clOptions) {
+            if (simOptions.containsKey(option)) {
+                simOptions.replace(option, true);
+            }
+            else if (option.equals("integrator")) {
+                int integratorFlagIndex = clOptions.indexOf("integrator");
+                String integratorName = clOptions.get(integratorFlagIndex + 1);
+                simulation.setIntegratorFunction(Integrators.integratorMap.get(integratorName));
+            }
+        }
+        simulation.setOptions(simOptions);
+    }
 
     private enum CalculationType {
         POTENTIAL_ENERGY,
