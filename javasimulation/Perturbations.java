@@ -3,7 +3,7 @@ package javasimulation;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -13,20 +13,52 @@ public class Perturbations {
     private double dt;
     private int halfGridSize;
     private double delta;
+
+    private HashMap<String, Boolean> options = new HashMap<String, Boolean>();
+    private IntegratorFunction simulationIntegrator;
+
     private final double originalEnergy;
     private final Vector originalCentreOfMass;
     private final Vector originalAngularMomentum;
 
-    public Perturbations(Body[] bodies, int N, double dt, int halfGridSize, double delta) {
+    public Perturbations(Body[] bodies, int N, double dt) {
         this.bodies = Calculations.copyBodies(bodies);
         this.N = N;
         this.dt = dt;
 
-        this.halfGridSize = halfGridSize;
-        this.delta = delta;
+        SimulationIO.setDefaultPerturbationsOptions(options);
+
         this.originalEnergy = Calculations.totalEnergy(bodies, 1);
         this.originalCentreOfMass = Calculations.centreOfMass(bodies);
         this.originalAngularMomentum = Calculations.angularMomentum(bodies);
+    }
+
+    public Perturbations(Body[] bodies, int N, double dt, int halfGridSize, double delta) {
+        this(bodies, N, dt);
+
+        this.halfGridSize = halfGridSize;
+        this.delta = delta;
+    }
+
+    public Perturbations(Body[] bodies, int N, double dt, List<String> clOptions) {
+        this(bodies, N, dt);
+        SimulationIO.setPerturbationsSettings(this, clOptions);
+    }
+
+    public HashMap<String, Boolean> getOptions() {
+        return options;
+    }
+
+    public void setDelta(double delta) {
+        this.delta = delta;
+    }
+
+    public void setHalfGridSize(int halfGridSize) {
+        this.halfGridSize = halfGridSize;
+    }
+
+    public void setIntegratorFunction(IntegratorFunction integratorFunction) {
+        this.simulationIntegrator = integratorFunction;
     }
 
     private Body[] perturbBodies(int i, int j, double delta) {
@@ -92,18 +124,9 @@ public class Perturbations {
         assert perturbedCentreOfMass.subtract(originalCentreOfMass).norm() < 1e-10;
         assert perturbedAngularMomentum.subtract(originalAngularMomentum).norm() < 1e-10;
         // #endregion
-        
-        // Run the simulation
-        String[] options = new String[] {"-integrator",
-                                        "yoshida",
-                                        "-checkStopConditions", 
-                                        "-calculateEnergies", 
-                                        "-calculateCentreOfMass", 
-                                        "-useVariableTimestep", 
-                                        "-skipSaveToCSV"};
-        List<String> clOptionsList = Arrays.asList(options);
 
-        Simulation simulation = new Simulation(perturbedBodies, N, dt, clOptionsList);
+        Simulation simulation = new Simulation(perturbedBodies, N, dt, options);
+        simulation.setIntegratorFunction(simulationIntegrator);
         Thread simulationThread = new Thread(simulation);
         simulationThread.setName("(" + rowIndex + ", " + columnIndex + ")");
 
@@ -114,7 +137,8 @@ public class Perturbations {
         } finally {
             stopMatrix[rowIndex + halfGridSize][columnIndex + halfGridSize] = simulation.getCurrentTimestep();
             char stopCode = simulation.getStopCode();
-            System.out.println("Thread " + simulationThread.getName() + "\t " + stopCode);
+            String ThreadName = "Thread " + simulationThread.getName();
+            System.out.println(String.format("%-" + 25 + "s", ThreadName) + stopCode);
         }
 
     }

@@ -16,7 +16,7 @@ public class Simulation implements Runnable {
     private HashMap<String, Boolean> options = new HashMap<String, Boolean>();
 
     private double energyErrorBound = 1e-3;
-    private double distanceBound = 20;
+    private double distanceBound = 5;
     private double timestepSizeBound = 1e-6;
 
     private Vector[] centreOfMass;
@@ -35,14 +35,7 @@ public class Simulation implements Runnable {
         this.dt = dt;
         this.G = 1;
         
-        options.put("useVariableTimestep", false);
-        options.put("checkStopConditions", false);
-        options.put("calculateCentreOfMass", false);
-        options.put("calculateEnergies", false);
-        options.put("calculateAngularMomentum", false);
-        options.put("calculateLinearMomentum", false);
-        options.put("findOrbitLength", false);
-        options.put("skipSaveToCSV", false);
+        SimulationIO.setDefaultSimulationOptions(options);
 
         centreOfMass = new Vector[N];
         potentialEnergy = new double[N];
@@ -55,7 +48,6 @@ public class Simulation implements Runnable {
 
     public Simulation(Body[] bodies, int N, double dt, List<String> customOptions) {
         this(bodies, N, dt);
-        // setCommandlineOptions(customOptions);
         SimulationIO.setSimulationOptions(this, customOptions);
     }
 
@@ -226,6 +218,27 @@ public class Simulation implements Runnable {
                 return true;
             }
         }
+
+        // Check if the maximum distance between any two bodies is within the bound
+        double maxDistance = 0;
+        for (Body body : bodies) {
+            for (Body otherBody : bodies) {
+                double distance = body.getPosition().subtract(otherBody.getPosition()).norm();
+                if (distance > maxDistance) {
+                    maxDistance = distance;
+                }
+            }
+        }
+        if (maxDistance > distanceBound) {
+            // System.out.println("Simulation terminated after exceeding distance bound");
+            // System.out.println("Distance bound: \t" + distanceBound);
+            // System.out.println("Distance: \t" + maxDistance);
+            // System.out.println("Time reached: \t" + elapsedTime);
+            // throw new RuntimeException("Distance bound exceeded");
+            stopCode = 'D';
+            return true;
+        }
+
 
         // Check if the timestep size is within the bound
         if (options.get("useVariableTimestep")) {

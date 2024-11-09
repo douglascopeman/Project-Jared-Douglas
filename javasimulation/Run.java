@@ -1,6 +1,5 @@
 package javasimulation;
 import java.util.List;
-import java.util.HashMap;
 import java.util.Arrays;
 
 public class Run{
@@ -13,23 +12,8 @@ public class Run{
         List<String> clOptionsList = Arrays.asList(commandlineOptions);
 
         if (clOptionsList.contains("-perturbate")) {
-            // This definitely needs to be refactored
-            int halfGridSize = clOptionsList.stream()
-                                            .filter(s -> s.strip().equals("-halfGridSize"))
-                                            .map(s -> clOptionsList.get(clOptionsList.indexOf(s) + 1))
-                                            .mapToInt(Integer::parseInt)
-                                            .findFirst()
-                                            .orElseThrow(() -> new IllegalArgumentException("Missing -halfGridSize option"));
-            double delta = clOptionsList.stream()
-                                        .filter(s -> s.strip().equals("-delta"))
-                                        .map(s -> clOptionsList.get(clOptionsList.indexOf(s) + 1))
-                                        .mapToDouble(Double::parseDouble)
-                                        .findFirst()
-                                        .orElseThrow(() -> new IllegalArgumentException("Missing -delta option"));
-
-            System.out.println("Perturbating with halfGridSize: " + halfGridSize + " and delta: " + delta);
             SimulationIO.setupDirectories();
-            Perturbations runPerturbations = new Perturbations(bodies, N, dt, halfGridSize, delta);
+            Perturbations runPerturbations = new Perturbations(bodies, N, dt, clOptionsList);
             double[][] stopMatrix = runPerturbations.run();
             SimulationIO.saveMatrix(stopMatrix);
         } else {

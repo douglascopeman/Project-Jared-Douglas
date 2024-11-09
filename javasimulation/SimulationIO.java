@@ -26,6 +26,53 @@ public class SimulationIO {
         simulation.setOptions(simOptions);
     }
 
+    public static void setDefaultSimulationOptions(HashMap<String, Boolean> options) {
+        options.put("useVariableTimestep", false);
+        options.put("checkStopConditions", false);
+        options.put("calculateCentreOfMass", false);
+        options.put("calculateEnergies", false);
+        options.put("calculateAngularMomentum", false);
+        options.put("calculateLinearMomentum", false);
+        options.put("findOrbitLength", false);
+        options.put("skipSaveToCSV", false);
+    }
+
+    public static void setPerturbationsSettings(Perturbations perturbations, List<String> clOptions) {
+        HashMap<String, Boolean> perturbationsOptions = perturbations.getOptions();
+        clOptions.replaceAll(String::strip);
+        clOptions.replaceAll(s -> s.startsWith("-") ? s.substring(1) : s);
+        for (String option : clOptions) {
+            if (perturbationsOptions.containsKey(option)) {
+                perturbationsOptions.replace(option, true);
+            }
+            else if (option.equals("delta")) {
+                int deltaFlagIndex = clOptions.indexOf("delta");
+                double delta = Double.parseDouble(clOptions.get(deltaFlagIndex + 1));
+                perturbations.setDelta(delta);
+            }
+            else if (option.equals("halfGridSize")) {
+                int halfGridSizeFlagIndex = clOptions.indexOf("halfGridSize");
+                int halfGridSize = Integer.parseInt(clOptions.get(halfGridSizeFlagIndex + 1));
+                perturbations.setHalfGridSize(halfGridSize);
+            } else if (option.equals("integrator")) {
+                int integratorFlagIndex = clOptions.indexOf("integrator");
+                String integratorName = clOptions.get(integratorFlagIndex + 1);
+                perturbations.setIntegratorFunction(Integrators.integratorMap.get(integratorName));
+            }
+        }
+    }
+
+    public static void setDefaultPerturbationsOptions(HashMap<String, Boolean> options) {
+        options.put("perturbPositions", false);
+        options.put("perturbVelocities", false);
+        options.put("perturbEnergy", false);
+        options.put("perturbAngularMomentum", false);
+        setDefaultSimulationOptions(options);
+        options.replace("checkStopConditions", true);
+        options.replace("skipSaveToCSV", true);
+
+    }
+
     private enum CalculationType {
         POTENTIAL_ENERGY,
         KINETIC_ENERGY,
