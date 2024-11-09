@@ -34,8 +34,6 @@ param ([Parameter(
         [Parameter(Mandatory=$False)]
         [switch] $findOrbitLength,
         [Parameter(Mandatory=$False)]
-        [switch] $perturbate,
-        [Parameter(Mandatory=$False)]
         [switch] $perturbPositions,
         [Parameter(Mandatory=$False)]
         [switch] $perturbVelocities,
@@ -71,9 +69,6 @@ if ($calculateLinearMomentum) {
 }
 if ($findOrbitLength) {
         $javaArgs += "-findOrbitLength"
-}
-if ($perturbate) {
-        $javaArgs += "-perturbate"
 }
 if ($perturbPositions) {
         $javaArgs += "-perturbPositions"
