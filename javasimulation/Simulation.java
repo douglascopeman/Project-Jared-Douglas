@@ -16,7 +16,7 @@ public class Simulation implements Runnable {
     private HashMap<String, Boolean> options = new HashMap<String, Boolean>();
 
     private double energyErrorBound = 1e-3;
-    private double distanceBound = 5;
+    private double distanceBound = 15;
     private double timestepSizeBound = 1e-6;
 
     private Vector[] centreOfMass;
@@ -252,7 +252,10 @@ public class Simulation implements Runnable {
                 return true;
             }
         }
+
         return false;
     } 
+
+    
 
 }

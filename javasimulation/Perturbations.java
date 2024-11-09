@@ -135,7 +135,8 @@ public class Perturbations {
             simulationThread.join();
         } catch (Exception e) {
         } finally {
-            stopMatrix[rowIndex + halfGridSize][columnIndex + halfGridSize] = simulation.getCurrentTimestep();
+            int gridSize = 2 * halfGridSize + 1;
+            stopMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize)] = simulation.getCurrentTimestep();
             char stopCode = simulation.getStopCode();
             String ThreadName = "Thread " + simulationThread.getName();
             System.out.println(String.format("%-" + 25 + "s", ThreadName) + stopCode);
