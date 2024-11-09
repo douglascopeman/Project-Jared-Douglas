@@ -36,6 +36,11 @@ param ([Parameter(
         [Parameter(Mandatory=$False)]
         [switch] $perturbate,
         [Parameter(Mandatory=$False)]
+        [switch] $perturbPositions,
+        [Parameter(Mandatory=$False)]
+        [switch] $perturbVelocities,
+
+        [Parameter(Mandatory=$False)]
         [float] $delta,
         [Parameter(Mandatory=$False)]
         [int] $halfGridSize
@@ -69,6 +74,12 @@ if ($findOrbitLength) {
 }
 if ($perturbate) {
         $javaArgs += "-perturbate"
+}
+if ($perturbPositions) {
+        $javaArgs += "-perturbPositions"
+}
+if ($perturbVelocities) {
+        $javaArgs += "-perturbVelocities"
 }
 if ($delta) {
         $javaArgs += "-delta " 

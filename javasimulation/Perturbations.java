@@ -61,7 +61,7 @@ public class Perturbations {
         this.simulationIntegrator = integratorFunction;
     }
 
-    private Body[] perturbBodies(int i, int j, double delta) {
+    private Body[] perturbPositions(int i, int j, double delta) {
         Body[] perturbedBodies = Calculations.copyBodies(bodies);
         
         // Perturn body 0 and adjust body 2 accordingly
@@ -81,6 +81,25 @@ public class Perturbations {
 
         return perturbedBodies;
     }
+
+    private Body[] perturbVelocities(int i, int j, double detla) {
+        Body[] perturbedBodies = Calculations.copyBodies(bodies);
+
+        // Perturb body 0 and then preserve angular momentum by setting the velocities of bodies 1 and 2 accordingly
+        Vector perturbedVelocity = Vector.add(bodies[0].getVelocity(), new Vector(i * delta, j * delta, 0));
+        perturbedBodies[0].setVelocity(perturbedVelocity);
+        perturbedBodies[2].setVelocity(perturbedVelocity);
+        perturbedBodies[1].setVelocity(perturbedVelocity.multiply(-2.0));
+
+        // finally, preserve the energy by ensuring the magnitude of body 0's position is correct
+        double newMagnitude = -5.0/(2.0 * (originalEnergy - 3.0*Math.pow(bodies[0].getVelocity().norm(),2)));
+
+        perturbedBodies[0].setPosition(bodies[0].getPosition().normalise().multiply(newMagnitude));
+        perturbedBodies[2].setPosition(perturbedBodies[0].getPosition().negate());
+
+        return perturbedBodies;
+    }
+
 
     public double[][] run() {
         // Initialise the stop matrix populated with the time at which the simulation stops
@@ -112,7 +131,12 @@ public class Perturbations {
 
     private void simulationThread(int rowIndex, int columnIndex, double[][] stopMatrix) {
         // Perturb the bodies
-        Body[] perturbedBodies = perturbBodies(rowIndex, columnIndex, delta);
+        Body[] perturbedBodies = bodies;
+        if (options.get("perturbPositions")) {
+            perturbedBodies = perturbPositions(rowIndex, columnIndex, delta);
+        } else if (options.get("perturbVelocities")) {
+            perturbedBodies = perturbVelocities(rowIndex, columnIndex, delta);
+        }
 
 
         // #region Sanity checks to be removed later
