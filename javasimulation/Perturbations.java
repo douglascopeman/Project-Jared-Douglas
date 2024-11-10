@@ -160,7 +160,7 @@ public class Perturbations {
         } catch (Exception e) {
         } finally {
             int gridSize = 2 * halfGridSize + 1;
-            stopMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize)] = simulation.getCurrentTimestep();
+            stopMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize)] = simulation.getElapsedTime();
             char stopCode = simulation.getStopCode();
             String ThreadName = "Thread " + simulationThread.getName();
             System.out.println(String.format("%-" + 25 + "s", ThreadName) + stopCode);
