@@ -141,10 +141,8 @@ public class Simulation implements Runnable {
             elapsedTime += usedTimestepLength;
 
             // Check if the simulation should stop
-            if (options.get("checkStopConditions")) {
-                if (checkStopConditions(i, usedTimestepLength, elapsedTime)) {
-                    break;
-                }
+            if (options.get("checkStopConditions") && checkStopConditions(i, usedTimestepLength, elapsedTime)) {
+                break;
             }
 
             if (options.get("findOrbitLength") && (i > 10) && (orbitLength != 0.0)) {
