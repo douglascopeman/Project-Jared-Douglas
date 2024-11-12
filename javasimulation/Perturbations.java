@@ -21,6 +21,9 @@ public class Perturbations {
     private final Vector originalCentreOfMass;
     private final Vector originalAngularMomentum;
 
+    private double[][] timeMatrix;
+    private char[][] stopCodeMatrix;
+
     public Perturbations(Body[] bodies, int N, double dt) {
         this.bodies = Calculations.copyBodies(bodies);
         this.N = N;
@@ -43,6 +46,8 @@ public class Perturbations {
     public Perturbations(Body[] bodies, int N, double dt, List<String> clOptions) {
         this(bodies, N, dt);
         SimulationIO.setPerturbationsSettings(this, clOptions);
+        timeMatrix = new double[2 * halfGridSize + 1][2 * halfGridSize + 1];
+        stopCodeMatrix = new char[2 * halfGridSize + 1][2 * halfGridSize + 1];
     }
 
     public HashMap<String, Boolean> getOptions() {
@@ -102,8 +107,6 @@ public class Perturbations {
 
 
     public void run() {
-        // Initialise the stop matrix populated with the time at which the simulation stops
-        double[][] timeMatrix = new double[2 * halfGridSize + 1][2 * halfGridSize + 1];
         ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
         // Save the perturbation settings
@@ -114,7 +117,7 @@ public class Perturbations {
             for (int j = -halfGridSize; j <= halfGridSize; j++) {
                 final int rowIndex = i;
                 final int columnIndex = j;
-                executor.submit(() -> simulationThread(rowIndex, columnIndex, timeMatrix));
+                executor.submit(() -> simulationThread(rowIndex, columnIndex));
             }
         }
 
@@ -127,9 +130,10 @@ public class Perturbations {
         }
 
         SimulationIO.saveMatrix("timeMatrix", timeMatrix);
+        SimulationIO.saveMatrix("stopCodeMatrix", stopCodeMatrix);
     }
 
-    private void simulationThread(int rowIndex, int columnIndex, double[][] stopMatrix) {
+    private void simulationThread(int rowIndex, int columnIndex) {
         // Perturb the bodies
         Body[] perturbedBodies = bodies;
         if (options.get("perturbPositions")) {
@@ -160,10 +164,13 @@ public class Perturbations {
         } catch (Exception e) {
         } finally {
             int gridSize = 2 * halfGridSize + 1;
-            stopMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize)] = simulation.getElapsedTime();
+            timeMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize + 1)] = simulation.getElapsedTime();
             char stopCode = simulation.getStopCode();
-            String ThreadName = "Thread " + simulationThread.getName();
-            System.out.println(String.format("%-" + 25 + "s", ThreadName) + stopCode);
+            stopCodeMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize + 1)] = stopCode;
+            if (columnIndex == 0){
+                String ThreadName = "Thread " + simulationThread.getName();
+                System.out.println(String.format("%-" + 25 + "s", ThreadName) + stopCode);
+            }
         }
 
     }
