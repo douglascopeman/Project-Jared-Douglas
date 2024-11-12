@@ -27,6 +27,8 @@ public class Simulation implements Runnable {
     private double orbitLength;
     private int currentTimestep;
     private char stopCode = '.';
+    private Vector initialCentreOfMass;
+    private double initialEnergy;
 
     public Simulation(Body[] bodies, int N, double dt) {
         this.bodies = bodies;
@@ -34,6 +36,11 @@ public class Simulation implements Runnable {
         this.N = N;
         this.dt = dt;
         this.G = 1;
+
+        // Setting initial system properties
+        this.initialCentreOfMass = Calculations.centreOfMass(bodies);
+        this.initialEnergy = Calculations.totalEnergy(bodies, 1);
+
         
         SimulationIO.setDefaultSimulationOptions(options);
 
@@ -120,6 +127,8 @@ public class Simulation implements Runnable {
         for (int i = 0; i < N; i++) {
             this.currentTimestep = i;
 
+            
+
             // Record all optional calculations
             doOptionalCalculations(i);
 
@@ -140,8 +149,10 @@ public class Simulation implements Runnable {
             double usedTimestepLength = integratorFunction.Integrate(bodies, dt, useVariableTimestep);
             elapsedTime += usedTimestepLength;
 
+            double currentEnergy = Calculations.totalEnergy(bodies, 1);
+
             // Check if the simulation should stop
-            if (options.get("checkStopConditions") && checkStopConditions(i, usedTimestepLength, elapsedTime)) {
+            if (options.get("checkStopConditions") && checkStopConditions(currentEnergy, usedTimestepLength, elapsedTime)) {
                 break;
             }
 
@@ -186,11 +197,11 @@ public class Simulation implements Runnable {
         }
     }
 
-    private boolean checkStopConditions(int timestep, double usedTimestepLength, double elapsedTime) {
+    private boolean checkStopConditions(double currentEnergy, double usedTimestepLength, double elapsedTime) {
         if (options.get("calculateEnergies")) {
             // Check if the energy error is within the bound
-            double energyDiff = kineticEnergy[timestep] - kineticEnergy[0] + potentialEnergy[timestep] - potentialEnergy[0];
-            double energyError = Math.abs(energyDiff / (kineticEnergy[0] + potentialEnergy[0]));
+            double energyDiff = currentEnergy - this.initialEnergy;
+            double energyError = Math.abs(energyDiff / (this.initialEnergy));
             if (energyError > energyErrorBound) {
                 // System.out.println("Simulation terminated after exceeding energy error bound");
                 // System.out.println("Energy error bound: \t" + energyErrorBound);
@@ -205,7 +216,7 @@ public class Simulation implements Runnable {
 
         if (options.get("calculateCentreOfMass")) {
             // Check if the distance between the centre of mass and the origin is within the bound
-            double distance = centreOfMass[timestep].norm();
+            double distance = this.initialCentreOfMass.norm();
             if (distance > distanceBound) {
                 // System.out.println("Simulation terminated after exceeding distance bound");
                 // System.out.println("Distance bound: \t" + distanceBound);
