@@ -230,8 +230,8 @@ public class SimulationIO {
         }
     }
 
-    public static void saveMatrix(double[][] matrix) {
-        try (FileWriter writer = new FileWriter("Outputs\\perturbationMatrix.csv")) {
+    public static void saveMatrix(String fileName, double[][] matrix) {
+        try (FileWriter writer = new FileWriter("Outputs\\"+ fileName +".csv")) {
             for (int i = 0; i < matrix.length; i++) {
                 for (int j = 0; j < matrix[i].length - 1; j++) {
                     writer.write(matrix[i][j] + ",");

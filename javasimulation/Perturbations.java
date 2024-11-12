@@ -103,7 +103,7 @@ public class Perturbations {
 
     public void run() {
         // Initialise the stop matrix populated with the time at which the simulation stops
-        double[][] stopMatrix = new double[2 * halfGridSize + 1][2 * halfGridSize + 1];
+        double[][] timeMatrix = new double[2 * halfGridSize + 1][2 * halfGridSize + 1];
         ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
         // Save the perturbation settings
@@ -114,7 +114,7 @@ public class Perturbations {
             for (int j = -halfGridSize; j <= halfGridSize; j++) {
                 final int rowIndex = i;
                 final int columnIndex = j;
-                executor.submit(() -> simulationThread(rowIndex, columnIndex, stopMatrix));
+                executor.submit(() -> simulationThread(rowIndex, columnIndex, timeMatrix));
             }
         }
 
@@ -126,7 +126,7 @@ public class Perturbations {
             System.err.println("Error in executor.awaitTermination");
         }
 
-        SimulationIO.saveMatrix(stopMatrix);
+        SimulationIO.saveMatrix("timeMatrix", timeMatrix);
     }
 
     private void simulationThread(int rowIndex, int columnIndex, double[][] stopMatrix) {
