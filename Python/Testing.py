@@ -7,23 +7,23 @@ import Perturbation
 import PerturbationPlot
 import time
 
-N = 10000 #rename to N
+N = 1000 #rename to N
 dt = 0.1
 
-# simulation = Simulation.Simulation(N,
-#                                    dt,
-#                                    orbit_examples.elliptical,
-#                                    Integrator = Integrators.euler,
-#                                    is_focus_on_body = False,
-#                                    is_variable_dt = False,
-#                                   #  stop_conditions = {
-#                                   #      "energy_error_bound": 0.001,
-#                                   #       "distance_bound": 20,
-#                                   #       "variable_dt_bound": 1*10**(-6)
-#                                   #  }
-#                                    )
+simulation = Simulation.Simulation(N,
+                                   dt,
+                                   orbit_examples.figure_eight,
+                                   Integrator = Integrators.yoshida,
+                                   is_focus_on_body = False,
+                                   is_variable_dt = False,
+                                  #  stop_conditions = {
+                                  #      "energy_error_bound": 0.001,
+                                  #       "distance_bound": 20,
+                                  #       "variable_dt_bound": 1*10**(-6)
+                                  #  }
+                                   )
 
-# simulation.run()
+simulation.run()
 
 # start = time.time()
 # for i in range(0, 100):
@@ -43,19 +43,19 @@ dt = 0.1
 
 
 
-# plotter = Plotter.Plotter("Javasimulation\\Outputs", 
-#                           run_fast=True, 
-#                           plot_centre_of_mass=False, 
-#                           plot_energy=False, 
-#                           plot_energy_error=False, 
-#                           plot_angular_momentum_error = False, 
-#                           plot_linear_momentum_error=False, 
-#                           plot_3D=False,
-#                           x_label="Time",
-#                           save_plots=False
-#                           )
+plotter = Plotter.Plotter("Python\\Outputs", 
+                          run_fast=True, 
+                          plot_centre_of_mass=False, 
+                          plot_energy=False, 
+                          plot_energy_error=False, 
+                          plot_angular_momentum_error = False, 
+                          plot_linear_momentum_error=False, 
+                          plot_3D=False,
+                          x_label="Time",
+                          save_plots=False
+                          )
 
-# plotter.plot()
+plotter.shape_space()
 
-perturbation_plot = PerturbationPlot.PerturbationPlot("JavaSimulation\\Outputs")
-perturbation_plot.plot()
+# perturbation_plot = PerturbationPlot.PerturbationPlot("JavaSimulation\\Outputs")
+# perturbation_plot.plot()

@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from matplotlib import animation
 import numpy as np
+import numpy.linalg as LA
 import os
 from matplotlib.animation import FuncAnimation
 import seaborn as sns
@@ -307,6 +308,22 @@ class Plotter():
         else:
             plt.show()
         plt.close()
+
+    def shape_space(self):
+        self.read_data()
+        
+        # Change of co-ordinates
+        R1 = self.bodies[:,:2,0] - self.bodies[:,:2,1]
+        R2 = self.bodies[:,:2,1] - self.bodies[:,:2,2]
+        R3 = self.bodies[:,:2,0] - self.bodies[:,:2,2]
+        
+        Z = [LA.norm(R1[i,:]) + LA.norm(R2[i,:]) + LA.norm(R3[i,:]) for i in range(self.N)] 
+
+        X1 = [LA.norm(R1[i,:])/Z for i in range(self.N)]
+        X2 = [LA.norm(R2[i,:])/Z for i in range(self.N)]
+
+        plt.plot(X1, X2)
+        plt.show()
 
 
         
