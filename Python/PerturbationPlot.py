@@ -13,8 +13,8 @@ class PerturbationPlot():
     def __init__(self, output_directory):
         self.output_directory = output_directory
 
-    def plot(self):
-        self.read_data()
+    def plot(self, filename):
+        self.read_data(filename)
 
         self.axis_labels = np.round(np.arange((-self.p*self.delta), (self.p*self.delta+(self.delta*0.5)), self.delta), decimals=4)
         print(self.axis_labels)
@@ -31,7 +31,7 @@ class PerturbationPlot():
         plt.show()
 
 
-    def read_data(self):
+    def read_data(self, filename):
         '''
         Take the relevent csv files from the chosen output directory and read it in
         '''
@@ -48,7 +48,7 @@ class PerturbationPlot():
             self.plot_size = 2*self.p + 1
 
         # Reading the perturbation matrix
-        with open(os.path.join(output_directory, "perturbationMatrix.csv"), 'r') as f:
+        with open(os.path.join(output_directory, filename + ".csv"), 'r') as f:
             data = np.loadtxt(f, delimiter=",")
             self.M = np.zeros((self.plot_size, self.plot_size), dtype=float)
             self.M[:,:] = data

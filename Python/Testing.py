@@ -55,7 +55,7 @@ plotter = Plotter.Plotter("Python\\Outputs",
                           save_plots=False
                           )
 
-plotter.shape_space()
+# plotter.shape_space()
 
-# perturbation_plot = PerturbationPlot.PerturbationPlot("JavaSimulation\\Outputs")
-# perturbation_plot.plot()
+perturbation_plot = PerturbationPlot.PerturbationPlot("JavaSimulation\\Outputs")
+perturbation_plot.plot("timeMatrix")
