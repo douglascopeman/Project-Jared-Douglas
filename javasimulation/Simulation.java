@@ -26,7 +26,7 @@ public class Simulation implements Runnable {
     private Vector[] linearMomentum;
     private double orbitLength;
     private int currentTimestep = 0;
-    private char stopCode = '.';
+    private char stopCode = 'X';
     private Vector initialCentreOfMass;
     private double initialEnergy;
 
