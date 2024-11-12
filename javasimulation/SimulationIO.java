@@ -35,6 +35,8 @@ public class SimulationIO {
         options.put("calculateLinearMomentum", false);
         options.put("findOrbitLength", false);
         options.put("skipSaveToCSV", false);
+        options.put("perturbPositions", false);
+        options.put("perturbVelocities", false);
     }
 
     public static void setPerturbationsSettings(Perturbations perturbations, List<String> clOptions) {

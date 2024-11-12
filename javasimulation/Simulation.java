@@ -25,10 +25,12 @@ public class Simulation implements Runnable {
     private Vector[] angularMomentum;
     private Vector[] linearMomentum;
     private double orbitLength;
-    private int currentTimestep;
+    private int currentTimestep = 0;
     private char stopCode = '.';
     private Vector initialCentreOfMass;
     private double initialEnergy;
+
+    private boolean isPerturbed = false;
 
     public Simulation(Body[] bodies, int N, double dt) {
         this.bodies = bodies;
@@ -121,27 +123,34 @@ public class Simulation implements Runnable {
 
     public void run(){
 
-        simulation = new double[N][6][n];
+        if (options.get("perturbPositions") || options.get("peturbVelocities")){
+            this.isPerturbed = true;
+        }
+
+        if (!this.isPerturbed){
+            simulation = new double[N][6][n];
+        }
 
         // ----- Main Time Loop ----- \\
-        for (int i = 0; i < N; i++) {
-            this.currentTimestep = i;
+        while (true) {
 
-            
+            // If we are not running memoryless for pertubation 
+            if (!this.isPerturbed){
+                
+                // Record all optional calculations
+                doOptionalCalculations(this.currentTimestep);
 
-            // Record all optional calculations
-            doOptionalCalculations(i);
-
-            // Record the current timestep of the simulation
-            for (int p = 0; p < n; p++) {
-                Vector position = bodies[p].getPosition();
-                Vector velocity = bodies[p].getVelocity();
-                simulation[i][0][p] = position.getX();
-                simulation[i][1][p] = position.getY();
-                simulation[i][2][p] = position.getZ();
-                simulation[i][3][p] = velocity.getX();
-                simulation[i][4][p] = velocity.getY();
-                simulation[i][5][p] = velocity.getZ();
+                // Record the current timestep of the simulation
+                for (int p = 0; p < n; p++) {
+                    Vector position = bodies[p].getPosition();
+                    Vector velocity = bodies[p].getVelocity();
+                    simulation[this.currentTimestep][0][p] = position.getX();
+                    simulation[this.currentTimestep][1][p] = position.getY();
+                    simulation[this.currentTimestep][2][p] = position.getZ();
+                    simulation[this.currentTimestep][3][p] = velocity.getX();
+                    simulation[this.currentTimestep][4][p] = velocity.getY();
+                    simulation[this.currentTimestep][5][p] = velocity.getZ();
+                }
             }
 
             // Then update the states of all bodies
@@ -156,12 +165,24 @@ public class Simulation implements Runnable {
                 break;
             }
 
-            if (options.get("findOrbitLength") && (i > 10) && (orbitLength != 0.0)) {
+            if (options.get("findOrbitLength") && (this.currentTimestep > 10) && (orbitLength != 0.0)) {
                 findOrbitLength();
             }
+
+            // Increase step count
+            this.currentTimestep ++;
+
+            // Check if at the end of the simulaion
+            if(this.isPerturbed && elapsedTime >= this.N){
+                break;
+            } else if(!this.isPerturbed && this.currentTimestep >= this.N){
+                System.out.println("Wrong");
+                break;
+            }
+
         }
 
-        if (!options.get("skipSaveToCSV"))  {
+        if (!options.get("skipSaveToCSV") || !this.isPerturbed)  {
             writeSimulationToFiles();       
         }
     }
