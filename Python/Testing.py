@@ -57,5 +57,6 @@ plotter = Plotter.Plotter("Python\\Outputs",
 
 # plotter.shape_space()
 
-perturbation_plot = PerturbationPlot.PerturbationPlot("JavaSimulation\\Outputs")
+perturbation_plot = PerturbationPlot.PerturbationPlot("javasimulation\\Outputs")
 perturbation_plot.plot("timeMatrix")
+perturbation_plot.plot_stop_codes("stopCodeMatrix")
