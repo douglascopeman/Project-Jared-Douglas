@@ -128,7 +128,7 @@ class PerturbationPlot():
         
         # Create a dataframe from the matrix
         df_stop = pd.DataFrame(self.stopCodeMatrix.T, columns=self.axis_labels, index=-self.axis_labels)
-        df_time = pd.DataFrame(self.M, columns=-self.axis_labels, index=self.axis_labels)
+        df_time = pd.DataFrame(self.M.T, columns=self.axis_labels, index=-self.axis_labels)
 
         # Get unique categories
         categories = df_stop.stack().unique().tolist()
@@ -154,4 +154,14 @@ class PerturbationPlot():
         plt.xlabel("Column")
         plt.ylabel("Row")
         plt.show()
-        
+
+    def count_stop_matrix(self, stop_filename):
+        self.read_stop_codes(stop_filename)
+        print("[X, V, D, E, C]")
+        count = [np.count_nonzero(self.stopCodeMatrix == 'X'),
+                 np.count_nonzero(self.stopCodeMatrix == 'V'),
+                 np.count_nonzero(self.stopCodeMatrix == 'D'),
+                 np.count_nonzero(self.stopCodeMatrix == 'E'),
+                 np.count_nonzero(self.stopCodeMatrix == 'C')
+                 ]
+        print(count)

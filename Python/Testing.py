@@ -58,5 +58,7 @@ dt = 0.1
 # plotter.shape_space()
 
 perturbation_plot = PerturbationPlot.PerturbationPlot("javasimulation\\Outputs")
-#perturbation_plot.plot("timeMatrix")
-perturbation_plot.plot_stop_codes_gradient("timeMatrix", "stopCodeMatrix")
+# perturbation_plot.plot("timeMatrix")
+# perturbation_plot.plot_stop_codes("stopCodeMatrix")
+# perturbation_plot.plot_stop_codes_gradient("timeMatrix", "stopCodeMatrix")
+perturbation_plot.count_stop_matrix("stopCodeMatrix")
