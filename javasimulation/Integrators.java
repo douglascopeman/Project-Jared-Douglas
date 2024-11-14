@@ -29,7 +29,7 @@ public class Integrators{
 
     public static double symplecticEuler(Body[] bodies, double dt, boolean useVariableTimestep) {
         if (useVariableTimestep) {
-            dt = getVariableTimestep(bodies, 0.1, integratorMap.get("symplecticEuler"));
+            dt = getVariableTimestep(bodies, dt, integratorMap.get("symplecticEuler"));
         }
 
         for (Body body : bodies){
@@ -48,7 +48,7 @@ public class Integrators{
         }
 
         if (useVariableTimestep) {
-            dt = getVariableTimestep(bodies, 0.1, integratorMap.get("threeStepLeapfrog"));
+            dt = getVariableTimestep(bodies, dt, integratorMap.get("threeStepLeapfrog"));
         }
 
         Vector[] half_velocity = new Vector[bodies.length];
@@ -99,7 +99,7 @@ public class Integrators{
         Ds[1] = w0;
 
         if (useVariableTimestep) {
-            dt = getVariableTimestep(bodies, 0.1, integratorMap.get("yoshida"));
+            dt = getVariableTimestep(bodies, dt, integratorMap.get("yoshida"));
         }
 
         higherOrderHelper(bodies, dt, Cs, Ds);
@@ -114,7 +114,7 @@ public class Integrators{
 
         for(int i = 0; i < 4; i++){
             if (useVariableTimestep) {
-                dt = getVariableTimestep(bodies, 0.1, integratorMap.get("forestRuth"));
+                dt = getVariableTimestep(bodies, dt, integratorMap.get("forestRuth"));
             }
             higherOrderHelper(bodies, dt, Cs, Ds);
         }
