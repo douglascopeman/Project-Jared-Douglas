@@ -51,8 +51,7 @@ public class SimulationIO {
                 int deltaFlagIndex = clOptions.indexOf("delta");
                 double delta = Double.parseDouble(clOptions.get(deltaFlagIndex + 1));
                 perturbations.setDelta(delta);
-            }
-            else if (option.equals("halfGridSize")) {
+            } else if (option.equals("halfGridSize")) {
                 int halfGridSizeFlagIndex = clOptions.indexOf("halfGridSize");
                 int halfGridSize = Integer.parseInt(clOptions.get(halfGridSizeFlagIndex + 1));
                 perturbations.setHalfGridSize(halfGridSize);
