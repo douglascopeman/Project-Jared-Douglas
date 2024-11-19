@@ -62,6 +62,31 @@ class Perturbation():
         current_bodies[1].velocity = (-2)*np.copy(current_bodies[0].velocity)
 
         return current_bodies
+    
+    ## ================ Code for modifying energy of a system =======================
+    def do_pertubation_energy_modified(self, percent_energy_change):
+        current_bodies = copy.deepcopy(self.bodies)
+
+        original_energy = self.calculate_kinetic_energy(self.bodies) + self.calculate_potential_energy(self.bodies)
+        energy_change = np.sign(percent_energy_change)*(np.abs((percent_energy_change/100)*original_energy))
+        
+        # Find the new magnatude of velocity required to preserve energy
+        speed = np.sqrt((1/3)*(original_energy + energy_change + 5/(2 * LA.norm(current_bodies[0].position))))
+
+        # To preserve angular momentum the velocity of body 1 is x(-2) that of bodies 0 and 1
+        current_bodies[0].velocity = (self.bodies[0].velocity / LA.norm(self.bodies[0].velocity))*speed
+        current_bodies[2].velocity = np.copy(current_bodies[0].velocity)
+        current_bodies[1].velocity = (-2)*np.copy(current_bodies[0].velocity)
+        print(original_energy)
+        print(energy_change)
+
+        for body in current_bodies:
+            print("\n")
+            print(body.position)
+            print(body.velocity)
+
+        return current_bodies
+
 
     def run(self):
         # The matrix to be populated with the distance from completion of the simulation (0 means it reached the end)
@@ -135,5 +160,76 @@ class Perturbation():
         np.savetxt(os.path.join(path, "perturbationSettings.csv"), perturbation_settings, delimiter=",")
         np.savetxt(os.path.join(path, "perturbationMatrix.csv"), stop_matrix, delimiter=",")
 
+    
+
+    def run_specfic_pertubation(self,i,j):
+        bodies = self.bodies
+
+        simulation = np.zeros((self.N, 6, self.n), dtype=float)
+
+        # Initialising the origianl properties of the simulation to be used for checking in the loops
+        original_energy = self.calculate_kinetic_energy(bodies) + self.calculate_potential_energy(bodies)
+        original_CoM = self.calculate_centre_of_mass(bodies)
+        original_angular_momentum = self.calculate_angular_momentum(bodies)
+
+
+        # We perform the perturbation on all but the original i=0, j=0 case
+        if (i != 0 or j != 0):
+            current_bodies = self.do_perturbation(i,j, 1, original_energy)
+        else:
+            current_bodies = copy.deepcopy(self.bodies)
+        
+        # Calculating the new perturbed properties of the simulaiton
+        current_energy = self.calculate_kinetic_energy(current_bodies) + self.calculate_potential_energy(current_bodies)
+        current_CoM = self.calculate_centre_of_mass(current_bodies)
+        current_angular_momentum = self.calculate_angular_momentum(current_bodies)
+
+        # An assertion error is thrown if the constants are not "equal" to the original simulaiton
+        # assert np.isclose(original_energy, current_energy)
+        # assert np.allclose(current_angular_momentum, original_angular_momentum)
+        # assert np.isclose(np.sum([body.velocity for body in bodies]),0)
+        # assert np.allclose(original_CoM, current_CoM)
+
+        potential_energy = np.zeros((self.N), dtype=float)
+        kinetic_energy = np.zeros((self.N), dtype=float)
+
+        # The loop for the simulation 
+        for k in range(0,self.N):
+
+            for p, body in enumerate(current_bodies):
+                simulation[k,:,p] = np.concatenate((body.position, body.velocity), axis=None)
+
+            current_bodies, used_dt = Integrators.yoshida(current_bodies, self.dt)
+
+            potential_energy[k] = self.calculate_potential_energy(current_bodies)
+            kinetic_energy[k] = self.calculate_kinetic_energy(current_bodies)
+
+            body_pairs = list(combinations(current_bodies, 2))
+            energy_error = (np.abs((kinetic_energy[k]-kinetic_energy[0]+potential_energy[k]-potential_energy[0])/(potential_energy[0]+kinetic_energy[0])))
+            max_relative_position = max([LA.norm(body1.position - body2.position) for body1, body2 in body_pairs])
+
+            if self.stop_conditions['energy_error_bound'] < energy_error:
+                print("Simulation Terminated due to energy error bound exceded")
+                print("Energy errror is: ", energy_error)
+                print("Timestep reached: ", k, "\n")
+                break
+            if self.stop_conditions['variable_dt_bound'] > used_dt:
+                print("Simulation Terminated due to variable timestep bound exceded")
+                print("Variable Timestep is: ", used_dt)
+                print("Timestep reached: ", k, "\n")
+                break
+            if self.stop_conditions['distance_bound'] < max_relative_position:
+                print("Simulation Terminated due to distance bound exceded")
+                print("Max realtive distance between bodies is: ", max_relative_position)
+                print("Timestep reached: ", k, "\n")
+                break
+
+
+        simulation_settings = np.array([self.N, self.dt, self.n])
+        path = os.path.join(os.getcwd(), "Python\\Outputs")
+        simulationSettings = np.array([self.N, self.dt, self.n, 1, 0.0])
+        np.savetxt(os.path.join(path, "simulationSettings.csv"), simulationSettings, delimiter=",")
+        for p in range(self.n):
+            np.savetxt(os.path.join(path, "output" + str(p) + ".csv"), simulation[:,:,p], delimiter=",")
     
 

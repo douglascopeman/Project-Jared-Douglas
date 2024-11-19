@@ -17,7 +17,7 @@ public class Simulation implements Runnable {
 
     private double energyErrorBound = 1e-3;
     private double distanceBound = 15;
-    private double timestepSizeBound = 1e-7;
+    private double timestepSizeBound = 1e-5;
 
     private Vector[] centreOfMass;
     private double[] potentialEnergy;
