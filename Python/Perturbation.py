@@ -62,6 +62,31 @@ class Perturbation():
         current_bodies[1].velocity = (-2)*np.copy(current_bodies[0].velocity)
 
         return current_bodies
+    
+    ## ================ Code for modifying energy of a system =======================
+    def do_pertubation_energy_modified(self, percent_energy_change):
+        current_bodies = copy.deepcopy(self.bodies)
+
+        original_energy = self.calculate_kinetic_energy(self.bodies) + self.calculate_potential_energy(self.bodies)
+        energy_change = np.sign(percent_energy_change)*(np.abs((percent_energy_change/100)*original_energy))
+        
+        # Find the new magnatude of velocity required to preserve energy
+        speed = np.sqrt((1/3)*(original_energy + energy_change + 5/(2 * LA.norm(current_bodies[0].position))))
+
+        # To preserve angular momentum the velocity of body 1 is x(-2) that of bodies 0 and 1
+        current_bodies[0].velocity = (self.bodies[0].velocity / LA.norm(self.bodies[0].velocity))*speed
+        current_bodies[2].velocity = np.copy(current_bodies[0].velocity)
+        current_bodies[1].velocity = (-2)*np.copy(current_bodies[0].velocity)
+        print(original_energy)
+        print(energy_change)
+
+        for body in current_bodies:
+            print("\n")
+            print(body.position)
+            print(body.velocity)
+
+        return current_bodies
+
 
     def run(self):
         # The matrix to be populated with the distance from completion of the simulation (0 means it reached the end)
