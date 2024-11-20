@@ -41,7 +41,10 @@ param ([Parameter(
         [Parameter(Mandatory=$False)]
         [float] $delta,
         [Parameter(Mandatory=$False)]
-        [int] $halfGridSize
+        [int] $halfGridSize,
+
+        [Parameter(Mandatory=$False)]
+        [float] $shiftEnergy
 )
 
 $javaArgs = @($Orbit, $N, $dt)
@@ -83,6 +86,10 @@ if ($delta) {
 if ($halfGridSize) {
         $javaArgs += "-halfGridSize " 
         $javaArgs += $halfGridSize
+} 
+if ($shiftEnergy) {
+        $javaArgs += "-shiftEnergy"
+        $javaArgs += $shiftEnergy
 }
 
 Set-Location .\javasimulation
