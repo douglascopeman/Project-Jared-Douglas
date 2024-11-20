@@ -17,7 +17,7 @@ public class Perturbations {
     private HashMap<String, Boolean> options = new HashMap<String, Boolean>();
     private IntegratorFunction simulationIntegrator;
 
-    private final double originalEnergy;
+    private double originalEnergy;
     private final Vector originalCentreOfMass;
     private final Vector originalAngularMomentum;
 
@@ -67,9 +67,8 @@ public class Perturbations {
     }
 
     public void shiftEnergy(double shiftEnergy){
-        double newEnergy =(1-shiftEnergy)*originalEnergy;
-        double newVelocity = Math.sqrt((1.0/3.0) * (newEnergy + 5.0/(2.0 * bodies[0].getPosition().norm())));
-        System.out.println(newEnergy);
+        originalEnergy =(1+shiftEnergy)*originalEnergy;
+        double newVelocity = Math.sqrt((1.0/3.0) * (originalEnergy + 5.0/(2.0 * bodies[0].getPosition().norm())));
         // Finally, preserve the angular momentum by setting the velocity of body 1 to (-2) times that of bodies 0 and 2
         bodies[0].setVelocity(bodies[0].getVelocity().normalise().multiply(newVelocity));
         bodies[2].setVelocity(bodies[0].getVelocity());
