@@ -24,8 +24,8 @@ public class Perturbations {
     private double[][] timeMatrix;
     private char[][] stopCodeMatrix;
 
-    public Perturbations(Body[] bodies, int N, double dt) {
-        this.bodies = Calculations.copyBodies(bodies);
+    public Perturbations(Body[] bodiesOriginal, int N, double dt) {
+        this.bodies = Calculations.copyBodies(bodiesOriginal);
         this.N = N;
         this.dt = dt;
 
@@ -64,6 +64,16 @@ public class Perturbations {
 
     public void setIntegratorFunction(IntegratorFunction integratorFunction) {
         this.simulationIntegrator = integratorFunction;
+    }
+
+    public void shiftEnergy(double shiftEnergy){
+        double newEnergy =(1-shiftEnergy)*originalEnergy;
+        double newVelocity = Math.sqrt((1.0/3.0) * (newEnergy + 5.0/(2.0 * bodies[0].getPosition().norm())));
+        System.out.println(newEnergy);
+        // Finally, preserve the angular momentum by setting the velocity of body 1 to (-2) times that of bodies 0 and 2
+        bodies[0].setVelocity(bodies[0].getVelocity().normalise().multiply(newVelocity));
+        bodies[2].setVelocity(bodies[0].getVelocity());
+        bodies[1].setVelocity(bodies[0].getVelocity().multiply(-2.0));
     }
 
     private Body[] perturbPositions(int i, int j, double delta) {
@@ -137,6 +147,13 @@ public class Perturbations {
         // Perturb the bodies
         Body[] perturbedBodies = bodies;
         if (options.get("perturbPositions")) {
+            // Check if the Figure 8 can be initialised
+            if((originalEnergy + 5.0/(2.0 * Vector.add(bodies[0].getPosition(), new Vector(rowIndex * delta, columnIndex * delta, 0)).norm())) < 0){
+                int gridSize = 2 * halfGridSize + 1;
+                timeMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize + 1)] = 0;
+                stopCodeMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize + 1)] = 'F';
+                return;
+            }
             perturbedBodies = perturbPositions(rowIndex, columnIndex, delta);
         } else if (options.get("perturbVelocities")) {
             perturbedBodies = perturbVelocities(rowIndex, columnIndex, delta);
