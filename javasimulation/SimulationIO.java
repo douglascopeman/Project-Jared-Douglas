@@ -34,6 +34,7 @@ public class SimulationIO {
         options.put("calculateAngularMomentum", false);
         options.put("calculateLinearMomentum", false);
         options.put("findOrbitLength", false);
+        options.put("calculateShapeSpace", false);
         options.put("skipSaveToCSV", false);
         // options.put("perturbPositions", false);
         // options.put("perturbVelocities", false);
@@ -232,6 +233,34 @@ public class SimulationIO {
             java.nio.file.Files.createDirectories(outputPath);
         } catch (IOException e) {
             System.err.println("Failed to create or clear output directory: " + e.getMessage());
+        }
+    }
+
+    public static void saveMatrix(String fileName, int[][] matrix) {
+        try (FileWriter writer = new FileWriter("Outputs\\"+ fileName +".csv")) {
+            for (int i = 0; i < matrix.length; i++) {
+                for (int j = 0; j < matrix[i].length - 1; j++) {
+                    writer.write(matrix[i][j] + ",");
+                }
+                writer.write(matrix[i][matrix[i].length-1] + "\n");
+            }
+            
+        } catch (Exception e) {
+            System.out.println("Error writing stop matrix to file");
+        }
+    }
+
+    public static void saveMatrix(String fileName, boolean[][] matrix) {
+        try (FileWriter writer = new FileWriter("Outputs\\"+ fileName +".csv")) {
+            for (int i = 0; i < matrix.length; i++) {
+                for (int j = 0; j < matrix[i].length - 1; j++) {
+                    writer.write(matrix[i][j] + ",");
+                }
+                writer.write(matrix[i][matrix[i].length-1] + "\n");
+            }
+            
+        } catch (Exception e) {
+            System.out.println("Error writing stop matrix to file");
         }
     }
 

@@ -324,7 +324,23 @@ class Plotter():
 
         plt.plot(X1, X2)
         plt.show()
-
+        
+    def plot_simulation_shape_space(self, filename):
+        data = np.loadtxt(filename, delimiter=",", dtype=bool)
+        non_zero_indices = np.argwhere(data > 0)
+        if non_zero_indices.size > 0:
+            max_indices = np.max(non_zero_indices, axis=0)
+            # print(f"Largest first index with nonzero value: {max_indices[0]}")
+            # print(f"Largest second index with nonzero value: {max_indices[1]}")
+        else:
+            print("No nonzero values found in the data array.")
+        plt.xlim(0, max_indices[0] * 1.1)
+        plt.ylim(0, max_indices[1] * 1.1)
+        plt.imshow(data, cmap='viridis', interpolation='none', origin='lower')
+        plt.colorbar()
+        plt.title("Simulation Shape Space")
+        plt.show()
+        
 
         
         

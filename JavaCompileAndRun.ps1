@@ -34,6 +34,9 @@ param ([Parameter(
         [Parameter(Mandatory=$False)]
         [switch] $findOrbitLength,
         [Parameter(Mandatory=$False)]
+        [switch] $calculateShapeSpace,
+
+        [Parameter(Mandatory=$False)]
         [switch] $perturbPositions,
         [Parameter(Mandatory=$False)]
         [switch] $perturbVelocities,
@@ -90,6 +93,9 @@ if ($halfGridSize) {
 if ($shiftEnergy) {
         $javaArgs += "-shiftEnergy"
         $javaArgs += $shiftEnergy
+}
+if ($calculateShapeSpace) {
+        $javaArgs += "-calculateShapeSpace"
 }
 
 Set-Location .\javasimulation

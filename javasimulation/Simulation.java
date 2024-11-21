@@ -12,6 +12,7 @@ public class Simulation implements Runnable {
     private double elapsedTime = 0;
     private IntegratorFunction integratorFunction;
     private double[][][] simulation;
+    private int[][] shapeSpace = new int[1000][1000];
 
     private HashMap<String, Boolean> options = new HashMap<String, Boolean>();
 
@@ -67,6 +68,18 @@ public class Simulation implements Runnable {
     }
 
     // #region Getters and Setters
+
+    public int getShapeSpaceStabilityNumber() {
+        int stabilityNumber = 0;
+        for (int[] row : shapeSpace) {
+            for (int value : row) {
+                if (value > 1) {
+                    stabilityNumber += 1;
+                }
+            }
+        }
+        return stabilityNumber;
+    }
 
     public char getStopCode() {
         return stopCode;
@@ -148,6 +161,10 @@ public class Simulation implements Runnable {
                     simulation[this.currentTimestep][4][p] = velocity.getY();
                     simulation[this.currentTimestep][5][p] = velocity.getZ();
                 }
+                if (options.get("calculateShapeSpace")) {
+                    int[] shapeSpaceCoords = getShapeSpace(bodies);
+                    shapeSpace[shapeSpaceCoords[0]][shapeSpaceCoords[1]] = 1;
+                }
             }
 
             // Then update the states of all bodies
@@ -170,10 +187,9 @@ public class Simulation implements Runnable {
             this.currentTimestep++;
 
             // Check if at the end of the simulaion
-            if(this.isPerturbed && elapsedTime >= this.N){
+            if((this.isPerturbed && elapsedTime >= this.N) || this.currentTimestep > 1e6){
                 break;
             } else if(!this.isPerturbed && this.currentTimestep >= this.N){
-                System.out.println("Wrong");
                 break;
             }
 
@@ -197,6 +213,8 @@ public class Simulation implements Runnable {
 
         // Finally, write all optional calculations to files
         SimulationIO.writeOptionsToFiles(options, centreOfMass, potentialEnergy, kineticEnergy, angularMomentum, linearMomentum);
+
+        if (options.get("calculateShapeSpace")) {SimulationIO.saveMatrix("shapeSpaceMatrix", shapeSpace); }
 
     }
 
@@ -288,6 +306,18 @@ public class Simulation implements Runnable {
         return false;
     } 
 
-    
+    // The following method takes a body and returns an integer array containing the two shape space coordinates
+    private int[] getShapeSpace(Body[] bodies) {
+        double r_12 = bodies[0].getPosition().subtract(bodies[1].getPosition()).norm();
+        double r_13 = bodies[0].getPosition().subtract(bodies[2].getPosition()).norm();
+        double r_23 = bodies[1].getPosition().subtract(bodies[2].getPosition()).norm();
+        
+        double q_1 = r_12 / (r_12 + r_13 + r_23);
+        double q_2 = r_23 / (r_12 + r_13 + r_23);
+
+        int x = (int) Math.round(q_1 * shapeSpace.length);
+        int y = (int) Math.round(q_2 * shapeSpace[0].length);
+        return new int[] {x, y};
+    }
 
 }
