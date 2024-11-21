@@ -46,6 +46,8 @@ param ([Parameter(
         [float] $energyDelta,
         [Parameter(Mandatory=$False)]
         [int] $halfGridSize,
+        [Parameter(Mandatory=$False)]
+        [int] $halfGridSizeEnergy,
 
         [Parameter(Mandatory=$False)]
         [float] $shiftEnergy
@@ -98,6 +100,10 @@ if ($energyDelta) {
 if ($halfGridSize) {
         $javaArgs += "-halfGridSize " 
         $javaArgs += $halfGridSize
+} 
+if ($halfGridSizeEnergy) {
+        $javaArgs += "-halfGridSizeEnergy " 
+        $javaArgs += $halfGridSizeEnergy
 } 
 if ($shiftEnergy) {
         $javaArgs += "-shiftEnergy "
