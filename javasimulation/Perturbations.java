@@ -12,6 +12,7 @@ public class Perturbations {
     private int N;
     private double dt;
     private int halfGridSize;
+    private int gridSize;
     private double delta;
 
     private HashMap<String, Boolean> options = new HashMap<String, Boolean>();
@@ -40,12 +41,14 @@ public class Perturbations {
         this(bodies, N, dt);
 
         this.halfGridSize = halfGridSize;
+        this.gridSize = 2 * halfGridSize + 1;
         this.delta = delta;
     }
 
     public Perturbations(Body[] bodies, int N, double dt, List<String> clOptions) {
         this(bodies, N, dt);
         SimulationIO.setPerturbationsSettings(this, clOptions);
+        gridSize = 2 * halfGridSize + 1;
         timeMatrix = new double[2 * halfGridSize + 1][2 * halfGridSize + 1];
         stopCodeMatrix = new char[2 * halfGridSize + 1][2 * halfGridSize + 1];
     }
@@ -85,7 +88,14 @@ public class Perturbations {
         perturbedBodies[2].setPosition(perturbedPosition.negate());
 
         // Find the new magnitude of velocity required to preserve the energy
-        double newVelocity = Math.sqrt((1.0/3.0) * (originalEnergy + 5.0/(2.0 * perturbedBodies[0].getPosition().norm())));
+        // First check that the root of the energy term is real
+        double energyTerm = originalEnergy + 5.0/(2.0 * perturbedBodies[0].getPosition().norm());
+        if (energyTerm < 0) {
+            return null;
+        }
+
+
+        double newVelocity = Math.sqrt((1.0/3.0) * energyTerm);
 
         // Finally, preserve the angular momentum by setting the velocity of body 1 to (-2) times that of bodies 0 and 2
 
@@ -147,13 +157,18 @@ public class Perturbations {
         Body[] perturbedBodies = bodies;
         if (options.get("perturbPositions")) {
             // Check if the Figure 8 can be initialised
-            if((originalEnergy + 5.0/(2.0 * Vector.add(bodies[0].getPosition(), new Vector(rowIndex * delta, columnIndex * delta, 0)).norm())) < 0){
-                int gridSize = 2 * halfGridSize + 1;
+            // if((originalEnergy + 5.0/(2.0 * Vector.add(bodies[0].getPosition(), new Vector(rowIndex * delta, columnIndex * delta, 0)).norm())) < 0){
+            //     int gridSize = 2 * halfGridSize + 1;
+            //     timeMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize + 1)] = 0;
+            //     stopCodeMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize + 1)] = 'F';
+            //     return;
+            // }
+            perturbedBodies = perturbPositions(rowIndex, columnIndex, delta);
+            if (perturbedBodies == null) {
                 timeMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize + 1)] = 0;
                 stopCodeMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize + 1)] = 'F';
                 return;
             }
-            perturbedBodies = perturbPositions(rowIndex, columnIndex, delta);
         } else if (options.get("perturbVelocities")) {
             perturbedBodies = perturbVelocities(rowIndex, columnIndex, delta);
         }
