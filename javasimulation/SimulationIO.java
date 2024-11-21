@@ -63,6 +63,10 @@ public class SimulationIO {
                 int shiftEnergyFlagIndex = clOptions.indexOf("shiftEnergy");
                 double shiftEnergy = Double.parseDouble(clOptions.get(shiftEnergyFlagIndex + 1));
                 perturbations.shiftEnergy(shiftEnergy);
+            } else if (option.equals("energyDelta")){
+                int energyDeltaFlagIndex = clOptions.indexOf("energyDelta");
+                double energyDelta = Double.parseDouble(clOptions.get(energyDeltaFlagIndex + 1));
+                perturbations.setEnergyDelta(energyDelta);
             }
         }
     }
