@@ -43,6 +43,8 @@ param ([Parameter(
         [Parameter(Mandatory=$False)]
         [float] $delta,
         [Parameter(Mandatory=$False)]
+        [float] $energyDelta,
+        [Parameter(Mandatory=$False)]
         [int] $halfGridSize,
 
         [Parameter(Mandatory=$False)]
@@ -88,6 +90,10 @@ if ($peturbEnergies) {
 if ($delta) {
         $javaArgs += "-delta " 
         $javaArgs += $delta
+}
+if ($energyDelta) {
+        $javaArgs += "-energyDelta"
+        $javaArgs += $energyDelta
 }
 if ($halfGridSize) {
         $javaArgs += "-halfGridSize " 
