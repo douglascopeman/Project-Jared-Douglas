@@ -215,6 +215,19 @@ public class Simulation implements Runnable {
         }
     }
 
+    private double findMaxDistance() {
+        double maxDistance = 0;
+        for (Body body : bodies) {
+            for (Body otherBody : bodies) {
+                double distance = body.getPosition().subtract(otherBody.getPosition()).norm();
+                if (distance > maxDistance) {
+                    maxDistance = distance;
+                }
+            }
+        }
+        return maxDistance;
+    }
+
     private boolean checkStopConditions(double currentEnergy, double usedTimestepLength, double elapsedTime) {
         if (options.get("calculateEnergies")) {
             // Check if the energy error is within the bound
@@ -247,15 +260,7 @@ public class Simulation implements Runnable {
         }
 
         // Check if the maximum distance between any two bodies is within the bound
-        double maxDistance = 0;
-        for (Body body : bodies) {
-            for (Body otherBody : bodies) {
-                double distance = body.getPosition().subtract(otherBody.getPosition()).norm();
-                if (distance > maxDistance) {
-                    maxDistance = distance;
-                }
-            }
-        }
+        double maxDistance = findMaxDistance();
         if (maxDistance > distanceBound) {
             // System.out.println("Simulation terminated after exceeding distance bound");
             // System.out.println("Distance bound: \t" + distanceBound);
