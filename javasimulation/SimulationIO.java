@@ -59,6 +59,10 @@ public class SimulationIO {
                 int integratorFlagIndex = clOptions.indexOf("integrator");
                 String integratorName = clOptions.get(integratorFlagIndex + 1);
                 perturbations.setIntegratorFunction(Integrators.integratorMap.get(integratorName));
+            } else if (option.equals("shiftEnergy")) {
+                int shiftEnergyFlagIndex = clOptions.indexOf("shiftEnergy");
+                double shiftEnergy = Double.parseDouble(clOptions.get(shiftEnergyFlagIndex + 1));
+                perturbations.shiftEnergy(shiftEnergy);
             }
         }
     }
