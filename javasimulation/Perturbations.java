@@ -8,11 +8,12 @@ import java.util.List;
 
 
 public class Perturbations {
-    private final Body[] bodies;
+    private Body[] bodies;
     private int N;
     private double dt;
     private int halfGridSize;
     private double delta;
+    private double energyDelta = 0.01;
 
     private HashMap<String, Boolean> options = new HashMap<String, Boolean>();
     private IntegratorFunction simulationIntegrator;
@@ -65,10 +66,13 @@ public class Perturbations {
     public void setIntegratorFunction(IntegratorFunction integratorFunction) {
         this.simulationIntegrator = integratorFunction;
     }
+    public void setEnergyDelta(double energyDelta) {
+        this.energyDelta = energyDelta;
+    }
 
     public void shiftEnergy(double shiftEnergy){
         originalEnergy =(1+shiftEnergy)*originalEnergy;
-        double newVelocity = Math.sqrt((1.0/3.0) * (originalEnergy + 5.0/(2.0 * bodies[0].getPosition().norm())));
+        double newVelocity = Math.sqrt((1.0/3.0) * ((1+shiftEnergy)*originalEnergy + 5.0/(2.0 * bodies[0].getPosition().norm())));
         // Finally, preserve the angular momentum by setting the velocity of body 1 to (-2) times that of bodies 0 and 2
         bodies[0].setVelocity(bodies[0].getVelocity().normalise().multiply(newVelocity));
         bodies[2].setVelocity(bodies[0].getVelocity());
@@ -113,7 +117,6 @@ public class Perturbations {
 
         return perturbedBodies;
     }
-
 
     public void run() {
         ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
@@ -189,6 +192,44 @@ public class Perturbations {
             }
         }
 
+    }
+
+    public void runMany(){
+
+        // Save the perturbation settings
+        SimulationIO.writePerturbationSettingsToFile(N, dt, N, delta, halfGridSize);
+
+        double energyCopy = originalEnergy;
+        Body[] originalBodies = Calculations.copyBodies(bodies);
+
+        for(int k = -halfGridSize+8; k <= halfGridSize-8; k++){
+            ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
+            System.out.println(k);
+            this.bodies = Calculations.copyBodies(originalBodies);
+            this.originalEnergy = energyCopy;
+            shiftEnergy(k*energyDelta);
+            
+            // Iterate over the grid of perturbations
+            for (int i = -halfGridSize; i <= halfGridSize; i++) {
+                for (int j = -halfGridSize; j <= halfGridSize; j++) {
+                    final int rowIndex = i;
+                    final int columnIndex = j;
+                    executor.submit(() -> simulationThread(rowIndex, columnIndex));
+                }
+            }
+
+            executor.shutdown();
+            try {
+                executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+            } catch (InterruptedException e) {
+            } catch (RuntimeException e) {
+                System.err.println("Error in executor.awaitTermination");
+            }
+
+            SimulationIO.saveMatrix("timeMatrix"+k, timeMatrix);
+            SimulationIO.saveMatrix("stopCodeMatrix"+k, stopCodeMatrix);
+        }
     }
 
 }
