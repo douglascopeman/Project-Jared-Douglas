@@ -223,9 +223,9 @@ public class SimulationIO {
         }
     }
 
-    public static void writePerturbationSettingsToFile(int N, double dt, int n, double delta, int halfGridSize) {
+    public static void writePerturbationSettingsToFile(int N, double delta, int halfGridSize) {
         try(FileWriter writer = new FileWriter("Outputs\\perturbationSettings.csv")){
-            writer.append(N + "," + dt + "," + n + "," + delta + "," + halfGridSize);
+            writer.append(N + ","  + "," + delta + "," + halfGridSize);
             writer.append("\n");
         } catch (FileNotFoundException e) {
             System.err.println("Setting file not found");

@@ -127,7 +127,7 @@ public class Perturbations {
         ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
         // Save the perturbation settings
-        SimulationIO.writePerturbationSettingsToFile(N, dt, N, delta, halfGridSize);
+        SimulationIO.writePerturbationSettingsToFile(N, delta, halfGridSize);
 
         // Iterate over the grid of perturbations
         for (int i = -halfGridSize; i <= halfGridSize; i++) {
@@ -202,7 +202,7 @@ public class Perturbations {
     public void runMany(){
 
         // Save the perturbation settings
-        SimulationIO.writePerturbationSettingsToFile(N, dt, N, delta, halfGridSize);
+        SimulationIO.writePerturbationSettingsToFile(N, delta, halfGridSize);
 
         // Keeping the original bodies and energy to revert back to at the start of each child pertubation
         double energyCopy = originalEnergy;
