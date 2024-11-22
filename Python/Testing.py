@@ -5,6 +5,7 @@ from orbit_examples import orbit_examples
 import Integrators
 import Perturbation
 import PerturbationPlot
+import ThreeDimensionalPerturbationPlot
 import time
 
 N = 5000 #rename to N
@@ -58,7 +59,10 @@ dt = 0.01
 # plotter.plot()
 
 perturbation_plot = PerturbationPlot.PerturbationPlot("javasimulation\\Outputs")
-perturbation_plot.plot("timeMatrix")
+# perturbation_plot.plot("timeMatrix")
 #perturbation_plot.plot_stop_codes("stopCodeMatrix")
 perturbation_plot.plot_stop_codes_gradient("timeMatrix", "stopCodeMatrix")
 perturbation_plot.count_stop_matrix("stopCodeMatrix")
+
+# pertubation_3dplot = ThreeDimensionalPerturbationPlot.ThreeDimensionalPerturbationPlot("C:\\Users\\Douglas\\OneDrive - University of Edinburgh\\Uni\\Project-Jared-Douglas\\PaperTrail\\Pertubations\\Energy Layers\\First Energy Cube")
+# pertubation_3dplot.scatter_plot("D")
