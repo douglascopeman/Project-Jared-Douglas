@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Arrays; 
 
 
+
 public class Perturbations {
     private Body[] bodies;
     private int N;
@@ -158,6 +159,7 @@ public class Perturbations {
 
         SimulationIO.saveMatrix("timeMatrix", timeMatrix);
         SimulationIO.saveMatrix("stopCodeMatrix", stopCodeMatrix);
+        SimulationIO.saveMatrix("stabilityMatrix", stabilityMatrix);
     }
 
     private void simulationThread(int rowIndex, int columnIndex) {
@@ -168,6 +170,7 @@ public class Perturbations {
             if (perturbedBodies == null) {
                 timeMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize + 1)] = 0;
                 stopCodeMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize + 1)] = 'F';
+                stabilityMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize + 1)] = 0;
                 return;
             }
         } else if (options.get("perturbVelocities")) {
@@ -196,13 +199,22 @@ public class Perturbations {
         } catch (Exception e) {
         } finally {
             int gridSize = 2 * halfGridSize + 1;
-            timeMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize + 1)] = simulation.getElapsedTime();
+            // save the elapsed time to the time matrix
+            double elapsedTime = simulation.getElapsedTime();
+            timeMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize + 1)] = elapsedTime;
+            // save the stop code to the stop code matrix
             char stopCode = simulation.getStopCode();
-            if (stopCode == 'X') {
-                stabilityMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize + 1)] = simulation.getShapeSpaceStabilityNumber();
-                
-            }
             stopCodeMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize + 1)] = stopCode;
+            // save the stability number to the stability matrix if the simulation completed successfully
+            if (stopCode == 'X') {
+                int stabilityNumber = simulation.getShapeSpaceStabilityNumber();
+                System.out.println("Stability number: " + stabilityNumber);
+                stabilityMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize + 1)] = stabilityNumber;
+            } else {
+                stabilityMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize + 1)] = 0;
+            }
+
+            //printing the thread name and stop code every row
             if (columnIndex == 0){
                 String ThreadName = "Thread " + simulationThread.getName();
                 System.out.println(String.format("%-" + 25 + "s", ThreadName) + stopCode);
