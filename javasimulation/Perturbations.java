@@ -56,6 +56,7 @@ public class Perturbations {
         gridSize = 2 * halfGridSize + 1;
         timeMatrix = new double[2 * halfGridSize + 1][2 * halfGridSize + 1];
         stopCodeMatrix = new char[2 * halfGridSize + 1][2 * halfGridSize + 1];
+        stabilityMatrix = new int[2 * halfGridSize + 1][2 * halfGridSize + 1];
     }
 
     public HashMap<String, Boolean> getOptions() {
@@ -159,7 +160,9 @@ public class Perturbations {
 
         SimulationIO.saveMatrix("timeMatrix", timeMatrix);
         SimulationIO.saveMatrix("stopCodeMatrix", stopCodeMatrix);
-        SimulationIO.saveMatrix("stabilityMatrix", stabilityMatrix);
+        if (options.get("calculateShapeSpace")) {
+            SimulationIO.saveMatrix("stabilityMatrix", stabilityMatrix);
+        }
     }
 
     private void simulationThread(int rowIndex, int columnIndex) {
@@ -206,9 +209,8 @@ public class Perturbations {
             char stopCode = simulation.getStopCode();
             stopCodeMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize + 1)] = stopCode;
             // save the stability number to the stability matrix if the simulation completed successfully
-            if (stopCode == 'X') {
+            if (stopCode == 'X' && options.get("calculateShapeSpace")) {
                 int stabilityNumber = simulation.getShapeSpaceStabilityNumber();
-                System.out.println("Stability number: " + stabilityNumber);
                 stabilityMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize + 1)] = stabilityNumber;
             } else {
                 stabilityMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize + 1)] = 0;

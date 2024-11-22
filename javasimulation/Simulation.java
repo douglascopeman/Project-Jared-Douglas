@@ -74,7 +74,7 @@ public class Simulation implements Runnable {
         int stabilityNumber = 0;
         for (int[] row : shapeSpace) {
             for (int value : row) {
-                if (value > 1) {
+                if (value >= 1) {
                     stabilityNumber += 1;
                 }
             }
@@ -162,11 +162,13 @@ public class Simulation implements Runnable {
                     simulation[this.currentTimestep][4][p] = velocity.getY();
                     simulation[this.currentTimestep][5][p] = velocity.getZ();
                 }
-                if (options.get("calculateShapeSpace")) {
-                    int[] shapeSpaceCoords = getShapeSpace(bodies);
-                    shapeSpace[shapeSpaceCoords[0]][shapeSpaceCoords[1]] = 1;
-                }
             }
+
+            if (options.get("calculateShapeSpace")) {
+                int[] shapeSpaceCoords = getShapeSpace(bodies);
+                shapeSpace[shapeSpaceCoords[0]][shapeSpaceCoords[1]] = 1;
+            }
+
 
             // Then update the states of all bodies
             boolean useVariableTimestep = options.get("useVariableTimestep");
