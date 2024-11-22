@@ -19,6 +19,7 @@ public class Simulation implements Runnable {
     private double energyErrorBound = 1e-3;
     private double distanceBound = 15;
     private double timestepSizeBound = 1e-5;
+    private double MaxNumberOfTimesteps = 1e6;
 
     private Vector[] centreOfMass;
     private double[] potentialEnergy;
@@ -187,9 +188,12 @@ public class Simulation implements Runnable {
             this.currentTimestep++;
 
             // Check if at the end of the simulaion
-            if((this.isPerturbed && elapsedTime >= this.N) || this.currentTimestep > 1e6){
+            if((this.isPerturbed && elapsedTime >= this.N)){
                 break;
-            } else if(!this.isPerturbed && this.currentTimestep >= this.N){
+            } else if(!this.isPerturbed && this.currentTimestep >= this.N) {
+                break;
+            } else if (this.currentTimestep > this.MaxNumberOfTimesteps) {
+                stopCode = 'L';
                 break;
             }
 
