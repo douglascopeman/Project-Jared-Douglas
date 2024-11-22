@@ -40,14 +40,21 @@ param ([Parameter(
         [switch] $perturbPositions,
         [Parameter(Mandatory=$False)]
         [switch] $perturbVelocities,
+        [Parameter(Mandatory=$False)]
+        [switch] $peturbEnergies,
 
         [Parameter(Mandatory=$False)]
         [float] $delta,
         [Parameter(Mandatory=$False)]
+        [float] $energyDelta,
+        [Parameter(Mandatory=$False)]
         [int] $halfGridSize,
+        [Parameter(Mandatory=$False)]
+        [int] $halfGridSizeEnergy,
 
         [Parameter(Mandatory=$False)]
         [float] $shiftEnergy
+
 )
 
 $javaArgs = @($Orbit, $N, $dt)
@@ -82,21 +89,33 @@ if ($perturbPositions) {
 if ($perturbVelocities) {
         $javaArgs += "-perturbVelocities"
 }
+if ($peturbEnergies) {
+        $javaArgs += "-peturbEnergies"
+}
 if ($delta) {
         $javaArgs += "-delta " 
         $javaArgs += $delta
+}
+if ($energyDelta) {
+        $javaArgs += "-energyDelta"
+        $javaArgs += $energyDelta
 }
 if ($halfGridSize) {
         $javaArgs += "-halfGridSize " 
         $javaArgs += $halfGridSize
 } 
+if ($halfGridSizeEnergy) {
+        $javaArgs += "-halfGridSizeEnergy " 
+        $javaArgs += $halfGridSizeEnergy
+} 
 if ($shiftEnergy) {
-        $javaArgs += "-shiftEnergy"
+        $javaArgs += "-shiftEnergy "
         $javaArgs += $shiftEnergy
 }
 if ($calculateShapeSpace) {
         $javaArgs += "-calculateShapeSpace"
 }
+
 
 Set-Location .\javasimulation
 javac .\*.java -d .\

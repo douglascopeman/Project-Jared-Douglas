@@ -5,15 +5,18 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Arrays; 
 
 
 public class Perturbations {
-    private final Body[] bodies;
+    private Body[] bodies;
     private int N;
     private double dt;
     private int halfGridSize;
     private int gridSize;
     private double delta;
+    private double energyDelta = 0.01;
+    private int halfGridSizeEnergy = 1;
 
     private HashMap<String, Boolean> options = new HashMap<String, Boolean>();
     private IntegratorFunction simulationIntegrator;
@@ -65,14 +68,20 @@ public class Perturbations {
     public void setHalfGridSize(int halfGridSize) {
         this.halfGridSize = halfGridSize;
     }
+    public void setHalfGridSizeEnergy(int halfGridSizeEnergy) {
+        this.halfGridSizeEnergy = halfGridSizeEnergy;
+    }
 
     public void setIntegratorFunction(IntegratorFunction integratorFunction) {
         this.simulationIntegrator = integratorFunction;
     }
+    public void setEnergyDelta(double energyDelta) {
+        this.energyDelta = energyDelta;
+    }
 
     public void shiftEnergy(double shiftEnergy){
         originalEnergy =(1+shiftEnergy)*originalEnergy;
-        double newVelocity = Math.sqrt((1.0/3.0) * (originalEnergy + 5.0/(2.0 * bodies[0].getPosition().norm())));
+        double newVelocity = Math.sqrt((1.0/3.0) * ((1+shiftEnergy)*originalEnergy + 5.0/(2.0 * bodies[0].getPosition().norm())));
         // Finally, preserve the angular momentum by setting the velocity of body 1 to (-2) times that of bodies 0 and 2
         bodies[0].setVelocity(bodies[0].getVelocity().normalise().multiply(newVelocity));
         bodies[2].setVelocity(bodies[0].getVelocity());
@@ -124,12 +133,11 @@ public class Perturbations {
         return perturbedBodies;
     }
 
-
     public void run() {
         ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
         // Save the perturbation settings
-        SimulationIO.writePerturbationSettingsToFile(N, dt, N, delta, halfGridSize);
+        SimulationIO.writePerturbationSettingsToFile(N, delta, halfGridSize);
 
         // Iterate over the grid of perturbations
         for (int i = -halfGridSize; i <= halfGridSize; i++) {
@@ -208,6 +216,57 @@ public class Perturbations {
             }
         }
 
+    }
+
+    public void runMany(){
+
+        // Save the perturbation settings
+        SimulationIO.write3dPerturbationSettingsToFile(N, delta, energyDelta, halfGridSize, halfGridSizeEnergy);
+
+        // Keeping the original bodies and energy to revert back to at the start of each child pertubation
+        double energyCopy = originalEnergy;
+        Body[] originalBodies = Calculations.copyBodies(bodies);
+
+        // The loop for the parent pertubation
+        for(int k = -halfGridSizeEnergy; k <= halfGridSizeEnergy; k++){
+            ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
+            // Ensuring the bodies and energy is set back to the original before proceeding
+            System.out.println(k);
+            this.bodies = Calculations.copyBodies(originalBodies);
+            this.originalEnergy = energyCopy;
+            
+            // We return matrices filled with "F" for failed to intialise for choices of energy that will result in negative sqrt
+            if((1+(k*energyDelta))*originalEnergy + 5.0/(2.0 * bodies[0].getPosition().norm()) < 0){
+                Arrays.fill(timeMatrix, 0);
+                Arrays.fill(stopCodeMatrix, "F");
+                return;
+            } else{
+                // Performing the energy shift
+                shiftEnergy(k*energyDelta);
+            }
+            
+            // Iterate over the grid of perturbations
+            for (int i = -halfGridSize; i <= halfGridSize; i++) {
+                for (int j = -halfGridSize; j <= halfGridSize; j++) {
+                    final int rowIndex = i;
+                    final int columnIndex = j;
+                    executor.submit(() -> simulationThread(rowIndex, columnIndex));
+                }
+            }
+
+            executor.shutdown();
+            try {
+                executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+            } catch (InterruptedException e) {
+            } catch (RuntimeException e) {
+                System.err.println("Error in executor.awaitTermination");
+            }
+
+            // Saving the child pertubation csv's with the relevent energy stamp
+            SimulationIO.saveMatrix("timeMatrix"+k, timeMatrix);
+            SimulationIO.saveMatrix("stopCodeMatrix"+k, stopCodeMatrix);
+        }
     }
 
 }

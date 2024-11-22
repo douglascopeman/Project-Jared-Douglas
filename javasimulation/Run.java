@@ -14,7 +14,11 @@ public class Run{
         if (clOptionsList.contains("-perturbPositions") || clOptionsList.contains("-perturbVelocities")) {
             SimulationIO.setupDirectories();
             Perturbations perturbations = new Perturbations(bodies, N, dt, clOptionsList);
-            perturbations.run();
+            if(clOptionsList.contains("peturbEnergies")){
+                perturbations.runMany();
+            } else {
+                perturbations.run();
+            }
         } else {
             Simulation simulation = new Simulation(bodies, N, dt, clOptionsList);
             simulation.run();

@@ -57,21 +57,35 @@ public class SimulationIO {
                 perturbationsOptions.replace(option, true);
             }
             else if (option.equals("delta")) {
+                // Setting Delta
                 int deltaFlagIndex = clOptions.indexOf("delta");
                 double delta = Double.parseDouble(clOptions.get(deltaFlagIndex + 1));
                 perturbations.setDelta(delta);
             } else if (option.equals("halfGridSize")) {
+                // Setting Half Grid Size
                 int halfGridSizeFlagIndex = clOptions.indexOf("halfGridSize");
                 int halfGridSize = Integer.parseInt(clOptions.get(halfGridSizeFlagIndex + 1));
                 perturbations.setHalfGridSize(halfGridSize);
             } else if (option.equals("integrator")) {
+                // Setting the integrator
                 int integratorFlagIndex = clOptions.indexOf("integrator");
                 String integratorName = clOptions.get(integratorFlagIndex + 1);
                 perturbations.setIntegratorFunction(Integrators.integratorMap.get(integratorName));
             } else if (option.equals("shiftEnergy")) {
+                // Setting the shift in Energy for a single shift
                 int shiftEnergyFlagIndex = clOptions.indexOf("shiftEnergy");
                 double shiftEnergy = Double.parseDouble(clOptions.get(shiftEnergyFlagIndex + 1));
                 perturbations.shiftEnergy(shiftEnergy);
+            } else if (option.equals("energyDelta")){
+                // Setting the amount to shift each energy layer for multiple layer calculations
+                int energyDeltaFlagIndex = clOptions.indexOf("energyDelta");
+                double energyDelta = Double.parseDouble(clOptions.get(energyDeltaFlagIndex + 1));
+                perturbations.setEnergyDelta(energyDelta);
+            } else if (option.equals("halfGridSizeEnergy")){
+                // Setting the amount to shift each energy layer for multiple layer calculations
+                int halfGridSizeEnergyIndex = clOptions.indexOf("halfGridSizeEnergy");
+                int halfGridSizeEnergy = Integer.parseInt(clOptions.get(halfGridSizeEnergyIndex + 1));
+                perturbations.setHalfGridSizeEnergy(halfGridSizeEnergy);
             }
         }
     }
@@ -218,9 +232,20 @@ public class SimulationIO {
         }
     }
 
-    public static void writePerturbationSettingsToFile(int N, double dt, int n, double delta, int halfGridSize) {
+    public static void writePerturbationSettingsToFile(int N, double delta, int halfGridSize) {
         try(FileWriter writer = new FileWriter("Outputs\\perturbationSettings.csv")){
-            writer.append(N + "," + dt + "," + n + "," + delta + "," + halfGridSize);
+            writer.append(N + "," + delta + "," + halfGridSize);
+            writer.append("\n");
+        } catch (FileNotFoundException e) {
+            System.err.println("Setting file not found");
+        } catch (IOException e) {
+            System.err.println("Something went wrong writing to file: " + e.getMessage());
+        }
+    }
+    
+    public static void write3dPerturbationSettingsToFile(int N, double deltaAxis1, double deltaAxis2, int halfGridSizeAxis1, int halfGridSizeAxis2) {
+        try(FileWriter writer = new FileWriter("Outputs\\perturbationSettings.csv")){
+            writer.append(N + "," + deltaAxis1 + "," + deltaAxis2 + "," + halfGridSizeAxis1 + "," + halfGridSizeAxis2);
             writer.append("\n");
         } catch (FileNotFoundException e) {
             System.err.println("Setting file not found");
