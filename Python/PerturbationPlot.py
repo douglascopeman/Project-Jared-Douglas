@@ -41,10 +41,8 @@ class PerturbationPlot():
         with open(os.path.join(output_directory, "perturbationSettings.csv"), 'r') as f:
             data = np.loadtxt(f, delimiter=",")
             self.N = int(data[0])
-            self.dt = float(data[1])
-            self.n = int(data[2])
-            self.delta = float(data[3])
-            self.p = int(data[4])
+            self.delta = float(data[1])
+            self.p = int(data[2])
             self.plot_size = 2*self.p + 1
 
         # Reading the perturbation matrix
@@ -101,10 +99,8 @@ class PerturbationPlot():
         with open(os.path.join(output_directory, "perturbationSettings.csv"), 'r') as f:
             data = np.loadtxt(f, delimiter=",")
             self.N = int(data[0])
-            self.dt = float(data[1])
-            self.n = int(data[2])
-            self.delta = float(data[3])
-            self.p = int(data[4])
+            self.delta = float(data[1])
+            self.p = int(data[2])
             self.plot_size = 2*self.p + 1
 
         # Reading the perturbation matrix
