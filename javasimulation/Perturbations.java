@@ -164,13 +164,6 @@ public class Perturbations {
         // Perturb the bodies
         Body[] perturbedBodies = bodies;
         if (options.get("perturbPositions")) {
-            // Check if the Figure 8 can be initialised
-            // if((originalEnergy + 5.0/(2.0 * Vector.add(bodies[0].getPosition(), new Vector(rowIndex * delta, columnIndex * delta, 0)).norm())) < 0){
-            //     int gridSize = 2 * halfGridSize + 1;
-            //     timeMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize + 1)] = 0;
-            //     stopCodeMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize + 1)] = 'F';
-            //     return;
-            // }
             perturbedBodies = perturbPositions(rowIndex, columnIndex, delta);
             if (perturbedBodies == null) {
                 timeMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize + 1)] = 0;
@@ -207,9 +200,9 @@ public class Perturbations {
             char stopCode = simulation.getStopCode();
             if (stopCode == 'X') {
                 stabilityMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize + 1)] = simulation.getShapeSpaceStabilityNumber();
-            } else {
-                stopCodeMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize + 1)] = stopCode;
+                
             }
+            stopCodeMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize + 1)] = stopCode;
             if (columnIndex == 0){
                 String ThreadName = "Thread " + simulationThread.getName();
                 System.out.println(String.format("%-" + 25 + "s", ThreadName) + stopCode);
