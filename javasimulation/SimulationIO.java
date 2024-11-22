@@ -43,15 +43,15 @@ public class SimulationIO {
     public static void setPerturbationsSettings(Perturbations perturbations, List<String> clOptions) {
         HashMap<String, Boolean> perturbationsOptions = perturbations.getOptions();
         clOptions.replaceAll(String::strip);
-        int[] clOptionsFlagIndeces = clOptions.stream()
-            .filter(perturbationsOptions::containsKey)
-            .map(clOptions::indexOf)
-            .mapToInt(Integer::intValue)
-            .toArray();
-        for (int i : clOptionsFlagIndeces) {
-            clOptions.set(i, clOptions.get(i).substring(1));
-        }
-        // clOptions.replaceAll(s -> s.startsWith("-") ? s.substring(1) : s);
+        // int[] clOptionsFlagIndeces = clOptions.stream()
+        //     .filter(perturbationsOptions::containsKey)
+        //     .map(clOptions::indexOf)
+        //     .mapToInt(Integer::intValue)
+        //     .toArray();
+        // for (int i : clOptionsFlagIndeces) {
+        //     clOptions.set(i, clOptions.get(i).substring(1));
+        // }
+        clOptions.replaceAll(s -> s.startsWith("-") ? s.substring(1) : s);
         for (String option : clOptions) {
             if (perturbationsOptions.containsKey(option)) {
                 perturbationsOptions.replace(option, true);
