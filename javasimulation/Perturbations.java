@@ -24,6 +24,7 @@ public class Perturbations {
 
     private double[][] timeMatrix;
     private char[][] stopCodeMatrix;
+    private int[][] stabilityMatrix;
 
     public Perturbations(Body[] bodiesOriginal, int N, double dt) {
         this.bodies = Calculations.copyBodies(bodiesOriginal);
@@ -93,7 +94,6 @@ public class Perturbations {
         if (energyTerm < 0) {
             return null;
         }
-
 
         double newVelocity = Math.sqrt((1.0/3.0) * energyTerm);
 
@@ -197,7 +197,11 @@ public class Perturbations {
             int gridSize = 2 * halfGridSize + 1;
             timeMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize + 1)] = simulation.getElapsedTime();
             char stopCode = simulation.getStopCode();
-            stopCodeMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize + 1)] = stopCode;
+            if (stopCode == 'X') {
+                stabilityMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize + 1)] = simulation.getShapeSpaceStabilityNumber();
+            } else {
+                stopCodeMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize + 1)] = stopCode;
+            }
             if (columnIndex == 0){
                 String ThreadName = "Thread " + simulationThread.getName();
                 System.out.println(String.format("%-" + 25 + "s", ThreadName) + stopCode);
