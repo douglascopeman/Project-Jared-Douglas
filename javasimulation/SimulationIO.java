@@ -225,7 +225,18 @@ public class SimulationIO {
 
     public static void writePerturbationSettingsToFile(int N, double delta, int halfGridSize) {
         try(FileWriter writer = new FileWriter("Outputs\\perturbationSettings.csv")){
-            writer.append(N + ","  + "," + delta + "," + halfGridSize);
+            writer.append(N + "," + delta + "," + halfGridSize);
+            writer.append("\n");
+        } catch (FileNotFoundException e) {
+            System.err.println("Setting file not found");
+        } catch (IOException e) {
+            System.err.println("Something went wrong writing to file: " + e.getMessage());
+        }
+    }
+    
+    public static void write3dPerturbationSettingsToFile(int N, double deltaAxis1, double deltaAxis2, int halfGridSizeAxis1, int halfGridSizeAxis2) {
+        try(FileWriter writer = new FileWriter("Outputs\\perturbationSettings.csv")){
+            writer.append(N + "," + deltaAxis1 + "," + deltaAxis2 + "," + halfGridSizeAxis1 + "," + halfGridSizeAxis2);
             writer.append("\n");
         } catch (FileNotFoundException e) {
             System.err.println("Setting file not found");

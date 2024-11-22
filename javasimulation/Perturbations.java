@@ -202,7 +202,7 @@ public class Perturbations {
     public void runMany(){
 
         // Save the perturbation settings
-        SimulationIO.writePerturbationSettingsToFile(N, delta, halfGridSize);
+        SimulationIO.write3dPerturbationSettingsToFile(N, delta, energyDelta, halfGridSize, halfGridSizeEnergy);
 
         // Keeping the original bodies and energy to revert back to at the start of each child pertubation
         double energyCopy = originalEnergy;
