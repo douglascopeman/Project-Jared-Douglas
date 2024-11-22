@@ -24,7 +24,7 @@ class PerturbationPlot():
         print(skip_no_labels)
 
 
-        sns.heatmap(self.df.T, xticklabels=skip_no_labels, yticklabels=skip_no_labels)
+        sns.heatmap(self.df.T, square = True, xticklabels=skip_no_labels, yticklabels=skip_no_labels, cbar_kws={'label': 'Number of Simulation Steps'})
         plt.title("Perturbation Plot")
         plt.xlabel(r"$\Delta x$")
         plt.ylabel(r"$\Delta y$")
