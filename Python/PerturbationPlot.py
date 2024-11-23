@@ -25,8 +25,8 @@ class PerturbationPlot():
             
         self.axis_labels = np.round(np.arange((-self.p*self.delta), (self.p*self.delta+(self.delta*0.5)), self.delta), decimals=4)
         self.skip_no_labels = np.size(self.axis_labels)//10
-        self.color_map = ["#FFFFFF", "#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#00FFFF"]
-        self.color_map_words = ["Greys", "Reds", "Greens", "Blues", "Yellows", "Cyan"]
+        self.color_map = ["#FF0000", "#00FF00", "#0000FF", "#FFFF00", "#00FFFF"]
+        self.color_map_words = ["Reds", "Greens", "Blues", "Yellows", "Cyan"]
         
     def read_time(self, filename):
         with open(os.path.join(self.output_directory, filename + ".csv"), 'r') as f:
@@ -115,6 +115,9 @@ class PerturbationPlot():
         plt.show()
         
 
+    def plot_stop_codes_gradient_simple(self, time_filename, stop_filename):
+        self.plot_stop_codes_gradient(time_filename, stop_filename, time_filename)
+
     def plot_stop_codes_gradient(self, time_filename, stop_filename, stability_filename):
         self.read_time(time_filename)
         self.read_stop_codes(stop_filename)
@@ -160,25 +163,25 @@ class PerturbationPlot():
         # Time colorbars
         norm = plt.Normalize(vmin=self.time_matrix.min(), vmax=self.time_matrix.max()) #find the range of values
         #then iterate through all categories other than completion and create a colorbar for each
-        for i in range(1, len(categories)):
+        is_label_set = False
+        for i in range(len(categories)):
+            if (categories[i] == "X"): continue
             #set the colourmap correctly
             sm = plt.cm.ScalarMappable(cmap=self.color_map_words[i], norm=norm)
             sm.set_array([])
             #create the colorbar and place it in the right space
             #if the colorbar is the first, leave space for the stability colorbar ticks
-            cax = divider.append_axes("right", size="5%", pad= 0.75 if i == 1 else 0.1)
+            cax = divider.append_axes("right", size="5%", pad= 0.75 if not is_label_set else 0.1)
             cbar = plt.colorbar(sm, cax=cax, orientation="vertical")
             cbar.ax.set_title(categories[i], pad=10)
             #if the colorbar is the first, we also label it
-            if (i == 1):
+            if (not is_label_set):
                 cbar.set_label("Time Number", labelpad=1, rotation=90)
                 cbar.ax.yaxis.set_label_position('left')
+                is_label_set = True
             #if the colorbar is not the last, remove the ticks
             if (i != len(categories) - 1): 
                 cbar.set_ticks([])
-        
-        
-        
         
         plt.show()
 
