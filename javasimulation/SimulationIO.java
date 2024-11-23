@@ -11,7 +11,7 @@ public class SimulationIO {
     public static void setSimulationOptions(Simulation simulation, List<String> clOptions) {
         HashMap<String, Boolean> simOptions = simulation.getOptions();
         clOptions.replaceAll(String::strip);
-        clOptions.replaceAll(s -> s.startsWith("-") ? s.substring(1) : s);
+        clOptions.replaceAll(s -> s.startsWith("--") ? s.substring(2) : s);
 
         for (String option : clOptions) {
             if (simOptions.containsKey(option)) {
@@ -36,14 +36,15 @@ public class SimulationIO {
         options.put("findOrbitLength", false);
         options.put("calculateShapeSpace", false);
         options.put("skipSaveToCSV", false);
-        // options.put("perturbPositions", false);
-        // options.put("perturbVelocities", false);
     }
 
     public static void setPerturbationsSettings(Perturbations perturbations, List<String> clOptions) {
         HashMap<String, Boolean> perturbationsOptions = perturbations.getOptions();
         clOptions.replaceAll(String::strip);
-        clOptions.replaceAll(s -> s.startsWith("-") ? s.substring(1) : s);
+        clOptions.replaceAll(s -> s.startsWith("--") ? s.substring(2) : s);
+        for(String option : clOptions) {
+            System.out.println(option);
+        }
         for (String option : clOptions) {
             if (perturbationsOptions.containsKey(option)) {
                 perturbationsOptions.replace(option, true);
@@ -81,40 +82,17 @@ public class SimulationIO {
                     break;
                 default:
             }
-            
-            // if (option.equals("delta")) {
-            //     int deltaFlagIndex = clOptions.indexOf("delta");
-            //     double delta = Double.parseDouble(clOptions.get(deltaFlagIndex + 1));
-            //     perturbations.setDelta(delta);
-            // } else if (option.equals("halfGridSize")) {
-            //     int halfGridSizeFlagIndex = clOptions.indexOf("halfGridSize");
-            //     int halfGridSize = Integer.parseInt(clOptions.get(halfGridSizeFlagIndex + 1));
-            //     perturbations.setHalfGridSize(halfGridSize);
-            // } else if (option.equals("integrator")) {
-            //     int integratorFlagIndex = clOptions.indexOf("integrator");
-            //     String integratorName = clOptions.get(integratorFlagIndex + 1);
-            //     perturbations.setIntegratorFunction(Integrators.integratorMap.get(integratorName));
-            // } else if (option.equals("shiftEnergy")) {
-            //     int shiftEnergyFlagIndex = clOptions.indexOf("shiftEnergy");
-            //     double shiftEnergy = Double.parseDouble(clOptions.get(shiftEnergyFlagIndex + 1));
-            //     perturbations.shiftEnergy(shiftEnergy);
-            // } else if (option.equals("energyDelta")){
-            //     int energyDeltaFlagIndex = clOptions.indexOf("energyDelta");
-            //     double energyDelta = Double.parseDouble(clOptions.get(energyDeltaFlagIndex + 1));
-            //     perturbations.setEnergyDelta(energyDelta);
-            // } else if (option.equals("halfGridSizeEnergy")){
-            //     int halfGridSizeEnergyIndex = clOptions.indexOf("halfGridSizeEnergy");
-            //     int halfGridSizeEnergy = Integer.parseInt(clOptions.get(halfGridSizeEnergyIndex + 1));
-            //     perturbations.setHalfGridSizeEnergy(halfGridSizeEnergy);
-            // }
         }
     }
 
     public static void setDefaultPerturbationsOptions(HashMap<String, Boolean> options) {
+        // Set the options unique to perturbations
         options.put("perturbPositions", false);
         options.put("perturbVelocities", false);
         options.put("perturbEnergy", false);
         options.put("perturbAngularMomentum", false);
+
+        // Set default options for each simulation, and override specific options
         setDefaultSimulationOptions(options);
         options.replace("checkStopConditions", true);
         options.replace("skipSaveToCSV", true);

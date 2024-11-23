@@ -11,7 +11,7 @@ public class Run{
         String[] commandlineOptions = Arrays.copyOfRange(args, 3, args.length);
         List<String> clOptionsList = Arrays.asList(commandlineOptions);
 
-        if (clOptionsList.contains("-perturbPositions") || clOptionsList.contains("-perturbVelocities")) {
+        if (clOptionsList.contains("--perturbPositions") || clOptionsList.contains("--perturbVelocities")) {
             SimulationIO.setupDirectories();
             Perturbations perturbations = new Perturbations(bodies, N, dt, clOptionsList);
             if(clOptionsList.contains("peturbEnergies")){
