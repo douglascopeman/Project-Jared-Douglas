@@ -43,50 +43,70 @@ public class SimulationIO {
     public static void setPerturbationsSettings(Perturbations perturbations, List<String> clOptions) {
         HashMap<String, Boolean> perturbationsOptions = perturbations.getOptions();
         clOptions.replaceAll(String::strip);
-        // int[] clOptionsFlagIndeces = clOptions.stream()
-        //     .filter(perturbationsOptions::containsKey)
-        //     .map(clOptions::indexOf)
-        //     .mapToInt(Integer::intValue)
-        //     .toArray();
-        // for (int i : clOptionsFlagIndeces) {
-        //     clOptions.set(i, clOptions.get(i).substring(1));
-        // }
         clOptions.replaceAll(s -> s.startsWith("-") ? s.substring(1) : s);
         for (String option : clOptions) {
             if (perturbationsOptions.containsKey(option)) {
                 perturbationsOptions.replace(option, true);
             }
-            else if (option.equals("delta")) {
-                // Setting Delta
-                int deltaFlagIndex = clOptions.indexOf("delta");
-                double delta = Double.parseDouble(clOptions.get(deltaFlagIndex + 1));
-                perturbations.setDelta(delta);
-            } else if (option.equals("halfGridSize")) {
-                // Setting Half Grid Size
-                int halfGridSizeFlagIndex = clOptions.indexOf("halfGridSize");
-                int halfGridSize = Integer.parseInt(clOptions.get(halfGridSizeFlagIndex + 1));
-                perturbations.setHalfGridSize(halfGridSize);
-            } else if (option.equals("integrator")) {
-                // Setting the integrator
-                int integratorFlagIndex = clOptions.indexOf("integrator");
-                String integratorName = clOptions.get(integratorFlagIndex + 1);
-                perturbations.setIntegratorFunction(Integrators.integratorMap.get(integratorName));
-            } else if (option.equals("shiftEnergy")) {
-                // Setting the shift in Energy for a single shift
-                int shiftEnergyFlagIndex = clOptions.indexOf("shiftEnergy");
-                double shiftEnergy = Double.parseDouble(clOptions.get(shiftEnergyFlagIndex + 1));
-                perturbations.shiftEnergy(shiftEnergy);
-            } else if (option.equals("energyDelta")){
-                // Setting the amount to shift each energy layer for multiple layer calculations
-                int energyDeltaFlagIndex = clOptions.indexOf("energyDelta");
-                double energyDelta = Double.parseDouble(clOptions.get(energyDeltaFlagIndex + 1));
-                perturbations.setEnergyDelta(energyDelta);
-            } else if (option.equals("halfGridSizeEnergy")){
-                // Setting the amount to shift each energy layer for multiple layer calculations
-                int halfGridSizeEnergyIndex = clOptions.indexOf("halfGridSizeEnergy");
-                int halfGridSizeEnergy = Integer.parseInt(clOptions.get(halfGridSizeEnergyIndex + 1));
-                perturbations.setHalfGridSizeEnergy(halfGridSizeEnergy);
+            else switch (option) {
+                case "delta":
+                    int deltaFlagIndex = clOptions.indexOf("delta");
+                    double delta = Double.parseDouble(clOptions.get(deltaFlagIndex + 1));
+                    perturbations.setDelta(delta);
+                    break;
+                case "halfGridSize":
+                    int halfGridSizeFlagIndex = clOptions.indexOf("halfGridSize");
+                    int halfGridSize = Integer.parseInt(clOptions.get(halfGridSizeFlagIndex + 1));
+                    perturbations.setHalfGridSize(halfGridSize);
+                    break;
+                case "integrator":
+                    int integratorFlagIndex = clOptions.indexOf("integrator");
+                    String integratorName = clOptions.get(integratorFlagIndex + 1);
+                    perturbations.setIntegratorFunction(Integrators.integratorMap.get(integratorName));
+                    break;
+                case "shiftEnergy":
+                    int shiftEnergyFlagIndex = clOptions.indexOf("shiftEnergy");
+                    double shiftEnergy = Double.parseDouble(clOptions.get(shiftEnergyFlagIndex + 1));
+                    perturbations.shiftEnergy(shiftEnergy);
+                    break;
+                case "energyDelta":
+                    int energyDeltaFlagIndex = clOptions.indexOf("energyDelta");
+                    double energyDelta = Double.parseDouble(clOptions.get(energyDeltaFlagIndex + 1));
+                    perturbations.setEnergyDelta(energyDelta);
+                    break;
+                case "halfGridSizeEnergy":
+                    int halfGridSizeEnergyIndex = clOptions.indexOf("halfGridSizeEnergy");
+                    int halfGridSizeEnergy = Integer.parseInt(clOptions.get(halfGridSizeEnergyIndex + 1));
+                    perturbations.setHalfGridSizeEnergy(halfGridSizeEnergy);
+                    break;
+                default:
             }
+            
+            // if (option.equals("delta")) {
+            //     int deltaFlagIndex = clOptions.indexOf("delta");
+            //     double delta = Double.parseDouble(clOptions.get(deltaFlagIndex + 1));
+            //     perturbations.setDelta(delta);
+            // } else if (option.equals("halfGridSize")) {
+            //     int halfGridSizeFlagIndex = clOptions.indexOf("halfGridSize");
+            //     int halfGridSize = Integer.parseInt(clOptions.get(halfGridSizeFlagIndex + 1));
+            //     perturbations.setHalfGridSize(halfGridSize);
+            // } else if (option.equals("integrator")) {
+            //     int integratorFlagIndex = clOptions.indexOf("integrator");
+            //     String integratorName = clOptions.get(integratorFlagIndex + 1);
+            //     perturbations.setIntegratorFunction(Integrators.integratorMap.get(integratorName));
+            // } else if (option.equals("shiftEnergy")) {
+            //     int shiftEnergyFlagIndex = clOptions.indexOf("shiftEnergy");
+            //     double shiftEnergy = Double.parseDouble(clOptions.get(shiftEnergyFlagIndex + 1));
+            //     perturbations.shiftEnergy(shiftEnergy);
+            // } else if (option.equals("energyDelta")){
+            //     int energyDeltaFlagIndex = clOptions.indexOf("energyDelta");
+            //     double energyDelta = Double.parseDouble(clOptions.get(energyDeltaFlagIndex + 1));
+            //     perturbations.setEnergyDelta(energyDelta);
+            // } else if (option.equals("halfGridSizeEnergy")){
+            //     int halfGridSizeEnergyIndex = clOptions.indexOf("halfGridSizeEnergy");
+            //     int halfGridSizeEnergy = Integer.parseInt(clOptions.get(halfGridSizeEnergyIndex + 1));
+            //     perturbations.setHalfGridSizeEnergy(halfGridSizeEnergy);
+            // }
         }
     }
 
@@ -269,8 +289,8 @@ public class SimulationIO {
         }
     }
 
-    public static void saveMatrix(String fileName, int[][] matrix) {
-        try (FileWriter writer = new FileWriter("Outputs\\"+ fileName +".csv")) {
+    public static void saveMatrix(String filename, int[][] matrix) {
+        try (FileWriter writer = new FileWriter("Outputs\\"+ filename +".csv")) {
             for (int i = 0; i < matrix.length; i++) {
                 for (int j = 0; j < matrix[i].length - 1; j++) {
                     writer.write(matrix[i][j] + ",");
@@ -279,12 +299,12 @@ public class SimulationIO {
             }
             
         } catch (Exception e) {
-            System.out.println("Error writing stop matrix to file");
+            System.out.println("Error writing " + filename + " to file");
         }
     }
 
-    public static void saveMatrix(String fileName, boolean[][] matrix) {
-        try (FileWriter writer = new FileWriter("Outputs\\"+ fileName +".csv")) {
+    public static void saveMatrix(String filename, boolean[][] matrix) {
+        try (FileWriter writer = new FileWriter("Outputs\\"+ filename +".csv")) {
             for (int i = 0; i < matrix.length; i++) {
                 for (int j = 0; j < matrix[i].length - 1; j++) {
                     writer.write(matrix[i][j] + ",");
@@ -293,12 +313,12 @@ public class SimulationIO {
             }
             
         } catch (Exception e) {
-            System.out.println("Error writing stop matrix to file");
+            System.out.println("Error writing " + filename + " to file");
         }
     }
 
-    public static void saveMatrix(String fileName, double[][] matrix) {
-        try (FileWriter writer = new FileWriter("Outputs\\"+ fileName +".csv")) {
+    public static void saveMatrix(String filename, double[][] matrix) {
+        try (FileWriter writer = new FileWriter("Outputs\\"+ filename +".csv")) {
             for (int i = 0; i < matrix.length; i++) {
                 for (int j = 0; j < matrix[i].length - 1; j++) {
                     writer.write(matrix[i][j] + ",");
@@ -307,12 +327,12 @@ public class SimulationIO {
             }
             
         } catch (Exception e) {
-            System.out.println("Error writing stop matrix to file");
+            System.out.println("Error writing " + filename + " to file");
         }
     }
 
-    public static void saveMatrix(String fileName, char[][] matrix) {
-        try (FileWriter writer = new FileWriter("Outputs\\"+ fileName +".csv")) {
+    public static void saveMatrix(String filename, char[][] matrix) {
+        try (FileWriter writer = new FileWriter("Outputs\\"+ filename +".csv")) {
             for (int i = 0; i < matrix.length; i++) {
                 for (int j = 0; j < matrix[i].length - 1; j++) {
                     writer.write(matrix[i][j] + ",");
@@ -321,7 +341,7 @@ public class SimulationIO {
             }
             
         } catch (Exception e) {
-            System.out.println("Error writing stop matrix to file");
+            System.out.println("Error writing " + filename + " to file");
         }
     }
 }
