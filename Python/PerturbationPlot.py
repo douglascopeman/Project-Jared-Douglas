@@ -192,6 +192,23 @@ class PerturbationPlot():
                  np.count_nonzero(self.stop_code_matrix == 'C')
                  ]
         print(count)
+
+    def count_descrepencies(self, stop_filename1, stop_filename2):
+        self.read_stop_codes(stop_filename1)
+        stop_codes_file1 = np.copy(self.stop_code_matrix)
         
+        self.read_stop_codes(stop_filename2)
+        stop_codes_file2 = np.copy(self.stop_code_matrix)
+        
+        n = np.shape(stop_codes_file1)[0]
+        descrepency_count = 0
+
+        for i in range(n):
+            for j in range(n):
+                if stop_codes_file1[i,j] == 'X' and stop_codes_file2[i,j] != 'X':
+                    descrepency_count += 1
+                if stop_codes_file2[i,j] == 'X' and stop_codes_file1[i,j] != 'X':
+                    descrepency_count += 1
+        print(descrepency_count)
     
         
