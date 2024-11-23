@@ -326,7 +326,7 @@ class Plotter():
         plt.show()
         
     def plot_simulation_shape_space(self, filename):
-        data = np.loadtxt(filename, delimiter=",", dtype=bool)
+        data = np.loadtxt(filename, delimiter=",", dtype=int)
         non_zero_indices = np.argwhere(data > 0)
         if non_zero_indices.size > 0:
             max_indices = np.max(non_zero_indices, axis=0)
