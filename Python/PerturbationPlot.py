@@ -8,6 +8,7 @@ import seaborn as sns
 import pandas as pd
 from matplotlib.colors import ListedColormap
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+from multipledispatch import dispatch
 
 
 class PerturbationPlot():
@@ -115,9 +116,63 @@ class PerturbationPlot():
         plt.show()
         
 
-    def plot_stop_codes_gradient_simple(self, time_filename, stop_filename):
-        self.plot_stop_codes_gradient(time_filename, stop_filename, time_filename)
+    @dispatch(str, str)
+    def plot_stop_codes_gradient(self, time_filename, stop_filename):
+        self.read_time(time_filename)
+        self.read_stop_codes(stop_filename)
 
+        # Set up the plot
+        fig, ax = plt.subplots()
+        fig.set_size_inches(8, 6)
+        
+        # Create a dataframe from the matrix
+        df_stop = pd.DataFrame(self.stop_code_matrix.T, columns=self.axis_labels, index=-self.axis_labels)
+        df_time = pd.DataFrame(self.time_matrix.T, columns=self.axis_labels, index=-self.axis_labels)
+
+        # Get unique categories
+        categories = df_stop.stack().unique().tolist()
+        category_map = {cat: str(i) for i, cat in enumerate(categories)}
+        df_stop = df_stop.replace(category_map).astype(int)
+        if len(self.color_map) < len(categories):
+            raise ValueError("Not enough colours in custom colour map")
+        cmap = ListedColormap(self.color_map[:len(categories)])
+        
+        # Plot the heatmap
+        plt.title("Category Heatmap")
+        plt.xlabel("Column")
+        plt.ylabel("Row")
+        
+        sns.heatmap(df_stop, cmap=cmap, annot=False, fmt="s", square=True, cbar=False, ax=ax, xticklabels=self.skip_no_labels, yticklabels=self.skip_no_labels)
+        sns.heatmap(df_time, cmap="Greys", alpha=0.5,fmt="s", cbar=False, ax=ax, square=True, xticklabels=self.skip_no_labels, yticklabels=self.skip_no_labels)
+        
+        divider = make_axes_locatable(ax)
+        # Time colorbars
+        norm = plt.Normalize(vmin=self.time_matrix.min(), vmax=self.time_matrix.max()) #find the range of values
+        #then iterate through all categories other than completion and create a colorbar for each
+        bars_made = 0
+        for i in range(len(categories)):
+            if (categories[i] == "X"): continue
+            #set the colourmap correctly
+            sm = plt.cm.ScalarMappable(cmap=self.color_map_words[i], norm=norm)
+            sm.set_array([])
+            #create the colorbar and place it in the right space
+            #if the colorbar is the first, leave space for the stability colorbar ticks
+            cax = divider.append_axes("right", size="5%", pad= 0.5 if (bars_made == 0) else 0.1)
+            cbar = plt.colorbar(sm, cax=cax, orientation="vertical")
+            cbar.ax.set_title(categories[i], pad=10)
+            #if the colorbar is the first, we also label it
+            if (bars_made == 0):
+                cbar.set_label("Time Number", labelpad=1, rotation=90)
+                cbar.ax.yaxis.set_label_position('left')
+                is_label_set = True
+            #if the colorbar is not the last, remove the ticks
+            if (bars_made != len(categories) - 2): 
+                cbar.set_ticks([])
+            bars_made += 1
+        
+        plt.show()
+
+    @dispatch(str, str, str)
     def plot_stop_codes_gradient(self, time_filename, stop_filename, stability_filename):
         self.read_time(time_filename)
         self.read_stop_codes(stop_filename)
@@ -150,7 +205,6 @@ class PerturbationPlot():
         sns.heatmap(df_stability, cmap="Greys", alpha=0.5,fmt="s", cbar=False, ax=ax, square=True, xticklabels=self.skip_no_labels, yticklabels=self.skip_no_labels)
         
         # Stability colorbar
-        
         norm = plt.Normalize(vmin=self.stability_matrix.min(), vmax=self.stability_matrix.max())
         sm = plt.cm.ScalarMappable(cmap="Greys", norm=norm)
         sm.set_array([])
@@ -163,7 +217,7 @@ class PerturbationPlot():
         # Time colorbars
         norm = plt.Normalize(vmin=self.time_matrix.min(), vmax=self.time_matrix.max()) #find the range of values
         #then iterate through all categories other than completion and create a colorbar for each
-        is_label_set = False
+        bars_made = 0
         for i in range(len(categories)):
             if (categories[i] == "X"): continue
             #set the colourmap correctly
@@ -171,17 +225,18 @@ class PerturbationPlot():
             sm.set_array([])
             #create the colorbar and place it in the right space
             #if the colorbar is the first, leave space for the stability colorbar ticks
-            cax = divider.append_axes("right", size="5%", pad= 0.75 if not is_label_set else 0.1)
+            cax = divider.append_axes("right", size="5%", pad= 0.75 if (bars_made == 0) else 0.1)
             cbar = plt.colorbar(sm, cax=cax, orientation="vertical")
             cbar.ax.set_title(categories[i], pad=10)
             #if the colorbar is the first, we also label it
-            if (not is_label_set):
+            if (bars_made == 0):
                 cbar.set_label("Time Number", labelpad=1, rotation=90)
                 cbar.ax.yaxis.set_label_position('left')
                 is_label_set = True
             #if the colorbar is not the last, remove the ticks
-            if (i != len(categories) - 1): 
+            if (bars_made != len(categories) - 2): 
                 cbar.set_ticks([])
+            bars_made += 1
         
         plt.show()
 
