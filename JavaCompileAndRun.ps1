@@ -16,111 +16,18 @@ param ([Parameter(
                 )
         ]
         [string] $dt = $(throw "dt parameter is required for Java."),
-
-        [Parameter(Mandatory=$False)]
-        [string] $integrator = "symplecticEuler",
-        [Parameter(Mandatory=$False)]
-        [switch] $useVariableTimestep,
-        [Parameter(Mandatory=$False)]
-        [switch] $checkStopConditions,
-        [Parameter(Mandatory=$False)]
-        [switch] $calculateCentreOfMass,
-        [Parameter(Mandatory=$False)]
-        [switch] $calculateEnergies,
-        [Parameter(Mandatory=$False)]
-        [switch] $calculateAngularMomentum,
-        [Parameter(Mandatory=$False)]
-        [switch] $calculateLinearMomentum,
-        [Parameter(Mandatory=$False)]
-        [switch] $findOrbitLength,
-        [Parameter(Mandatory=$False)]
-        [switch] $calculateShapeSpace,
-
-        [Parameter(Mandatory=$False)]
-        [switch] $perturbPositions,
-        [Parameter(Mandatory=$False)]
-        [switch] $perturbVelocities,
-        [Parameter(Mandatory=$False)]
-        [switch] $peturbEnergies,
-
-        [Parameter(Mandatory=$False)]
-        [float] $delta,
-        [Parameter(Mandatory=$False)]
-        [float] $energyDelta,
-        [Parameter(Mandatory=$False)]
-        [int] $halfGridSize,
-        [Parameter(Mandatory=$False)]
-        [int] $halfGridSizeEnergy,
-
-        [Parameter(Mandatory=$False)]
-        [float] $shiftEnergy
-
+        [Parameter(ValueFromRemainingArguments=$true)]
+        [string[]] $remainingArgs
 )
 
 $javaArgs = @($Orbit, $N, $dt)
-if ($integrator){
-        $javaArgs += "-integrator " 
-        $javaArgs += $integrator
-}
-if ($useVariableTimestep) {
-        $javaArgs += "-useVariableTimestep"
-}
-if ($checkStopConditions) {
-        $javaArgs += "-checkStopConditions"
-}
-if ($calculateCentreOfMass) {
-        $javaArgs += "-calculateCentreOfMass"
-}
-if ($calculateEnergies) {
-        $javaArgs += "-calculateEnergies"
-}
-if ($calculateAngularMomentum) {
-        $javaArgs += "-calculateAngularMomentum"
-}
-if ($calculateLinearMomentum) {
-        $javaArgs += "-calculateLinearMomentum"
-}
-if ($findOrbitLength) {
-        $javaArgs += "-findOrbitLength"
-}
-if ($perturbPositions) {
-        $javaArgs += "-perturbPositions"
-}
-if ($perturbVelocities) {
-        $javaArgs += "-perturbVelocities"
-}
-if ($peturbEnergies) {
-        $javaArgs += "-peturbEnergies"
-}
-if ($delta) {
-        $javaArgs += "-delta " 
-        $javaArgs += $delta
-}
-if ($energyDelta) {
-        $javaArgs += "-energyDelta"
-        $javaArgs += $energyDelta
-}
-if ($halfGridSize) {
-        $javaArgs += "-halfGridSize " 
-        $javaArgs += $halfGridSize
-} 
-if ($halfGridSizeEnergy) {
-        $javaArgs += "-halfGridSizeEnergy " 
-        $javaArgs += $halfGridSizeEnergy
-} 
-if ($shiftEnergy) {
-        $javaArgs += "-shiftEnergy "
-        $javaArgs += $shiftEnergy
-}
-if ($calculateShapeSpace) {
-        $javaArgs += "-calculateShapeSpace"
-}
+$javaArgs += $remainingArgs
 
-
-Set-Location .\javasimulation
-javac .\*.java -d .\
-# Copy-Item -Path .\Outputs\* -Destination .\javasimulation\Outputs -Recurse -Force
-java -cp . javasimulation/Run $javaArgs
-# Copy-Item -Path .\javasimulation\Outputs\* -Destination .\Outputs -Recurse -Force
-Set-Location ..
-write-host "Done!"
+try {
+        Set-Location .\javasimulation
+        javac .\*.java -d .\
+        java -cp . javasimulation/Run $javaArgs
+        write-host "Done!"
+} finally {
+        Set-Location ..
+}
