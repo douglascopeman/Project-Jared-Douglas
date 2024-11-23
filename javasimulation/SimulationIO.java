@@ -42,9 +42,6 @@ public class SimulationIO {
         HashMap<String, Boolean> perturbationsOptions = perturbations.getOptions();
         clOptions.replaceAll(String::strip);
         clOptions.replaceAll(s -> s.startsWith("--") ? s.substring(2) : s);
-        for(String option : clOptions) {
-            System.out.println(option);
-        }
         for (String option : clOptions) {
             if (perturbationsOptions.containsKey(option)) {
                 perturbationsOptions.replace(option, true);
