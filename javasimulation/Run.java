@@ -22,8 +22,6 @@ public class Run{
         } else {
             Simulation simulation = new Simulation(bodies, N, dt, clOptionsList);
             simulation.run();
-
         }
-
     }
 }
