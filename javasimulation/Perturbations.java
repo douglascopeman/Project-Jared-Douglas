@@ -185,13 +185,13 @@ public class Perturbations {
 
 
         // #region Sanity checks to be removed later
-        // double perturbedEnergy = Calculations.totalEnergy(perturbedBodies, 1);
-        // Vector perturbedCentreOfMass = Calculations.centreOfMass(perturbedBodies);
-        // Vector perturbedAngularMomentum = Calculations.angularMomentum(perturbedBodies);
+        double perturbedEnergy = Calculations.totalEnergy(perturbedBodies, 1);
+        Vector perturbedCentreOfMass = Calculations.centreOfMass(perturbedBodies);
+        Vector perturbedAngularMomentum = Calculations.angularMomentum(perturbedBodies);
 
-        // assert Math.abs(perturbedEnergy - originalEnergy) < 1e-10;
-        // assert perturbedCentreOfMass.subtract(originalCentreOfMass).norm() < 1e-10;
-        // assert perturbedAngularMomentum.subtract(originalAngularMomentum).norm() < 1e-10;
+        assert Math.abs(perturbedEnergy - originalEnergy) < 1e-10;
+        assert perturbedCentreOfMass.subtract(originalCentreOfMass).norm() < 1e-10;
+        assert perturbedAngularMomentum.subtract(originalAngularMomentum).norm() < 1e-10;
         // #endregion
 
         Simulation simulation = new Simulation(perturbedBodies, N, dt, options);

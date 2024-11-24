@@ -26,8 +26,13 @@ $javaArgs += $remainingArgs
 try {
         Set-Location .\javasimulation
         javac .\*.java -d .\
-        java -cp . javasimulation/Run $javaArgs
+        $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+                java -cp . javasimulation/Run $javaArgs
+        $stopwatch.Stop()
+        $elapsed = $stopwatch.Elapsed
+        write-host ""
         write-host "Done!"
+        write-host "Elapsed time: $($elapsed.Hours)h $($elapsed.minutes)m $($elapsed.seconds)s."
 } finally {
         Set-Location ..
 }
