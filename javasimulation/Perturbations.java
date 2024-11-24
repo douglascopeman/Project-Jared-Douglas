@@ -154,7 +154,6 @@ public class Perturbations {
         try {
             executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
         } catch (InterruptedException e) {
-        } catch (RuntimeException e) {
             System.err.println("Error in executor.awaitTermination");
         }
 
@@ -166,14 +165,18 @@ public class Perturbations {
     }
 
     private void simulationThread(int rowIndex, int columnIndex) {
+        // matrix coordinates for convenience
+        int saveRowIndex = rowIndex + halfGridSize;
+        int saveColumnIndex = gridSize - (columnIndex + halfGridSize + 1);
+
         // Perturb the bodies
         Body[] perturbedBodies = bodies;
         if (options.get("perturbPositions")) {
             perturbedBodies = perturbPositions(rowIndex, columnIndex, delta);
             if (perturbedBodies == null) {
-                timeMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize + 1)] = 0;
-                stopCodeMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize + 1)] = 'F';
-                stabilityMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize + 1)] = 0;
+                timeMatrix[saveRowIndex][saveColumnIndex] = 0;
+                stopCodeMatrix[saveRowIndex][saveColumnIndex] = 'F';
+                stabilityMatrix[saveRowIndex][saveColumnIndex] = 0;
                 return;
             }
         } else if (options.get("perturbVelocities")) {
@@ -182,13 +185,13 @@ public class Perturbations {
 
 
         // #region Sanity checks to be removed later
-        double perturbedEnergy = Calculations.totalEnergy(perturbedBodies, 1);
-        Vector perturbedCentreOfMass = Calculations.centreOfMass(perturbedBodies);
-        Vector perturbedAngularMomentum = Calculations.angularMomentum(perturbedBodies);
+        // double perturbedEnergy = Calculations.totalEnergy(perturbedBodies, 1);
+        // Vector perturbedCentreOfMass = Calculations.centreOfMass(perturbedBodies);
+        // Vector perturbedAngularMomentum = Calculations.angularMomentum(perturbedBodies);
 
-        assert Math.abs(perturbedEnergy - originalEnergy) < 1e-10;
-        assert perturbedCentreOfMass.subtract(originalCentreOfMass).norm() < 1e-10;
-        assert perturbedAngularMomentum.subtract(originalAngularMomentum).norm() < 1e-10;
+        // assert Math.abs(perturbedEnergy - originalEnergy) < 1e-10;
+        // assert perturbedCentreOfMass.subtract(originalCentreOfMass).norm() < 1e-10;
+        // assert perturbedAngularMomentum.subtract(originalAngularMomentum).norm() < 1e-10;
         // #endregion
 
         Simulation simulation = new Simulation(perturbedBodies, N, dt, options);
@@ -201,25 +204,25 @@ public class Perturbations {
             simulationThread.join();
         } catch (Exception e) {
         } finally {
-            int gridSize = 2 * halfGridSize + 1;
             // save the elapsed time to the time matrix
             double elapsedTime = simulation.getElapsedTime();
-            timeMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize + 1)] = elapsedTime;
+            timeMatrix[saveRowIndex][saveColumnIndex] = elapsedTime;
+
             // save the stop code to the stop code matrix
             char stopCode = simulation.getStopCode();
-            stopCodeMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize + 1)] = stopCode;
+            stopCodeMatrix[saveRowIndex][saveColumnIndex] = stopCode;
             // save the stability number to the stability matrix if the simulation completed successfully
-            if (stopCode == 'X' && options.get("calculateShapeSpace")) {
+            if (options.get("calculateShapeSpace") && stopCode == 'X') {
                 int stabilityNumber = simulation.getShapeSpaceStabilityNumber();
-                stabilityMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize + 1)] = stabilityNumber;
+                stabilityMatrix[saveRowIndex][saveColumnIndex] = stabilityNumber;
             } else {
-                stabilityMatrix[rowIndex + halfGridSize][gridSize - (columnIndex + halfGridSize + 1)] = 0;
+                stabilityMatrix[saveRowIndex][saveColumnIndex] = 0;
             }
 
             //printing the thread name and stop code every row
             if (columnIndex == 0){
                 String ThreadName = "Thread " + simulationThread.getName();
-                System.out.println(String.format("%-" + 25 + "s", ThreadName) + stopCode);
+                System.out.print("\r" + String.format("%-" + 25 + "s", ThreadName));
             }
         }
 
@@ -266,7 +269,6 @@ public class Perturbations {
             try {
                 executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
             } catch (InterruptedException e) {
-            } catch (RuntimeException e) {
                 System.err.println("Error in executor.awaitTermination");
             }
 
