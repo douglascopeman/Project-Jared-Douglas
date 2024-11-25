@@ -23,5 +23,7 @@ public class Run{
             Simulation simulation = new Simulation(bodies, N, dt, clOptionsList);
             simulation.run();
         }
+
+        //java.awt.Toolkit.getDefaultToolkit().beep();
     }
 }
