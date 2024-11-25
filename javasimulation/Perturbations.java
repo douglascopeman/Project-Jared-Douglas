@@ -173,10 +173,11 @@ public class Perturbations {
         Body[] perturbedBodies = bodies;
         if (options.get("perturbPositions")) {
             perturbedBodies = perturbPositions(rowIndex, columnIndex, delta);
+            // If the perturbation results in a negative sqrt, set the results to a failed state
             if (perturbedBodies == null) {
                 timeMatrix[saveRowIndex][saveColumnIndex] = 0;
                 stopCodeMatrix[saveRowIndex][saveColumnIndex] = 'F';
-                stabilityMatrix[saveRowIndex][saveColumnIndex] = 0;
+                stabilityMatrix[saveRowIndex][saveColumnIndex] = (int) Math.pow(Simulation.getShapeSpaceSize(), 2);
                 return;
             }
         } else if (options.get("perturbVelocities")) {
@@ -197,7 +198,6 @@ public class Perturbations {
         Simulation simulation = new Simulation(perturbedBodies, N, dt, options);
         simulation.setIntegratorFunction(simulationIntegrator);
         Thread simulationThread = new Thread(simulation);
-        simulationThread.setName("(" + rowIndex + ", " + columnIndex + ")");
 
         try {
             simulationThread.start();
@@ -221,8 +221,7 @@ public class Perturbations {
 
             //printing the thread name and stop code every row
             if (columnIndex == 0){
-                String ThreadName = "Thread " + simulationThread.getName();
-                System.out.print("\r" + String.format("%-" + 25 + "s", ThreadName));
+                System.out.print("\rRow " + rowIndex + " in [-" + halfGridSize + "," + halfGridSize + "]          ");
             }
         }
 

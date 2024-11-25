@@ -12,7 +12,8 @@ public class Simulation implements Runnable {
     private double elapsedTime = 0;
     private IntegratorFunction integratorFunction;
     private double[][][] simulation;
-    private int[][] shapeSpace = new int[1000][1000];
+    private static final int shapeSpaceSize = 1000;
+    private int[][] shapeSpace = new int[shapeSpaceSize][shapeSpaceSize];
 
     private HashMap<String, Boolean> options = new HashMap<String, Boolean>();
 
@@ -80,6 +81,10 @@ public class Simulation implements Runnable {
             }
         }
         return stabilityNumber;
+    }
+
+    public static int getShapeSpaceSize() {
+        return shapeSpaceSize;
     }
 
     public char getStopCode() {
