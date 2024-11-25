@@ -1,5 +1,6 @@
 package javasimulation;
 
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -265,41 +266,44 @@ public class SimulationIO {
     }
 
     public static void saveMatrix(String filename, int[][] matrix) {
-        try (FileWriter writer = new FileWriter("Outputs\\"+ filename +".csv")) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("Outputs\\"+ filename +".csv"))) {
             for (int i = 0; i < matrix.length; i++) {
                 for (int j = 0; j < matrix[i].length - 1; j++) {
                     writer.write(matrix[i][j] + ",");
                 }
                 writer.write(matrix[i][matrix[i].length-1] + "\n");
             }
-            
+            writer.close();
+
         } catch (Exception e) {
             System.out.println("Error writing " + filename + " to file");
-        }
+        } 
     }
 
     public static void saveMatrix(String filename, boolean[][] matrix) {
-        try (FileWriter writer = new FileWriter("Outputs\\"+ filename +".csv")) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("Outputs\\"+ filename +".csv"))) {
             for (int i = 0; i < matrix.length; i++) {
                 for (int j = 0; j < matrix[i].length - 1; j++) {
                     writer.write(matrix[i][j] + ",");
                 }
                 writer.write(matrix[i][matrix[i].length-1] + "\n");
             }
-            
+            writer.close();
+
         } catch (Exception e) {
             System.out.println("Error writing " + filename + " to file");
         }
     }
 
     public static void saveMatrix(String filename, double[][] matrix) {
-        try (FileWriter writer = new FileWriter("Outputs\\"+ filename +".csv")) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("Outputs\\"+ filename +".csv"))) {
             for (int i = 0; i < matrix.length; i++) {
                 for (int j = 0; j < matrix[i].length - 1; j++) {
                     writer.write(matrix[i][j] + ",");
                 }
                 writer.write(matrix[i][matrix[i].length-1] + "\n");
             }
+            writer.close();
             
         } catch (Exception e) {
             System.out.println("Error writing " + filename + " to file");
@@ -307,13 +311,14 @@ public class SimulationIO {
     }
 
     public static void saveMatrix(String filename, char[][] matrix) {
-        try (FileWriter writer = new FileWriter("Outputs\\"+ filename +".csv")) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("Outputs\\"+ filename +".csv"))) {
             for (int i = 0; i < matrix.length; i++) {
                 for (int j = 0; j < matrix[i].length - 1; j++) {
                     writer.write(matrix[i][j] + ",");
                 }
                 writer.write(matrix[i][matrix[i].length-1] + "\n");
             }
+            writer.close();
             
         } catch (Exception e) {
             System.out.println("Error writing " + filename + " to file");
