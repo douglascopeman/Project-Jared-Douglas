@@ -27,10 +27,8 @@ class PerturbationPlot():
             
         self.axis_labels = np.round(np.arange((-self.p*self.delta), (self.p*self.delta+(self.delta*0.5)), self.delta), decimals=4)
         self.skip_no_labels = np.size(self.axis_labels)//10
-        self.color_map = ["#FF0000", "#0000FF", "#00FF00", "#FFFF00", "#FF00FF", "#00FFFF"]
-        self.stable_color = "#000000"
         
-        self.color_map_blends = ["blend:#300,#E00", "blend:#030,#0E0", "blend:#003,#00E"]
+        self.color_map_blends = ["blend:#300,#E00", "blend:#030,#0E0", "blend:#003,#00E", "blend:#330,#CC0", "blend:#033,#0CC", "blend:#303,#C0C"]
         self.stable_color_blend = "blend:#FFF,#000" #Scale going other way as big numbers are less stable vs big time being better above
         
     def read_time(self, filename):
