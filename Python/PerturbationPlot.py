@@ -10,6 +10,7 @@ from matplotlib.colors import ListedColormap
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from multipledispatch import dispatch
 import matplotlib.gridspec as gridspec
+from matplotlib.colors import LogNorm, Normalize
 
 
 class PerturbationPlot():
@@ -45,10 +46,11 @@ class PerturbationPlot():
 
         self.df = pd.DataFrame(self.time_matrix, columns=-self.axis_labels, index=self.axis_labels)
 
-        sns.heatmap(self.df.T, xticklabels=self.skip_no_labels, yticklabels=self.skip_no_labels)
+        sns.heatmap(self.df.T, xticklabels=self.skip_no_labels, yticklabels=self.skip_no_labels, norm=LogNorm())
         plt.title("Perturbation Plot")
         plt.xlabel(r"$\Delta x$")
         plt.ylabel(r"$\Delta y$")
+        plt.savefig("plotTime.png", format="png", dpi=2000)
         plt.show()
 
     def read_stop_codes(self, filename):
