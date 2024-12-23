@@ -15,7 +15,7 @@ public class Run{
             SimulationIO.setupDirectories();
             Perturbations perturbations = new Perturbations(bodies, N, dt, clOptionsList);
             if(clOptionsList.contains("peturbEnergies")){
-                perturbations.runMany();
+                perturbations.runEnergyLayers();
             } else {
                 perturbations.run();
             }

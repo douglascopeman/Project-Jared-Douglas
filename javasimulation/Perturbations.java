@@ -81,11 +81,15 @@ public class Perturbations {
         this.energyDelta = energyDelta;
     }
 
+    // public void shiftAngularMomentum(double shiftAngularMomentum){
+    //     double newVelocityMagnatude = Math.sqrt((1.0/3.0) * ((originalEnergy + 5.0/(2.0 * bodies[0].getPosition().norm()))));
+    // }
+
     public void shiftEnergy(double shiftEnergy){
-        originalEnergy =(1+shiftEnergy)*originalEnergy;
-        double newVelocity = Math.sqrt((1.0/3.0) * ((1+shiftEnergy)*originalEnergy + 5.0/(2.0 * bodies[0].getPosition().norm())));
+        //originalEnergy =(1+shiftEnergy)*originalEnergy;
+        double newVelocityMagnatude = Math.sqrt((1.0/3.0) * ((1+shiftEnergy)*originalEnergy + 5.0/(2.0 * bodies[0].getPosition().norm())));
         // Finally, preserve the angular momentum by setting the velocity of body 1 to (-2) times that of bodies 0 and 2
-        bodies[0].setVelocity(bodies[0].getVelocity().normalise().multiply(newVelocity));
+        bodies[0].setVelocity(bodies[0].getVelocity().normalise().multiply(newVelocityMagnatude));
         bodies[2].setVelocity(bodies[0].getVelocity());
         bodies[1].setVelocity(bodies[0].getVelocity().multiply(-2.0));
     }
@@ -227,7 +231,7 @@ public class Perturbations {
 
     }
 
-    public void runMany(){
+    public void runEnergyLayers(){
 
         // Save the perturbation settings
         SimulationIO.write3dPerturbationSettingsToFile(N, delta, energyDelta, halfGridSize, halfGridSizeEnergy);
