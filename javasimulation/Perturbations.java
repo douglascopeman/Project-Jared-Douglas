@@ -132,7 +132,7 @@ public class Perturbations {
 
         // finally, preserve the energy by ensuring the magnitude of body 0's position is correct
         double newMagnitude = -5.0/(2.0 * (originalEnergy - 3.0*Math.pow(bodies[0].getVelocity().norm(),2)));
-
+        
         perturbedBodies[0].setPosition(bodies[0].getPosition().normalise().multiply(newMagnitude));
         perturbedBodies[2].setPosition(perturbedBodies[0].getPosition().negate());
 
@@ -140,7 +140,7 @@ public class Perturbations {
     }
 
     public void run() {
-        ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        ExecutorService executor = Executors.newFixedThreadPool(10);
 
         // Save the perturbation settings
         SimulationIO.writePerturbationSettingsToFile(N, delta, halfGridSize);
@@ -194,15 +194,15 @@ public class Perturbations {
         Vector perturbedCentreOfMass = Calculations.centreOfMass(perturbedBodies);
         Vector perturbedAngularMomentum = Calculations.angularMomentum(perturbedBodies);
 
-        assert Math.abs(perturbedEnergy - originalEnergy) < 1e-10;
-        assert perturbedCentreOfMass.subtract(originalCentreOfMass).norm() < 1e-10;
-        assert perturbedAngularMomentum.subtract(originalAngularMomentum).norm() < 1e-10;
+        assert Math.abs(perturbedEnergy - originalEnergy) < 1e-10 : "Energy assertion failed";
+        assert perturbedCentreOfMass.subtract(originalCentreOfMass).norm() < 1e-10 : "CoM assertion failed";
+        assert perturbedAngularMomentum.subtract(originalAngularMomentum).norm() < 1e-10 : "Angular Momentum assertion failed";
         // #endregion
 
         Simulation simulation = new Simulation(perturbedBodies, N, dt, options);
         simulation.setIntegratorFunction(simulationIntegrator);
         Thread simulationThread = new Thread(simulation);
-
+        
         try {
             simulationThread.start();
             simulationThread.join();
@@ -228,7 +228,6 @@ public class Perturbations {
                 System.out.print("\rRow " + rowIndex + " in [-" + halfGridSize + "," + halfGridSize + "]          ");
             }
         }
-
     }
 
     public void runEnergyLayers(){
