@@ -46,7 +46,7 @@ class PerturbationPlot():
 
         self.df = pd.DataFrame(self.time_matrix, columns=-self.axis_labels, index=self.axis_labels)
 
-        sns.heatmap(self.df.T, xticklabels=self.skip_no_labels, yticklabels=self.skip_no_labels, norm=LogNorm())
+        sns.heatmap(self.df.T,  norm=LogNorm())
         plt.title("Perturbation Plot")
         plt.xlabel(r"$\Delta x$")
         plt.ylabel(r"$\Delta y$")
