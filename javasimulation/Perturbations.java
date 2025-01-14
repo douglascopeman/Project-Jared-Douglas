@@ -106,11 +106,11 @@ public class Perturbations {
         // Find the magnatude of the new velocity for Body 1
         double temp1 = perturbedBodies[0].getPosition().norm();
         double temp2 = Math.sin(theta);
-        double temp3 = (-3 * Math.pow(L,2)) + (30 * temp1 * Math.pow(temp2, 2)) + (12 * Math.pow(temp1, 2) * Math.pow(temp2, 2) * originalEnergy);
-        if (temp3 < 0){
+        double temp3 = (-3.0 * Math.pow(L,2.0)) + (30.0 * temp1 * Math.pow(temp2, 2.0)) + (12.0 * Math.pow(temp1, 2.0) * Math.pow(temp2, 2.0) * originalEnergy);
+        if (temp3 < 0) {
             return null;
         }
-        double velMagnatudeOne = ((3 * L) + Math.sqrt(temp3)) / (6 * temp1 * temp2);
+        double velMagnatudeOne = ((3.0 * L) + Math.sqrt(temp3)) / (6.0 * temp1 * temp2);
 
         // Magnatude of the new velocity for Body 3
         double velMagnatudeThree = velMagnatudeOne - (L / (temp1 * temp2));
@@ -118,10 +118,10 @@ public class Perturbations {
         // Update Velocities
         perturbedBodies[0].setVelocity(bodies[0].getVelocity().normalise().multiply(velMagnatudeOne));
         perturbedBodies[2].setVelocity(bodies[2].getVelocity().normalise().multiply(velMagnatudeThree));
-        perturbedBodies[1].setVelocity(perturbedBodies[0].getVelocity().negate().subtract(perturbedBodies[2].getVelocity().negate()));
+        perturbedBodies[1].setVelocity(perturbedBodies[0].getVelocity().negate().subtract(perturbedBodies[2].getVelocity()));
         
-        System.out.println(Calculations.angularMomentum(bodies));
-        System.out.println(Calculations.angularMomentum(perturbedBodies));
+        System.out.println(originalEnergy);
+        System.out.println(Calculations.totalEnergy(perturbedBodies, 1));
 
         return perturbedBodies;
     }
