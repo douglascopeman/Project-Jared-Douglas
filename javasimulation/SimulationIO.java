@@ -229,7 +229,7 @@ public class SimulationIO {
     }
 
     public static void writePerturbationSettingsToFile(int N, double delta, int halfGridSize) {
-        try(FileWriter writer = new FileWriter("Outputs\\perturbationSettings.csv")){
+        try(FileWriter writer = new FileWriter("Outputs/perturbationSettings.csv")){
             writer.append(N + "," + delta + "," + halfGridSize);
             writer.append("\n");
         } catch (FileNotFoundException e) {
@@ -266,7 +266,7 @@ public class SimulationIO {
     }
 
     public static void saveMatrix(String filename, int[][] matrix) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("Outputs\\"+ filename +".csv"))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("Outputs/"+ filename +".csv"))) {
             for (int i = 0; i < matrix.length; i++) {
                 for (int j = 0; j < matrix[i].length - 1; j++) {
                     writer.write(matrix[i][j] + ",");
@@ -281,7 +281,7 @@ public class SimulationIO {
     }
 
     public static void saveMatrix(String filename, boolean[][] matrix) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("Outputs\\"+ filename +".csv"))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("Outputs/"+ filename +".csv"))) {
             for (int i = 0; i < matrix.length; i++) {
                 for (int j = 0; j < matrix[i].length - 1; j++) {
                     writer.write(matrix[i][j] + ",");
@@ -296,7 +296,7 @@ public class SimulationIO {
     }
 
     public static void saveMatrix(String filename, double[][] matrix) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("Outputs\\"+ filename +".csv"))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("Outputs/"+ filename +".csv"))) {
             for (int i = 0; i < matrix.length; i++) {
                 for (int j = 0; j < matrix[i].length - 1; j++) {
                     writer.write(matrix[i][j] + ",");
@@ -311,7 +311,7 @@ public class SimulationIO {
     }
 
     public static void saveMatrix(String filename, char[][] matrix) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("Outputs\\"+ filename +".csv"))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("Outputs/"+ filename +".csv"))) {
             for (int i = 0; i < matrix.length; i++) {
                 for (int j = 0; j < matrix[i].length - 1; j++) {
                     writer.write(matrix[i][j] + ",");
