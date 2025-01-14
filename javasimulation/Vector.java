@@ -108,6 +108,10 @@ public class Vector {
         return new Vector(a.x, a.y, a.z);
     }
 
+    public double angle(Vector other){
+        return Math.acos(dot(this.normalise(), other.normalise()));
+    }
+
     @Override
     public String toString() {     
         return "(" + this.x + ", " + this.y + ", " + this.z + ")";
