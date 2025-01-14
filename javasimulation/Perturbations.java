@@ -81,9 +81,19 @@ public class Perturbations {
         this.energyDelta = energyDelta;
     }
 
-    // public void shiftAngularMomentum(double shiftAngularMomentum){
-    //     double newVelocityMagnatude = Math.sqrt((1.0/3.0) * ((originalEnergy + 5.0/(2.0 * bodies[0].getPosition().norm()))));
-    // }
+    public void shiftAngularMomentum(int k, double shiftAngularMomentumDelta, int i, int j, double delta){
+        double theta = bodies[0].getPosition().angle(bodies[0].getVelocity().subtract(bodies[2].getVelocity()));
+
+        Body[] perturbedBodies = perturbPositions(i, j, delta);
+
+        double shiftInAngularMomentum = k*shiftAngularMomentumDelta;
+        double d = perturbedBodies[0].getVelocity().norm();
+        double d_prime = 
+        perturbedBodies[0].setVelocity((3*shiftInAngularMomentum + Math.sqrt()));
+
+
+        double newVelocityMagnatude = Math.sqrt((1.0/3.0) * ((originalEnergy + 5.0/(2.0 * bodies[0].getPosition().norm()))));
+    }
 
     public void shiftEnergy(double shiftEnergy){
         //originalEnergy =(1+shiftEnergy)*originalEnergy;
@@ -241,7 +251,7 @@ public class Perturbations {
 
         // The loop for the parent pertubation
         for(int k = -halfGridSizeEnergy; k <= halfGridSizeEnergy; k++){
-            ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+            ExecutorService executor = Executors.newFixedThreadPool(10);
 
             // Ensuring the bodies and energy is set back to the original before proceeding
             System.out.println(k);
