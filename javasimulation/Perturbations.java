@@ -119,9 +119,6 @@ public class Perturbations {
         perturbedBodies[0].setVelocity(bodies[0].getVelocity().normalise().multiply(velMagnatudeOne));
         perturbedBodies[2].setVelocity(bodies[2].getVelocity().normalise().multiply(velMagnatudeThree));
         perturbedBodies[1].setVelocity(perturbedBodies[0].getVelocity().negate().subtract(perturbedBodies[2].getVelocity()));
-        
-        System.out.println(originalEnergy);
-        System.out.println(Calculations.totalEnergy(perturbedBodies, 1));
 
         return perturbedBodies;
     }
@@ -335,7 +332,6 @@ public class Perturbations {
 
         for(int k = 0; k <= angularMomentumGridSize; k++){
             ExecutorService executor = Executors.newFixedThreadPool(10);
-            System.out.println(k);
 
             System.err.println(angularMomentumGridSize);
 
@@ -358,8 +354,8 @@ public class Perturbations {
             }
 
             // Saving the child pertubation csv's with the relevent energy stamp
-            SimulationIO.saveMatrix("timeMatrix"+k, timeMatrix);
-            SimulationIO.saveMatrix("stopCodeMatrix"+k, stopCodeMatrix);
+            SimulationIO.saveMatrix("timeMatrix"+ (k*angularMomentumDelta), timeMatrix);
+            SimulationIO.saveMatrix("stopCodeMatrix"+(k*angularMomentumDelta), stopCodeMatrix);
         }
         }
     
