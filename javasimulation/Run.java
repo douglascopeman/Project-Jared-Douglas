@@ -19,6 +19,10 @@ public class Run{
             } else {
                 perturbations.run();
             }
+        } else if (clOptionsList.contains("--perturbAngularMomentum")) {
+            SimulationIO.setupDirectories();
+            Perturbations perturbations = new Perturbations(bodies, N, dt, clOptionsList);
+            perturbations.runAngularMomentum();
         } else {
             Simulation simulation = new Simulation(bodies, N, dt, clOptionsList);
             simulation.run();

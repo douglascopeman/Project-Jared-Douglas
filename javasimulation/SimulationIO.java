@@ -80,6 +80,12 @@ public class SimulationIO {
                     break;
                 default:
             }
+            if (option.equals("perturbAngularMomentum")){
+                int angularMomentumIndex = clOptions.indexOf("perturbAngularMomentum");
+                double angularMomentumDelta = Double.parseDouble(clOptions.get(angularMomentumIndex + 2));
+                int angularMomentumGridSize = Integer.parseInt(clOptions.get(angularMomentumIndex + 1));
+                perturbations.setAngularMomentumShift(angularMomentumGridSize, angularMomentumDelta);
+            }
         }
     }
 
