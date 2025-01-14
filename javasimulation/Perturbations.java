@@ -91,7 +91,7 @@ public class Perturbations {
 
     public Body[] perturbAngularMomentum(int k, double shiftAngularMomentumDelta, int i, int j, double delta){
         // Get the angle between the position vector of body 1 and the difference between the velcotiy vectors of bodies 1 and 3
-        double theta = Math.PI;
+        double theta = bodies[0].getPosition().angle(bodies[0].getVelocity());
 
         Body[] perturbedBodies = Calculations.copyBodies(bodies);
         
@@ -106,21 +106,23 @@ public class Perturbations {
         // Find the magnatude of the new velocity for Body 1
         double temp1 = perturbedBodies[0].getPosition().norm();
         double temp2 = Math.sin(theta);
-        double temp3 = -3 * Math.pow(L,2) + 30 * temp1 * Math.pow(temp2, 2) + 12 * Math.pow(temp1, 2) * Math.pow(temp2, 2);
+        double temp3 = (-3 * Math.pow(L,2)) + (30 * temp1 * Math.pow(temp2, 2)) + (12 * Math.pow(temp1, 2) * Math.pow(temp2, 2) * originalEnergy);
         if (temp3 < 0){
             return null;
         }
-        double velMagnatudeOne = (3 * L + Math.sqrt(temp3)) / (6 * temp1 * temp2);
+        double velMagnatudeOne = ((3 * L) + Math.sqrt(temp3)) / (6 * temp1 * temp2);
 
         // Magnatude of the new velocity for Body 3
-        double velMagnatudeThree = velMagnatudeOne - L / (temp1 * temp2);
+        double velMagnatudeThree = velMagnatudeOne - (L / (temp1 * temp2));
 
         // Update Velocities
         perturbedBodies[0].setVelocity(bodies[0].getVelocity().normalise().multiply(velMagnatudeOne));
         perturbedBodies[2].setVelocity(bodies[2].getVelocity().normalise().multiply(velMagnatudeThree));
         perturbedBodies[1].setVelocity(perturbedBodies[0].getVelocity().negate().subtract(perturbedBodies[2].getVelocity().negate()));
         
-        System.err.println(L);
+        System.out.println(Calculations.angularMomentum(bodies));
+        System.out.println(Calculations.angularMomentum(perturbedBodies));
+
         return perturbedBodies;
     }
 
@@ -337,7 +339,7 @@ public class Perturbations {
 
             System.err.println(angularMomentumGridSize);
 
-            this.angularMomentumDelta = k;
+            this.angularMomentumIndex = k;
 
             // Iterate over the grid of perturbations
             for (int i = -halfGridSize; i <= halfGridSize; i++) {
