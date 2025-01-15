@@ -18,7 +18,7 @@ public class Perturbations {
     private double delta;
     private double energyDelta = 0.01;
     private double angularMomentumDelta = 0.01;
-    private int angularMomentumGridSize = 0;
+    private int halfGridSizeAngularMomentum = 0;
     private int angularMomentumIndex = 0;
     private int halfGridSizeEnergy = 1;
 
@@ -84,9 +84,9 @@ public class Perturbations {
         this.energyDelta = energyDelta;
     }
 
-    public void setAngularMomentumShift(int angularMomentumGridSize, double angularMomentumDelta) {
+    public void setAngularMomentumShift(int halfGridSizeAngularMomentum, double angularMomentumDelta) {
         this.angularMomentumDelta = angularMomentumDelta;
-        this.angularMomentumGridSize = angularMomentumGridSize;
+        this.halfGridSizeAngularMomentum = halfGridSizeAngularMomentum;
     }
 
     public Body[] perturbAngularMomentum(int k, double shiftAngularMomentumDelta, int i, int j, double delta){
@@ -328,12 +328,10 @@ public class Perturbations {
 
     public void runAngularMomentum(){
         // Save the perturbation settings
-        SimulationIO.write3dPerturbationSettingsToFile(N, delta, energyDelta, halfGridSize, halfGridSizeEnergy);
+        SimulationIO.write3dPerturbationSettingsToFile(N, delta, energyDelta, halfGridSize, halfGridSizeAngularMomentum);
 
-        for(int k = 0; k <= angularMomentumGridSize; k++){
+        for(int k = 0; k <= halfGridSizeAngularMomentum; k++){
             ExecutorService executor = Executors.newFixedThreadPool(10);
-
-            System.err.println(angularMomentumGridSize);
 
             this.angularMomentumIndex = k;
 
@@ -356,6 +354,10 @@ public class Perturbations {
             // Saving the child pertubation csv's with the relevent energy stamp
             SimulationIO.saveMatrix("timeMatrix"+ (k*angularMomentumDelta), timeMatrix);
             SimulationIO.saveMatrix("stopCodeMatrix"+(k*angularMomentumDelta), stopCodeMatrix);
+            if (options.get("calculateShapeSpace")) {
+                SimulationIO.saveMatrix("stabilityMatrix"+(k*angularMomentumDelta), stabilityMatrix);
+            }
+            
         }
         }
     
