@@ -328,7 +328,7 @@ public class Perturbations {
 
     public void runAngularMomentum(){
         // Save the perturbation settings
-        SimulationIO.write3dPerturbationSettingsToFile(N, delta, energyDelta, halfGridSize, halfGridSizeAngularMomentum);
+        SimulationIO.write3dPerturbationSettingsToFile(N, delta, angularMomentumDelta, halfGridSize, halfGridSizeAngularMomentum);
 
         for(int k = 0; k <= halfGridSizeAngularMomentum; k++){
             ExecutorService executor = Executors.newFixedThreadPool(10);
