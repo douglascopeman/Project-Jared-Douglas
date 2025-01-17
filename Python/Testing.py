@@ -63,7 +63,7 @@ import time
 
 
 
-perturbation_plot = PerturbationPlot.PerturbationPlot("javasimulation\\Outputs")
+#perturbation_plot = PerturbationPlot.PerturbationPlot("javasimulation\\Outputs")
 
 
 # perturbation_plot.plot_time("timeMatrix")
@@ -75,5 +75,5 @@ perturbation_plot = PerturbationPlot.PerturbationPlot("javasimulation\\Outputs")
 # perturbation_plot.plot_stop_codes_gradient("timeMatrix", "stopCodeMatrix", "stabilityMatrix")
 
 
-pertubation_3dplot = ThreeDimensionalPerturbationPlot.ThreeDimensionalPerturbationPlot("C:\\Users\\Douglas\\OneDrive - University of Edinburgh\\Uni\\Project-Jared-Douglas\\PaperTrail\\Pertubations\MathsServers\\40x40x40 AngularMomentum 1h")
-pertubation_3dplot.scatter_plot("X")
+pertubation_3dplot = ThreeDimensionalPerturbationPlot.ThreeDimensionalPerturbationPlot("C:\\Users\\Douglas\\Downloads\\Outputs")
+pertubation_3dplot.animate()

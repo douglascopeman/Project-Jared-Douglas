@@ -8,6 +8,7 @@ import seaborn as sns
 import pandas as pd
 from matplotlib.colors import ListedColormap
 from matplotlib.animation import FuncAnimation
+from matplotlib.colors import LogNorm, Normalize
 
 
 class ThreeDimensionalPerturbationPlot():
@@ -18,7 +19,7 @@ class ThreeDimensionalPerturbationPlot():
     def read_data(self):
 
         # Reading the settings file
-        with open(os.path.join(self.output_directory, "perturbationSettings.csv"), 'r') as f:
+        with open(os.path.join(self.output_directory, "3dperturbationSettings.csv"), 'r') as f:
             data = np.loadtxt(f, delimiter=',')
             self.N = int(data[0])
             self.delta_axis1 = float(data[1])
@@ -35,11 +36,11 @@ class ThreeDimensionalPerturbationPlot():
 
         for i in range(self.p_axis2):
              # Reading the timeMatrix
-            with open(os.path.join(self.output_directory, "timeMatrix" + str(np.round(i*self.delta_axis2,4)) + ".csv"), 'r') as f:
+            with open(os.path.join(self.output_directory, "timeMatrix" + str(i*self.delta_axis2) + ".csv"), 'r') as f:
                 data = np.loadtxt(f, delimiter=",", dtype=int)
                 self.time_matrix[:,:,i] = data
             # Reading the stopCodeMatrix
-            with open(os.path.join(self.output_directory, "stopCodeMatrix" + str(np.round(i*self.delta_axis2,4)) + ".csv"), 'r') as f:
+            with open(os.path.join(self.output_directory, "stopCodeMatrix" + str(i*self.delta_axis2) + ".csv"), 'r') as f:
                 data = np.loadtxt(f, delimiter=",", dtype=str)
                 self.stop_code_matrix[:,:,i] = data
 
@@ -56,17 +57,17 @@ class ThreeDimensionalPerturbationPlot():
 
         skip_no_labels = np.size(axis_labels)//10  # To declutter the axis labeling we only show 10 labels
 
-        heatmap = sns.heatmap(self.time_matrix[:,:,0].T, cbar=True,xticklabels=skip_no_labels, yticklabels=skip_no_labels, ax=ax, vmin=self.time_matrix.min(), vmax=self.time_matrix.max())
+        heatmap = sns.heatmap(self.time_matrix[:,:,0].T, cbar=True,xticklabels=skip_no_labels, yticklabels=skip_no_labels, ax=ax, vmin=self.time_matrix.min(), vmax=self.time_matrix.max(),  norm=LogNorm())
         
         def update(frame):
             """Update function for animation."""
             ax.clear()
             df = pd.DataFrame(self.time_matrix[:, :, frame].T, columns=axis_labels, index=-axis_labels)
-            sns.heatmap(df, cbar=False, xticklabels=skip_no_labels, yticklabels=skip_no_labels, ax=ax, vmin=self.time_matrix.min(), vmax=self.time_matrix.max())
+            sns.heatmap(df, cbar=False, xticklabels=skip_no_labels, yticklabels=skip_no_labels, ax=ax, vmin=self.time_matrix.min(), vmax=self.time_matrix.max(), norm=LogNorm())
     
 
         # Create the animation
-        ani = FuncAnimation(fig, update, frames=self.p_axis2, interval=500)
+        ani = FuncAnimation(fig, update, frames=self.p_axis2, interval=100)
 
         # Save the animation to a file or display it
         ani.save('heatmap_animation.gif', writer='ffmpeg')
