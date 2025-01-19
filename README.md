@@ -56,7 +56,7 @@ Additionally, the following flags can be included:
 Note that `--checkStopConditions` and `--skipSaveToCSV` are assumed for all perturbations.
 
 
-The Plotting code is entirely done in Python and some (rather rough) examples of the plotting is given in `Testing.py`
+The Plotting code is entirely done in Python and some examples of the plotting code is given in `plot_simulation.py` and `plot_perturbation.py`
 
 
 
