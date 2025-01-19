@@ -13,7 +13,7 @@ public class Simulation implements Runnable {
     private IntegratorFunction integratorFunction;
     private double[][][] simulation;
     private static final int shapeSpaceSize = 1000;
-    private int[][] shapeSpace = new int[shapeSpaceSize][shapeSpaceSize];
+    private int[][] shapeSpace = new int[shapeSpaceSize][shapeSpaceSize]; 
 
     private HashMap<String, Boolean> options = new HashMap<String, Boolean>();
 
@@ -327,6 +327,7 @@ public class Simulation implements Runnable {
         double q_1 = r_12 / (r_12 + r_13 + r_23);
         double q_2 = r_23 / (r_12 + r_13 + r_23);
 
+        //The below needs fixed to make use of the entire shape space. Double the coordinates in each direction!
         int x = (int) Math.round(q_1 * shapeSpace.length);
         int y = (int) Math.round(q_2 * shapeSpace[0].length);
         return new int[] {x, y};
