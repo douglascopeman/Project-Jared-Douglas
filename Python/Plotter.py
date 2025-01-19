@@ -352,9 +352,3 @@ class Plotter():
         plt.title("Simulation Shape Space")
         plt.show()
         
-
-        
-        
-        
-if __name__ == "__main__":
-    import Testing

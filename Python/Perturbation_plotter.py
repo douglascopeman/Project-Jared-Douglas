@@ -13,13 +13,12 @@ import matplotlib.gridspec as gridspec
 from matplotlib.colors import LogNorm, Normalize
 
 
-class PerturbationPlot():
+class Perturbation_plotter():
 
     def __init__(self, output_directory):
         self.output_directory = os.path.join(os.getcwd(), output_directory)
         self.settingsFilepath = os.path.join(self.output_directory, "perturbationSettings.csv")
 
-        
         with open(self.settingsFilepath, 'r') as f:
             data = np.loadtxt(f, delimiter=",")
             self.N = int(data[0])
@@ -73,22 +72,21 @@ class PerturbationPlot():
         categories = sorted(df.stack().unique().tolist())
         category_map = {cat: str(i) for i, cat in enumerate(categories)}
         df = df.replace(category_map).astype(int)
-        if len(self.color_map) < len(categories) - 1:
-            raise ValueError("Not enough colours in custom colour map")
-        cmap = ListedColormap(self.color_map[:len(categories) - 1] + [self.stable_color])
+        # Define the color palette
+        palette = sns.color_palette("husl", len(categories))
 
-        
         # Plot the heatmap
         plt.figure(figsize=(10, 8))
-        sns.heatmap(df, cmap=cmap, annot=False, fmt="s", square=True, cbar=False, xticklabels=self.skip_no_labels, yticklabels=self.skip_no_labels)
+        sns.heatmap(df, cmap=ListedColormap(palette), annot=False, fmt="s", square=True, cbar=False, xticklabels=self.skip_no_labels, yticklabels=self.skip_no_labels)
         
-        patches = [plt.plot([], [], marker="s", ms=10, ls="", c=cmap.colors[i])[0] for i in range(len(categories))]
+        patches = [plt.plot([], [], marker="s", ms=10, ls="", c=palette[i])[0] for i in range(len(categories))]
         plt.legend(patches, categories, loc="upper left", title="Categories", ncol=3, prop={'size': 8})
         
         #plt.title("Category Heatmap")
         plt.xlabel(r"$\Delta x$")
         plt.ylabel(r"$\Delta y$")
-        plt.show()
+        plt.savefig("plotStopCode.png", format="png", dpi=1000, bbox_inches='tight', pad_inches=0.2)     
+        # plt.show()
         
     def read_stability(self, filename):
         with open(os.path.join(self.output_directory, filename + ".csv"), 'r') as f:
@@ -106,6 +104,9 @@ class PerturbationPlot():
         
         df = pd.DataFrame(self.stability_matrix.T, columns=self.axis_labels, index=-self.axis_labels)
         
+        # Replace all zero values with the largest number in the dataframe as they are not stable
+        df.replace(0, df.max().max() + 1, inplace=True)
+        
         sns.heatmap(df, cmap="Greys", annot=False, fmt="s", square=True, cbar=False, xticklabels=self.skip_no_labels, yticklabels=self.skip_no_labels)
         
         norm = plt.Normalize(vmin=self.stability_matrix.min(), vmax=self.stability_matrix.max())
@@ -118,7 +119,11 @@ class PerturbationPlot():
         #plt.title("Stability Heatmap")
         plt.xlabel(r"$\Delta x$")
         plt.ylabel(r"$\Delta y$")
-        plt.show()
+        plt.savefig("plotStability.png", format="png", dpi=1000, bbox_inches='tight', pad_inches=0.2)     
+        # plt.show()
+
+
+    # TODO: The following two functions could use a lot of cleanup for duplicate code
 
     @dispatch(str, str)
     def plot_stop_codes_gradient(self, time_filename, stop_filename):
@@ -140,18 +145,23 @@ class PerturbationPlot():
         df_stop = df_stop.replace(category_map).astype(int)
         
         #normalise the two numeric matrices
-        norm_time = plt.Normalize(vmin=self.time_matrix.min(), vmax=self.time_matrix.max())
+        norm_time = LogNorm(vmin=self.time_matrix.min()+1, vmax=self.time_matrix.max())
         
         for i in range(len(categories) - 1):
+            if i == 0: 
+                cmap_time = sns.color_palette("mako", as_cmap=True)
+            elif i == 1: 
+                cmap_time = sns.color_palette("rocket", as_cmap=True)
+            else:
+                cmap_time = sns.color_palette(self.color_map_blends[i], as_cmap=True)
+            
             df_time_mask = df_time.where(df_stop == i)
-            cmap_time = sns.color_palette(self.color_map_blends[i], as_cmap=True)
             heatmap = sns.heatmap(df_time_mask, cmap=cmap_time, norm=norm_time, fmt="s", cbar=False, ax=ax, square=True, xticklabels=self.skip_no_labels, yticklabels=self.skip_no_labels)
             
         
         divider = make_axes_locatable(ax)
 
         # Time colorbars
-        norm = plt.Normalize(vmin=self.time_matrix.min(), vmax=self.time_matrix.max()) #find the range of values
         #then iterate through all categories other than completion and create a colorbar for each
         bars_made = 0
         colors_used = 0
@@ -159,12 +169,12 @@ class PerturbationPlot():
             if (categories[i] == "X"): continue
             #set the colourmap correctly
             if colors_used == 0:
-                cmap_time = sns.color_palette("rocket", as_cmap=True)
-            elif colors_used == 1:
                 cmap_time = sns.color_palette("mako", as_cmap=True)
+            elif colors_used == 1:
+                cmap_time = sns.color_palette("rocket", as_cmap=True)
             else:
                 cmap_time = sns.color_palette(self.color_map_blends[colors_used], as_cmap=True)
-            sm_time = plt.cm.ScalarMappable(cmap=cmap_time, norm=norm)
+            sm_time = plt.cm.ScalarMappable(cmap=cmap_time, norm=norm_time)
             colors_used += 1
             sm_time.set_array([])
             #create the colorbar and place it in the right space
@@ -184,7 +194,7 @@ class PerturbationPlot():
         plt.xlabel(r"$\Delta x$")
         plt.ylabel(r"$\Delta y$")
 
-        plt.savefig("stopCodeGrad.png", format="png", dpi=1000, bbox_inches='tight', pad_inches=0.2)
+        plt.savefig("plotStopCodeGrad.png", format="png", dpi=1000, bbox_inches='tight', pad_inches=0.2)
         #plt.show()
         
     @dispatch(str, str, str)
@@ -270,7 +280,7 @@ class PerturbationPlot():
         ax.yaxis.set_tick_params(rotation=0)
         ax.set_ylabel(r"$\Delta y$")
         ax.set_xlabel(r"$\Delta x$")
-        plt.savefig("stopCodeGrad.png", format="png", dpi=1000, bbox_inches='tight', pad_inches=0.2)     
+        plt.savefig("plotStopCodeStabGrad.png", format="png", dpi=1000, bbox_inches='tight', pad_inches=0.2)     
         #plt.show()
 
     def count_stop_matrix(self, stop_filename):
