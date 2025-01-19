@@ -25,7 +25,8 @@ $javaArgs += $remainingArgs
 
 try {
         Set-Location .\javasimulation
-        javac -source 11 -target 11 .\*.java -d .\
+        # javac -source 11 -target 11 .\*.java -d .\
+        javac --release 11 .\*.java -d .\
         $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
                 java -cp . javasimulation/Run $javaArgs
         $stopwatch.Stop()
