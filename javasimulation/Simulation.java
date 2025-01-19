@@ -66,7 +66,7 @@ public class Simulation implements Runnable {
     public Simulation(Body[] bodies, int N, double dt, HashMap<String, Boolean> customOptions) {
         this(bodies, N, dt);
         this.options.putAll(customOptions);
-        isPerturbed = options.get("perturbPositions") || options.get("perturbVelocities");
+        isPerturbed = options.get("perturbPositions") || options.get("perturbVelocities") || options.get("perturbAngularMomentum");
     }
 
     // #region Getters and Setters

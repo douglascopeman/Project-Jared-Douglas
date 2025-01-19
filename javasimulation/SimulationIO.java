@@ -80,6 +80,12 @@ public class SimulationIO {
                     break;
                 default:
             }
+            if (option.equals("perturbAngularMomentum")){
+                int angularMomentumIndex = clOptions.indexOf("perturbAngularMomentum");
+                double angularMomentumDelta = Double.parseDouble(clOptions.get(angularMomentumIndex + 2));
+                int halfGridSizeAngularMomentum = Integer.parseInt(clOptions.get(angularMomentumIndex + 1));
+                perturbations.setAngularMomentumShift(halfGridSizeAngularMomentum, angularMomentumDelta);
+            }
         }
     }
 
@@ -124,7 +130,7 @@ public class SimulationIO {
 
     public static void writeBodiesToFiles(double[][][] simulation, int N, int n) {
         for (int p = 0; p < n; p++) {
-            try (FileWriter writer = new FileWriter("Outputs\\output" + p + ".csv")) {
+            try (FileWriter writer = new FileWriter("Outputs/output" + p + ".csv")) {
                 StringBuilder sb = new StringBuilder();
                 for (int i = 0; i < N; i++) {
                     sb.append(simulation[i][0][p])
@@ -153,10 +159,10 @@ public class SimulationIO {
         String fileName = "";
         switch (calculationType) {
             case POTENTIAL_ENERGY:
-                fileName = "Outputs\\potentialEnergy.csv";
+                fileName = "Outputs/potentialEnergy.csv";
                 break;
             case KINETIC_ENERGY:
-                fileName = "Outputs\\kineticEnergy.csv";
+                fileName = "Outputs/kineticEnergy.csv";
                 break;
             default:
                 break;
@@ -182,13 +188,13 @@ public class SimulationIO {
         String fileName = "";
         switch (calculationType) {
             case CENTRE_OF_MASS:
-                fileName = "Outputs\\centreOfMass.csv";
+                fileName = "Outputs/centreOfMass.csv";
                 break;
             case ANGULAR_MOMENTUM:
-                fileName = "Outputs\\angularMomentum.csv";
+                fileName = "Outputs/angularMomentum.csv";
                 break;
             case LINEAR_MOMENTUM:
-                fileName = "Outputs\\linearMomentum.csv";
+                fileName = "Outputs/linearMomentum.csv";
                 break;
             default:
                 break;
@@ -215,7 +221,7 @@ public class SimulationIO {
     }
 
     public static void writeSettingsToFile(int N, double dt, int n, double G, boolean findOrbitLength, double orbitLength) {
-        try(FileWriter writer = new FileWriter("Outputs\\simulationSettings.csv")){
+        try(FileWriter writer = new FileWriter("Outputs/simulationSettings.csv")){
             writer.append(N + "," + dt + "," + n + "," + G);
             if (findOrbitLength) {
                 writer.append("," + orbitLength);
@@ -229,7 +235,7 @@ public class SimulationIO {
     }
 
     public static void writePerturbationSettingsToFile(int N, double delta, int halfGridSize) {
-        try(FileWriter writer = new FileWriter("Outputs\\perturbationSettings.csv")){
+        try(FileWriter writer = new FileWriter("Outputs/perturbationSettings.csv")){
             writer.append(N + "," + delta + "," + halfGridSize);
             writer.append("\n");
         } catch (FileNotFoundException e) {
@@ -240,7 +246,7 @@ public class SimulationIO {
     }
     
     public static void write3dPerturbationSettingsToFile(int N, double deltaAxis1, double deltaAxis2, int halfGridSizeAxis1, int halfGridSizeAxis2) {
-        try(FileWriter writer = new FileWriter("Outputs\\perturbationSettings.csv")){
+        try(FileWriter writer = new FileWriter("Outputs/3dperturbationSettings.csv")){
             writer.append(N + "," + deltaAxis1 + "," + deltaAxis2 + "," + halfGridSizeAxis1 + "," + halfGridSizeAxis2);
             writer.append("\n");
         } catch (FileNotFoundException e) {
@@ -266,7 +272,7 @@ public class SimulationIO {
     }
 
     public static void saveMatrix(String filename, int[][] matrix) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("Outputs\\"+ filename +".csv"))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("Outputs/"+ filename +".csv"))) {
             for (int i = 0; i < matrix.length; i++) {
                 for (int j = 0; j < matrix[i].length - 1; j++) {
                     writer.write(matrix[i][j] + ",");
@@ -281,7 +287,7 @@ public class SimulationIO {
     }
 
     public static void saveMatrix(String filename, boolean[][] matrix) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("Outputs\\"+ filename +".csv"))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("Outputs/"+ filename +".csv"))) {
             for (int i = 0; i < matrix.length; i++) {
                 for (int j = 0; j < matrix[i].length - 1; j++) {
                     writer.write(matrix[i][j] + ",");
@@ -296,7 +302,7 @@ public class SimulationIO {
     }
 
     public static void saveMatrix(String filename, double[][] matrix) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("Outputs\\"+ filename +".csv"))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("Outputs/"+ filename +".csv"))) {
             for (int i = 0; i < matrix.length; i++) {
                 for (int j = 0; j < matrix[i].length - 1; j++) {
                     writer.write(matrix[i][j] + ",");
@@ -311,7 +317,7 @@ public class SimulationIO {
     }
 
     public static void saveMatrix(String filename, char[][] matrix) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("Outputs\\"+ filename +".csv"))) {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("Outputs/"+ filename +".csv"))) {
             for (int i = 0; i < matrix.length; i++) {
                 for (int j = 0; j < matrix[i].length - 1; j++) {
                     writer.write(matrix[i][j] + ",");

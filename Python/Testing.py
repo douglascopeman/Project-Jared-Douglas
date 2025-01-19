@@ -66,7 +66,7 @@ plotter.plot()
 # perturbation_plot = PerturbationPlot.PerturbationPlot("javasimulation\\Outputs")
 
 
-# perturbation_plot.plot_time("timeMatrix")
+#perturbation_plot.plot_time("timeMatrix")
 # perturbation_plot.plot_stop_codes("stopCodeMatrix")
 # perturbation_plot.count_stop_matrix("stopCodeMatrix")
 # perturbation_plot.plot_stability("stabilityMatrix")
@@ -75,5 +75,5 @@ plotter.plot()
 # perturbation_plot.plot_stop_codes_gradient("timeMatrix", "stopCodeMatrix", "stabilityMatrix")
 
 
-# pertubation_3dplot = ThreeDimensionalPerturbationPlot.ThreeDimensionalPerturbationPlot("C:\\Users\\Douglas\\OneDrive - University of Edinburgh\\Uni\\Project-Jared-Douglas\\PaperTrail\\Pertubations\\Energy Layers\\First Energy Cube")
-# pertubation_3dplot.scatter_plot("D")
+# pertubation_3dplot = ThreeDimensionalPerturbationPlot.ThreeDimensionalPerturbationPlot("C:\\Users\\Douglas\\Downloads\\Outputs")
+# pertubation_3dplot.animate()

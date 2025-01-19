@@ -17,6 +17,9 @@ public class Perturbations {
     private int gridSize;
     private double delta;
     private double energyDelta = 0.01;
+    private double angularMomentumDelta = 0.01;
+    private int halfGridSizeAngularMomentum = 0;
+    private int angularMomentumIndex = 0;
     private int halfGridSizeEnergy = 1;
 
     private HashMap<String, Boolean> options = new HashMap<String, Boolean>();
@@ -81,9 +84,44 @@ public class Perturbations {
         this.energyDelta = energyDelta;
     }
 
-    // public void shiftAngularMomentum(double shiftAngularMomentum){
-    //     double newVelocityMagnatude = Math.sqrt((1.0/3.0) * ((originalEnergy + 5.0/(2.0 * bodies[0].getPosition().norm()))));
-    // }
+    public void setAngularMomentumShift(int halfGridSizeAngularMomentum, double angularMomentumDelta) {
+        this.angularMomentumDelta = angularMomentumDelta;
+        this.halfGridSizeAngularMomentum = halfGridSizeAngularMomentum;
+    }
+
+    public Body[] perturbAngularMomentum(int k, double shiftAngularMomentumDelta, int i, int j, double delta){
+        // Get the angle between the position vector of body 1 and the difference between the velcotiy vectors of bodies 1 and 3
+        double theta = bodies[0].getPosition().angle(bodies[0].getVelocity());
+
+        Body[] perturbedBodies = Calculations.copyBodies(bodies);
+        
+        // Perturb Body 1 and adjust Body 3 accordingly, Body 2 remains in position
+        Vector perturbedPosition = Vector.add(bodies[0].getPosition(), new Vector(i * delta, j * delta, 0));
+        perturbedBodies[0].setPosition(perturbedPosition);
+        perturbedBodies[2].setPosition(perturbedPosition.negate());
+
+        // Magnatude shift of Angular Momentum
+        double L = k*shiftAngularMomentumDelta;
+
+        // Find the magnatude of the new velocity for Body 1
+        double temp1 = perturbedBodies[0].getPosition().norm();
+        double temp2 = Math.sin(theta);
+        double temp3 = (-3.0 * Math.pow(L,2.0)) + (30.0 * temp1 * Math.pow(temp2, 2.0)) + (12.0 * Math.pow(temp1, 2.0) * Math.pow(temp2, 2.0) * originalEnergy);
+        if (temp3 < 0) {
+            return null;
+        }
+        double velMagnatudeOne = ((3.0 * L) + Math.sqrt(temp3)) / (6.0 * temp1 * temp2);
+
+        // Magnatude of the new velocity for Body 3
+        double velMagnatudeThree = velMagnatudeOne - (L / (temp1 * temp2));
+
+        // Update Velocities
+        perturbedBodies[0].setVelocity(bodies[0].getVelocity().normalise().multiply(velMagnatudeOne));
+        perturbedBodies[2].setVelocity(bodies[2].getVelocity().normalise().multiply(velMagnatudeThree));
+        perturbedBodies[1].setVelocity(perturbedBodies[0].getVelocity().negate().subtract(perturbedBodies[2].getVelocity()));
+
+        return perturbedBodies;
+    }
 
     public void shiftEnergy(double shiftEnergy){
         //originalEnergy =(1+shiftEnergy)*originalEnergy;
@@ -186,9 +224,17 @@ public class Perturbations {
             }
         } else if (options.get("perturbVelocities")) {
             perturbedBodies = perturbVelocities(rowIndex, columnIndex, delta);
+        } else if (options.get("perturbAngularMomentum")) {
+            perturbedBodies = perturbAngularMomentum(this.angularMomentumIndex, angularMomentumDelta, rowIndex, columnIndex, delta);
+            if (perturbedBodies == null) {
+                timeMatrix[saveRowIndex][saveColumnIndex] = 0;
+                stopCodeMatrix[saveRowIndex][saveColumnIndex] = 'F';
+                stabilityMatrix[saveRowIndex][saveColumnIndex] = (int) Math.pow(Simulation.getShapeSpaceSize(), 2);
+                return;
+            }
         }
 
-
+        
         // #region Sanity checks to be removed later
         double perturbedEnergy = Calculations.totalEnergy(perturbedBodies, 1);
         Vector perturbedCentreOfMass = Calculations.centreOfMass(perturbedBodies);
@@ -199,10 +245,10 @@ public class Perturbations {
         assert perturbedAngularMomentum.subtract(originalAngularMomentum).norm() < 1e-10 : "Angular Momentum assertion failed";
         // #endregion
 
+        
         Simulation simulation = new Simulation(perturbedBodies, N, dt, options);
         simulation.setIntegratorFunction(simulationIntegrator);
         Thread simulationThread = new Thread(simulation);
-        
         try {
             simulationThread.start();
             simulationThread.join();
@@ -241,7 +287,7 @@ public class Perturbations {
 
         // The loop for the parent pertubation
         for(int k = -halfGridSizeEnergy; k <= halfGridSizeEnergy; k++){
-            ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+            ExecutorService executor = Executors.newFixedThreadPool(10);
 
             // Ensuring the bodies and energy is set back to the original before proceeding
             System.out.println(k);
@@ -280,4 +326,41 @@ public class Perturbations {
         }
     }
 
+    public void runAngularMomentum(){
+        // Save the perturbation settings
+        SimulationIO.write3dPerturbationSettingsToFile(N, delta, angularMomentumDelta, halfGridSize, halfGridSizeAngularMomentum);
+
+        for(int k = 0; k <= halfGridSizeAngularMomentum; k++){
+            ExecutorService executor = Executors.newFixedThreadPool(10);
+
+            this.angularMomentumIndex = k;
+
+            // Iterate over the grid of perturbations
+            for (int i = -halfGridSize; i <= halfGridSize; i++) {
+                for (int j = -halfGridSize; j <= halfGridSize; j++) {
+                    final int rowIndex = i;
+                    final int columnIndex = j;
+                    executor.submit(() -> simulationThread(rowIndex, columnIndex));
+                }
+            }
+            
+            executor.shutdown();
+            try {
+                executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+            } catch (InterruptedException e) {
+                System.err.println("Error in executor.awaitTermination");
+            }
+
+            // Saving the child pertubation csv's with the relevent energy stamp
+            SimulationIO.saveMatrix("timeMatrix"+ (k*angularMomentumDelta), timeMatrix);
+            SimulationIO.saveMatrix("stopCodeMatrix"+(k*angularMomentumDelta), stopCodeMatrix);
+            if (options.get("calculateShapeSpace")) {
+                SimulationIO.saveMatrix("stabilityMatrix"+(k*angularMomentumDelta), stabilityMatrix);
+            }
+            
+        }
+        }
+    
 }
+
+
