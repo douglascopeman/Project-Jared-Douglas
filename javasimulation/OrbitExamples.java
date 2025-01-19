@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 public class OrbitExamples {
 
-    // Remember to ammend HashMap at the end of the file when adding new examples
+    // Remember to amend HashMap at the end of the file when adding new examples
 
     public static Body[] circular = {
         new Body(new Vector(1, 0, 0), new Vector(0, 0.5, 0)), 
@@ -19,6 +19,21 @@ public class OrbitExamples {
     public static Body[] longElliptical = {
         new Body(new Vector(1, 0, 0), new Vector(0, 0.1, 0)), 
         new Body(new Vector(-1, 0, 0), new Vector(0, -0.1, 0))
+    };
+
+    private static double a = 1.11803125;
+    public static Body[] eulerThree = {
+        new Body(new Vector(1, 0, 0), new Vector(0, a, 0)),
+        new Body(new Vector(), new Vector()),
+        new Body(new Vector(-1, 0, 0), new Vector(0, -a, 0))
+    };
+
+
+    private static double b = 1.5197;
+    public static Body[] lagrangeThree = {
+        new Body(new Vector(1, 0, 0), new Vector(0, 0.5 * b, 0)),
+        new Body(new Vector(-0.5, Math.sqrt(3) / 2, 0), new Vector(-Math.sqrt(3) / 4 * b, -0.25 * b, 0)),
+        new Body(new Vector(-0.5, -Math.sqrt(3) / 2, 0), new Vector(Math.sqrt(3) / 4 * b, -0.25 * b, 0))
     };
 
     public static Body[] figureEight = {
@@ -64,6 +79,8 @@ public class OrbitExamples {
         put("circular", OrbitExamples.circular);
         put("elliptical", elliptical);
         put("longElliptical", longElliptical);
+        put("eulerThree", eulerThree);
+        put("lagrangeThree", lagrangeThree);
         put("figureEight", figureEight);
         put("figureEightMoving", figureEightMoving);
         put("figureEightEnergy10PercentMore", figureEightEnergy10PercentMore);
