@@ -2,7 +2,7 @@ import Perturbation_plotter
 import ThreeDimensionalPerturbationPlot
 
 
-perturbation_plot = Perturbation_plotter.Perturbation_plotter("Python\\Outputs")
+perturbation_plot = Perturbation_plotter.Perturbation_plotter("javasimulation\\Outputs")
 
 perturbation_plot.plot_time("timeMatrix")
 # perturbation_plot.plot_stop_codes("stopCodeMatrix")
