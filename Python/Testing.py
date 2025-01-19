@@ -44,26 +44,26 @@ import time
 
 
 
-# plotter = Plotter.Plotter("javasimulation\\Outputs", 
-#                           run_fast=True, 
-#                           plot_centre_of_mass=False, 
-#                           plot_energy=False, 
-#                           plot_energy_error=False, 
-#                           plot_angular_momentum_error = False, 
-#                           plot_linear_momentum_error=False, 
-#                           plot_3D=False,
-#                           x_label="Time",
-#                           save_plots=False
-#                           )
+plotter = Plotter.Plotter("javasimulation\\Outputs", 
+                          run_fast=True, 
+                          plot_centre_of_mass=False, 
+                          plot_energy=False, 
+                          plot_energy_error=False, 
+                          plot_angular_momentum_error = False, 
+                          plot_linear_momentum_error=False, 
+                          plot_3D=False,
+                          x_label="Time",
+                          save_plots=False
+                          )
 
-# plotter.plot()
+plotter.plot()
 # plotter.plot_simulation_shape_space("javasimulation\\Outputs\\shapeSpaceMatrix.csv")
 
 
 
 
 
-perturbation_plot = PerturbationPlot.PerturbationPlot("javasimulation\\Outputs")
+# perturbation_plot = PerturbationPlot.PerturbationPlot("javasimulation\\Outputs")
 
 
 # perturbation_plot.plot_time("timeMatrix")
@@ -71,8 +71,8 @@ perturbation_plot = PerturbationPlot.PerturbationPlot("javasimulation\\Outputs")
 # perturbation_plot.count_stop_matrix("stopCodeMatrix")
 # perturbation_plot.plot_stability("stabilityMatrix")
 
-perturbation_plot.plot_stop_codes_gradient("timeMatrix", "stopCodeMatrix")
-perturbation_plot.plot_stop_codes_gradient("timeMatrix", "stopCodeMatrix", "stabilityMatrix")
+# perturbation_plot.plot_stop_codes_gradient("timeMatrix", "stopCodeMatrix")
+# perturbation_plot.plot_stop_codes_gradient("timeMatrix", "stopCodeMatrix", "stabilityMatrix")
 
 
 # pertubation_3dplot = ThreeDimensionalPerturbationPlot.ThreeDimensionalPerturbationPlot("C:\\Users\\Douglas\\OneDrive - University of Edinburgh\\Uni\\Project-Jared-Douglas\\PaperTrail\\Pertubations\\Energy Layers\\First Energy Cube")
