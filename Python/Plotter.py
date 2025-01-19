@@ -48,7 +48,7 @@ class Plotter():
         if self.kwargs["plot_centre_of_mass"]:
             self.add_centre_of_mass(fig_orbits, ax_orbits)
             
-        fig_orbits.legend()
+        fig_orbits.legend(loc="upper right")
              
         #Other plots
         if self.kwargs["plot_energy"]:
@@ -143,9 +143,20 @@ class Plotter():
                 ax.plot(self.bodies[:,0,i], self.bodies[:,1,i], self.bodies[:,2,i], color=colors[i], alpha=0.25)
                 ax.plot(self.bodies[-1,0,i], self.bodies[-1,1,i], self.bodies[-1,2,i], 'o' ,label="Body " + str(i), color=colors[i])
         else:
+            # for i in range(self.n):
+            #     ax.plot(self.bodies[1,0,i], self.bodies[1,1,i], 'o', fillstyle='none', label="Body " + str(i) + "Initial Position", color=colors[i])
+            #     ax.plot(self.bodies[:,0,i], self.bodies[:,1,i], color=colors[i], alpha=0.25)
+            #     ax.plot(self.bodies[-1,0,i], self.bodies[-1,1,i], 'o' ,label="Body " + str(i), color=colors[i])
+            
+            
+            #Changed to make most recent orbit on top
+            
             for i in range(self.n):
-                ax.plot(self.bodies[:,0,i], self.bodies[:,1,i], color=colors[i], alpha=0.25)
-                ax.plot(self.bodies[-1,0,i], self.bodies[-1,1,i], 'o' ,label="Body " + str(i), color=colors[i])
+                ax.plot(self.bodies[1,0,i], self.bodies[1,1,i], 'o', fillstyle='none', label="Body " + str(i+1) + " Initial Position", color=colors[i], markersize=10)
+                ax.plot(self.bodies[-1,0,i], self.bodies[-1,1,i], 'o' ,label="Body " + str(i+1), color=colors[i], markersize=10)
+            for t in range(self.N):
+                for i in range(self.n):
+                    ax.plot(self.bodies[t,0,i], self.bodies[t,1,i], ".", color=colors[i], markersize=1)
     
     def add_centre_of_mass(self, fig, ax): 
         if ax.name == '3d':
