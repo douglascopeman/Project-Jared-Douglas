@@ -93,7 +93,11 @@ class Perturbation_plotter():
         with open(os.path.join(self.output_directory, filename + ".csv"), 'r') as f:
             data = np.loadtxt(f, delimiter=",", dtype=int)
             self.stability_matrix = np.zeros((self.plot_size, self.plot_size), dtype=int)
-            self.stability_matrix[:,:] = data[self.shrink:-self.shrink, self.shrink:-self.shrink]
+            if self.shrink != 0:
+                self.stability_matrix[:,:] = data[self.shrink:-self.shrink, self.shrink:-self.shrink]
+            else:
+                self.stability_matrix[:,:] = data
+            
             
             assert np.shape(self.stability_matrix)[0] % 2 != 0, "Matrix is not of odd dimension"
             assert np.shape(self.stability_matrix)[0] == np.shape(self.stability_matrix)[1], "Matrix is not square"
@@ -108,10 +112,10 @@ class Perturbation_plotter():
         # Replace all zero values with the largest number in the dataframe as they are not stable
         df.replace(0, df.max().max() + 1, inplace=True)
         
-        sns.heatmap(df, cmap="Greys", annot=False, fmt="s", square=True, cbar=False, xticklabels=self.skip_no_labels, yticklabels=self.skip_no_labels)
+        sns.heatmap(df, cmap="rocket", annot=False, fmt="s", square=True, cbar=False, xticklabels=self.skip_no_labels, yticklabels=self.skip_no_labels)
         
         norm = plt.Normalize(vmin=self.stability_matrix.min(), vmax=self.stability_matrix.max())
-        sm = plt.cm.ScalarMappable(cmap="Greys", norm=norm)
+        sm = plt.cm.ScalarMappable(cmap="rocket", norm=norm)
         sm.set_array([])
         cbar = plt.colorbar(sm, ax=ax, orientation="vertical")
         cbar.set_label("Stability Number", labelpad=1, rotation=90)
