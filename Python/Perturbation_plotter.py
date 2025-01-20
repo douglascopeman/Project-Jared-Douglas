@@ -12,6 +12,7 @@ from multipledispatch import dispatch
 import matplotlib.gridspec as gridspec
 from matplotlib.colors import LogNorm, Normalize
 import subprocess, sys
+import Plotter
 
 
 class Perturbation_plotter():
@@ -122,17 +123,37 @@ class Perturbation_plotter():
         cbar.set_label("Stability Number", labelpad=1, rotation=90)
         cbar.ax.yaxis.set_label_position('left')
 
+        # Section Used to Regsiter Double Click events and produce associated orbit
         coords = []
 
         def onclick(event):
             global ix, iy
-            ix, iy = event.xdata, event.ydata
+            ix, iy = event.xdata-self.p, event.ydata-self.p
             if event.dblclick:
                 print (f'x = {ix}, y = {iy}')
                 coords.append((ix, iy))
-                command = 'C:\\Users\\Douglas\\Downloads\\Project-Jared-Douglas\\JavaCompileAndRun.ps1 figureEight 1600 0.01 --integrator "yoshida" --perturbPositions --halfGridSize 2 --delta 0.01 --calculateEnergies --calculateCentreOfMass --useVariableTimestep'
+                command = 'C:\\Users\\Douglas\\"OneDrive - University of Edinburgh"\\Uni\\Project-Jared-Douglas\\Repository\\Project-Jared-Douglas\\JavaCompileAndRun.ps1 figureEight 16000 0.01 --integrator "yoshida" --perturbSingular ' + str(int(np.floor(ix))) + ' ' + str(int(np.floor(iy))) + ' ' + str(self.delta) + ' --calculateEnergies --calculateCentreOfMass --useVariableTimestep'
                 completed = subprocess.Popen(["powershell.exe",command], stdout=sys.stdout)
                 print(completed.communicate())
+
+                
+                plotter = Plotter.Plotter("javasimulation\\Outputs", 
+                          run_fast=True, 
+                          plot_centre_of_mass=False, 
+                          plot_energy=False, 
+                          plot_energy_error=False, 
+                          plot_angular_momentum_error = False, 
+                          plot_linear_momentum_error=False, 
+                          plot_3D=False,
+                          x_label="Time",
+                          save_plots=False
+                          )
+
+                plotter.plot()
+
+
+
+
 
             return coords
         cid = fig.canvas.mpl_connect('button_press_event', onclick)

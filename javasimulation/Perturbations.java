@@ -132,7 +132,7 @@ public class Perturbations {
         bodies[1].setVelocity(bodies[0].getVelocity().multiply(-2.0));
     }
 
-    private Body[] perturbPositions(int i, int j, double delta) {
+    public Body[] perturbPositions(int i, int j, double delta) {
         Body[] perturbedBodies = Calculations.copyBodies(bodies);
         
         // Perturn body 0 and adjust body 2 accordingly

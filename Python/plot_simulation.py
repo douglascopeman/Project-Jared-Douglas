@@ -14,8 +14,8 @@ plotter = Plotter.Plotter("javasimulation\\Outputs",
                           save_plots=False
                           )
 
-# plotter.plot()
-plotter.shape_space()
+plotter.plot()
+#plotter.shape_space()
 
 # plotter.plot_simulation_shape_space("javasimulation\\Outputs\\shapeSpaceMatrix.csv")
 
