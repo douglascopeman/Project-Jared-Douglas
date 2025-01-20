@@ -20,10 +20,11 @@ class Perturbation_plotter():
         self.settingsFilepath = os.path.join(self.output_directory, "perturbationSettings.csv")
 
         with open(self.settingsFilepath, 'r') as f:
+            self.shrink = 0
             data = np.loadtxt(f, delimiter=",")
             self.N = int(data[0])
             self.delta = float(data[1])
-            self.p = int(data[2])
+            self.p = int(data[2])-self.shrink
             self.plot_size = 2*self.p + 1
             
         self.axis_labels = np.round(np.arange((-self.p*self.delta), (self.p*self.delta+(self.delta*0.5)), self.delta), decimals=4)
@@ -92,7 +93,7 @@ class Perturbation_plotter():
         with open(os.path.join(self.output_directory, filename + ".csv"), 'r') as f:
             data = np.loadtxt(f, delimiter=",", dtype=int)
             self.stability_matrix = np.zeros((self.plot_size, self.plot_size), dtype=int)
-            self.stability_matrix[:,:] = data
+            self.stability_matrix[:,:] = data[self.shrink:-self.shrink, self.shrink:-self.shrink]
             
             assert np.shape(self.stability_matrix)[0] % 2 != 0, "Matrix is not of odd dimension"
             assert np.shape(self.stability_matrix)[0] == np.shape(self.stability_matrix)[1], "Matrix is not square"
