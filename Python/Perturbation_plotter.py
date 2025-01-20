@@ -11,6 +11,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from multipledispatch import dispatch
 import matplotlib.gridspec as gridspec
 from matplotlib.colors import LogNorm, Normalize
+import subprocess, sys
 
 
 class Perturbation_plotter():
@@ -120,12 +121,27 @@ class Perturbation_plotter():
         cbar = plt.colorbar(sm, ax=ax, orientation="vertical")
         cbar.set_label("Stability Number", labelpad=1, rotation=90)
         cbar.ax.yaxis.set_label_position('left')
+
+        coords = []
+
+        def onclick(event):
+            global ix, iy
+            ix, iy = event.xdata, event.ydata
+            if event.dblclick:
+                print (f'x = {ix}, y = {iy}')
+                coords.append((ix, iy))
+                command = 'C:\\Users\\Douglas\\Downloads\\Project-Jared-Douglas\\JavaCompileAndRun.ps1 figureEight 1600 0.01 --integrator "yoshida" --perturbPositions --halfGridSize 2 --delta 0.01 --calculateEnergies --calculateCentreOfMass --useVariableTimestep'
+                completed = subprocess.Popen(["powershell.exe",command], stdout=sys.stdout)
+                print(completed.communicate())
+
+            return coords
+        cid = fig.canvas.mpl_connect('button_press_event', onclick)
         
         #plt.title("Stability Heatmap")
         plt.xlabel(r"$\Delta x$")
         plt.ylabel(r"$\Delta y$")
-        plt.savefig("plotStability.png", format="png", dpi=1000, bbox_inches='tight', pad_inches=0.2)     
-        # plt.show()
+        #plt.savefig("plotStability.png", format="png", dpi=1000, bbox_inches='tight', pad_inches=0.2)     
+        plt.show()
 
 
     # TODO: The following two functions could use a lot of cleanup for duplicate code
@@ -316,5 +332,8 @@ class Perturbation_plotter():
                 if stop_codes_file2[i,j] == 'X' and stop_codes_file1[i,j] != 'X':
                     descrepency_count += 1
         print(descrepency_count)
+
+
+
     
         
