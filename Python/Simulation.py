@@ -169,6 +169,3 @@ class Simulation():
         np.savetxt(os.path.join(path, "simulationSettings.csv"), simulationSettings, delimiter=",")
         for p in range(self.n):
             np.savetxt(os.path.join(path, "output" + str(p) + ".csv"), simulation[:,:,p], delimiter=",")
-        
-if __name__ == "__main__":
-    import Testing

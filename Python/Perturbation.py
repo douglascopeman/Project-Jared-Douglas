@@ -155,10 +155,10 @@ class Perturbation():
 
                     current_bodies, used_dt = Integrators.yoshida(current_bodies, self.dt)
 
-        perturbation_settings = np.array([self.N, self.dt, self.n, self.delta, self.p])
+        perturbation_settings = np.array([self.N, self.delta, self.p])
         path = os.path.join(os.getcwd(), "Python\\Outputs")
-        np.savetxt(os.path.join(path, "perturbationSettings.csv"), perturbation_settings, delimiter=",")
-        np.savetxt(os.path.join(path, "perturbationMatrix.csv"), stop_matrix, delimiter=",")
+        np.savetxt(os.path.join(path, "perturbationSettings.csv"), np.atleast_2d(perturbation_settings), delimiter=",")
+        np.savetxt(os.path.join(path, "timeMatrix.csv"), stop_matrix, delimiter=",")
 
     
 
