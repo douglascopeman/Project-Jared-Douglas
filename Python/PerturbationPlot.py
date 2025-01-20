@@ -21,10 +21,11 @@ class PerturbationPlot():
 
         
         with open(self.settingsFilepath, 'r') as f:
+            self.shrink = 0
             data = np.loadtxt(f, delimiter=",")
             self.N = int(data[0])
             self.delta = float(data[1])
-            self.p = int(data[2])
+            self.p = int(data[2])-self.shrink
             self.plot_size = 2*self.p + 1
             
         self.axis_labels = np.round(np.arange((-self.p*self.delta), (self.p*self.delta+(self.delta*0.5)), self.delta), decimals=4)
@@ -73,9 +74,9 @@ class PerturbationPlot():
         categories = sorted(df.stack().unique().tolist())
         category_map = {cat: str(i) for i, cat in enumerate(categories)}
         df = df.replace(category_map).astype(int)
-        if len(self.color_map) < len(categories) - 1:
+        if len(self.color_map_blends) < len(categories) - 1:
             raise ValueError("Not enough colours in custom colour map")
-        cmap = ListedColormap(self.color_map[:len(categories) - 1] + [self.stable_color])
+        cmap = ListedColormap(self.color_map_blends[:len(categories) - 1] + [self.stable_color])
 
         
         # Plot the heatmap
@@ -94,7 +95,9 @@ class PerturbationPlot():
         with open(os.path.join(self.output_directory, filename + ".csv"), 'r') as f:
             data = np.loadtxt(f, delimiter=",", dtype=int)
             self.stability_matrix = np.zeros((self.plot_size, self.plot_size), dtype=int)
-            self.stability_matrix[:,:] = data
+            self.stability_matrix[:,:] = data[self.shrink:-self.shrink, self.shrink:-self.shrink]
+            self.stability_matrix[self.stability_matrix == 0] = 100000
+
             
             assert np.shape(self.stability_matrix)[0] % 2 != 0, "Matrix is not of odd dimension"
             assert np.shape(self.stability_matrix)[0] == np.shape(self.stability_matrix)[1], "Matrix is not square"
@@ -106,19 +109,20 @@ class PerturbationPlot():
         
         df = pd.DataFrame(self.stability_matrix.T, columns=self.axis_labels, index=-self.axis_labels)
         
-        sns.heatmap(df, cmap="Greys", annot=False, fmt="s", square=True, cbar=False, xticklabels=self.skip_no_labels, yticklabels=self.skip_no_labels)
+        sns.heatmap(df, cmap=sns.color_palette("rocket", as_cmap=True), annot=False, fmt="s", square=True, cbar=False, xticklabels=self.skip_no_labels, yticklabels=self.skip_no_labels)
         
         norm = plt.Normalize(vmin=self.stability_matrix.min(), vmax=self.stability_matrix.max())
-        sm = plt.cm.ScalarMappable(cmap="Greys", norm=norm)
+        sm = plt.cm.ScalarMappable(cmap=sns.color_palette("rocket", as_cmap=True), norm=norm)
         sm.set_array([])
-        cbar = plt.colorbar(sm, ax=ax, orientation="vertical")
+        cbar = plt.colorbar(sm, cmap = sns.color_palette("rocket", as_cmap=True), ax=ax, orientation="vertical")
         cbar.set_label("Stability Number", labelpad=1, rotation=90)
         cbar.ax.yaxis.set_label_position('left')
         
         #plt.title("Stability Heatmap")
         plt.xlabel(r"$\Delta x$")
         plt.ylabel(r"$\Delta y$")
-        plt.show()
+        plt.savefig("plotTime.png", format="png", dpi=1000, bbox_inches='tight', pad_inches=0.2)
+        #plt.show()
 
     @dispatch(str, str)
     def plot_stop_codes_gradient(self, time_filename, stop_filename):
@@ -219,9 +223,11 @@ class PerturbationPlot():
             if i == 0:
                 cmap_time = sns.color_palette("mako", as_cmap=True)
             elif i == 1:
+                cmap_time = sns.color_palette("blend:#002e16,#9bbdab", as_cmap=True)
+            elif i == 2:
                 cmap_time = sns.color_palette("rocket", as_cmap=True)
             else:
-                cmap_time = sns.color_palette(self.color_map_blends[colors_used], as_cmap=True)
+                cmap_time = sns.color_palette(self.color_map_blends[i], as_cmap=True)
             df_time_mask = df_time.where(df_stop == i)
             heatmap = sns.heatmap(df_time_mask, cmap=cmap_time, norm=norm_time, fmt="s", cbar=False, ax=ax, square=True, xticklabels=self.skip_no_labels, yticklabels=self.skip_no_labels)
             
@@ -242,13 +248,15 @@ class PerturbationPlot():
         colors_used = 0
         for i in range(len(categories)):
             if (categories[i] == "X"): continue
-            #set the colourmap correctly
-            if colors_used == 0:
+
+            if i == 0:
                 cmap_time = sns.color_palette("mako", as_cmap=True)
-            elif colors_used == 1:
+            elif i == 1:
+                cmap_time = sns.color_palette("blend:#002e16,#9bbdab", as_cmap=True)
+            elif i == 2:
                 cmap_time = sns.color_palette("rocket", as_cmap=True)
             else:
-                cmap_time = sns.color_palette(self.color_map_blends[colors_used], as_cmap=True)
+                cmap_time = sns.color_palette(self.color_map_blends[i], as_cmap=True)
             sm_time = plt.cm.ScalarMappable(cmap=cmap_time, norm=norm_time)
             colors_used += 1
             sm_time.set_array([])
@@ -268,8 +276,8 @@ class PerturbationPlot():
 
         ax.xaxis.set_tick_params(rotation=90)
         ax.yaxis.set_tick_params(rotation=0)
-        ax.set_ylabel(r"$\Delta y$")
-        ax.set_xlabel(r"$\Delta x$")
+        ax.set_ylabel(r"$\Delta \boldsymbol{v}_y$")
+        ax.set_xlabel(r"$\Delta \boldsymbol{v}_x$")
         plt.savefig("stopCodeGrad.png", format="png", dpi=1000, bbox_inches='tight', pad_inches=0.2)     
         #plt.show()
 
