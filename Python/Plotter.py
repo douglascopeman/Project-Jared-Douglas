@@ -67,8 +67,9 @@ class Plotter():
         if self.kwargs["save_plots"]:
             fig_energy_error.savefig("Python/Outputs/Energy Error.png")
             fig_angular_momentum_error.savefig("Python/Outputs/Angular Momentum Error.png")
-            fig_orbits.savefig("Python/Outputs/Orbits.png")
-        plt.show()
+        fig_orbits.savefig("Orbits.png")
+        plt.clf()
+        #plt.show()
         
         #Animation
         if self.kwargs["animate_orbits"]:

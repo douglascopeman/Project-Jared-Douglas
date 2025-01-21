@@ -128,13 +128,14 @@ class Perturbation_plotter():
 
         def onclick(event):
             global ix, iy
-            ix, iy = event.xdata-self.p, event.ydata-self.p
+            ix, iy = event.xdata-self.p, -event.ydata+self.p
             if event.dblclick:
                 print (f'x = {ix}, y = {iy}')
                 coords.append((ix, iy))
-                command = 'C:\\Users\\Douglas\\"OneDrive - University of Edinburgh"\\Uni\\Project-Jared-Douglas\\Repository\\Project-Jared-Douglas\\JavaCompileAndRun.ps1 figureEight 16000 0.01 --integrator "yoshida" --perturbSingular ' + str(int(np.floor(ix))) + ' ' + str(int(np.floor(iy))) + ' ' + str(self.delta) + ' --calculateEnergies --calculateCentreOfMass --useVariableTimestep'
+                command = '.\\JavaCompileAndRun.ps1 figureEight 16000 0.01 --integrator "yoshida" --perturbSingular ' + str(int(np.floor(ix))) + ' ' + str(int(np.floor(iy))) + ' ' + str(self.delta) + ' --calculateEnergies --calculateCentreOfMass --useVariableTimestep'
                 completed = subprocess.Popen(["powershell.exe",command], stdout=sys.stdout)
                 print(completed.communicate())
+                
 
                 
                 plotter = Plotter.Plotter("javasimulation\\Outputs", 
