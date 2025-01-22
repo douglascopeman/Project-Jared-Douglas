@@ -360,6 +360,29 @@ public class Perturbations {
             
         }
         }
+
+    public void perturbSingular(int i, int j, double currentDelta){
+        // This method is used to increase the accuracy when a double click action is made on a plot, 
+        // it breaks the pixel into a small perturbation plot
+        int p = 4; // This is the grid size of this perturbation plot
+        double previousStabilityNumber = 0;
+        Simulation bestSimulation = new Simulation(bodies, N, dt);
+        
+        for (int k = (i*p)-(p/2); k <= (i*p)+(p/2); k++){
+            for (int l = (j*p)-(p/2); l <= (j*p)+(p/2); l++){
+                System.out.println(k);
+                System.out.println(l);
+                Body [] perturbedBodies = perturbPositions(k,l, currentDelta / p);
+                Simulation simulation = new Simulation(perturbedBodies, N, dt, options);
+                simulation.run();
+                if (simulation.getShapeSpaceStabilityNumber() > previousStabilityNumber){
+                    simulation.writeSimulationToFiles();     
+                }
+            }
+        }
+        
+
+    }
     
 }
 
