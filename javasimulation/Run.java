@@ -26,10 +26,10 @@ public class Run{
         } else if (clOptionsList.contains("--perturbSingular")){
             int perturbSingularIndex = clOptionsList.indexOf("--perturbSingular");
             Perturbations perturbations = new Perturbations(bodies, N, dt);
-            // bodies = perturbations.perturbPositions(Integer.parseInt(clOptionsList.get(perturbSingularIndex + 1)), Integer.parseInt(clOptionsList.get(perturbSingularIndex + 2)), Float.parseFloat(clOptionsList.get(perturbSingularIndex + 3)));
-            // Simulation simulation = new Simulation(bodies, N, dt, clOptionsList);
-            // simulation.run();
-            perturbations.perturbSingular(Integer.parseInt(clOptionsList.get(perturbSingularIndex + 1)), Integer.parseInt(clOptionsList.get(perturbSingularIndex + 2)), Float.parseFloat(clOptionsList.get(perturbSingularIndex + 3)));
+            bodies = perturbations.perturbPositions(Integer.parseInt(clOptionsList.get(perturbSingularIndex + 1)), Integer.parseInt(clOptionsList.get(perturbSingularIndex + 2)), Float.parseFloat(clOptionsList.get(perturbSingularIndex + 3)));
+            Simulation simulation = new Simulation(bodies, N, dt, clOptionsList);
+            simulation.run();
+            //perturbations.perturbSingular(Integer.parseInt(clOptionsList.get(perturbSingularIndex + 1)), Integer.parseInt(clOptionsList.get(perturbSingularIndex + 2)), Float.parseFloat(clOptionsList.get(perturbSingularIndex + 3)));
         }else {
             Simulation simulation = new Simulation(bodies, N, dt, clOptionsList);
             simulation.run();
