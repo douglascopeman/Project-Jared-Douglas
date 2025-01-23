@@ -104,7 +104,7 @@ class Perturbation_plotter():
             assert np.shape(self.stability_matrix)[0] % 2 != 0, "Matrix is not of odd dimension"
             assert np.shape(self.stability_matrix)[0] == np.shape(self.stability_matrix)[1], "Matrix is not square"
             
-    def plot_stability(self, filename):
+    def plot_stability(self, filename, save=False, save_dbl_click=False):
         self.read_stability(filename)
         
         fig, ax = plt.subplots()
@@ -136,8 +136,6 @@ class Perturbation_plotter():
                 completed = subprocess.Popen(["powershell.exe",command], stdout=sys.stdout)
                 print(completed.communicate())
                 
-
-                
                 plotter = Plotter.Plotter("javasimulation\\Outputs", 
                           run_fast=True, 
                           plot_centre_of_mass=False, 
@@ -150,11 +148,7 @@ class Perturbation_plotter():
                           save_plots=False
                           )
 
-                plotter.plot()
-
-
-
-
+                plotter.plot(save=save_dbl_click)
 
             return coords
         cid = fig.canvas.mpl_connect('button_press_event', onclick)
@@ -162,8 +156,10 @@ class Perturbation_plotter():
         #plt.title("Stability Heatmap")
         plt.xlabel(r"$\Delta x$")
         plt.ylabel(r"$\Delta y$")
-        #plt.savefig("plotStability.png", format="png", dpi=1000, bbox_inches='tight', pad_inches=0.2)     
-        plt.show()
+        if save:
+            plt.savefig("plotStability.png", format="png", dpi=1000, bbox_inches='tight', pad_inches=0.2)  
+        else:   
+            plt.show()
 
 
     # TODO: The following two functions could use a lot of cleanup for duplicate code
