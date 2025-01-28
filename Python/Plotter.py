@@ -359,14 +359,21 @@ class Plotter():
         xs = self.bodies[:,0,0]
         first = xs[0]
         second = xs[1]
-        upper_bound = second*(1.001)
-        lower_bound = first*(0.999)
+        # we include a +- 0.2% error margin, this catches the orbits but doesn't double count them
+        upper_bound = second*(1.002)
+        lower_bound = first*(0.998)
+
+        # Double counting is avoided through waiting for a certain number of timesteps to pass before looking for another orbit
+        # This variable may reducing if orbits are extreemly small or increasing if orbits are extreemly slow
+        double_count_stopper = 50
 
         orbit_count = 0
+        pervious_orbit_index = 0
 
         for i,x in enumerate(xs[:-1]):
-            if lower_bound <= x < xs[i+1] <= upper_bound:
-                print(i)
+            if (lower_bound <= x < xs[i+1] <= upper_bound) and (i - pervious_orbit_index > double_count_stopper):
                 orbit_count += 1
+                pervious_orbit_index = i
+
         print(orbit_count)
 
