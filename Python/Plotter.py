@@ -352,4 +352,21 @@ class Plotter():
         plt.colorbar()
         plt.title("Simulation Shape Space")
         plt.show()
-        
+
+    def count_orbits(self):
+        self.read_data()   
+
+        xs = self.bodies[:,0,0]
+        first = xs[0]
+        second = xs[1]
+        upper_bound = second*(1.001)
+        lower_bound = first*(0.999)
+
+        orbit_count = 0
+
+        for i,x in enumerate(xs[:-1]):
+            if lower_bound <= x < xs[i+1] <= upper_bound:
+                print(i)
+                orbit_count += 1
+        print(orbit_count)
+
