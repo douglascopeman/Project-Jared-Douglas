@@ -7,7 +7,7 @@ import Body
 import seaborn as sns
 import pandas as pd
 from matplotlib.colors import ListedColormap
-from matplotlib.animation import FuncAnimation
+import matplotlib.animation as animation
 from matplotlib.colors import LogNorm, Normalize
 
 
@@ -67,10 +67,10 @@ class ThreeDimensionalPerturbationPlot():
     
 
         # Create the animation
-        ani = FuncAnimation(fig, update, frames=self.p_axis2, interval=100)
-
+        ani = animation.FuncAnimation(fig, update, frames=self.p_axis2, interval=40)
+        writervideo = animation.FFMpegWriter(fps=30) 
         # Save the animation to a file or display it
-        ani.save('heatmap_animation.gif', writer='ffmpeg')
+        ani.save('heatmap_animation.mp4', writer=writervideo)
 
     
     def scatter_plot(self, stop_code):
