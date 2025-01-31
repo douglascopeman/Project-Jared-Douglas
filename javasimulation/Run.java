@@ -11,14 +11,15 @@ public class Run{
         String[] commandlineOptions = Arrays.copyOfRange(args, 3, args.length);
         List<String> clOptionsList = Arrays.asList(commandlineOptions);
 
+        // We consider the cases where we perturb the positions, velocities, energy, angular momentum across an x-y delta, or if we consider a single orbit perturbation or given conditions, in that order
         if (clOptionsList.contains("--perturbPositions") || clOptionsList.contains("--perturbVelocities")) {
             SimulationIO.setupDirectories();
             Perturbations perturbations = new Perturbations(bodies, N, dt, clOptionsList);
-            if(clOptionsList.contains("peturbEnergies")){
-                perturbations.runEnergyLayers();
-            } else {
-                perturbations.run();
-            }
+            perturbations.run();
+        } else if (clOptionsList.contains("--perturbEnergy")) {
+            SimulationIO.setupDirectories();
+            Perturbations perturbations = new Perturbations(bodies, N, dt, clOptionsList);
+            perturbations.runEnergy();
         } else if (clOptionsList.contains("--perturbAngularMomentum")) {
             SimulationIO.setupDirectories();
             Perturbations perturbations = new Perturbations(bodies, N, dt, clOptionsList);
@@ -26,15 +27,24 @@ public class Run{
         } else if (clOptionsList.contains("--perturbSingular")){
             int perturbSingularIndex = clOptionsList.indexOf("--perturbSingular");
             Perturbations perturbations = new Perturbations(bodies, N, dt);
-            bodies = perturbations.perturbPositions(Integer.parseInt(clOptionsList.get(perturbSingularIndex + 1)), Integer.parseInt(clOptionsList.get(perturbSingularIndex + 2)), Float.parseFloat(clOptionsList.get(perturbSingularIndex + 3)));
+            int i_shift = Integer.parseInt(clOptionsList.get(perturbSingularIndex + 1));
+            int j_shift = Integer.parseInt(clOptionsList.get(perturbSingularIndex + 2));
+            float delta = Float.parseFloat(clOptionsList.get(perturbSingularIndex + 3));
+            bodies = perturbations.perturbPositions(i_shift, j_shift, delta);
             Simulation simulation = new Simulation(bodies, N, dt, clOptionsList);
             simulation.run();
+
+
+
+            // Is the perturbSingular function deprecated?
+
+
+
             //perturbations.perturbSingular(Integer.parseInt(clOptionsList.get(perturbSingularIndex + 1)), Integer.parseInt(clOptionsList.get(perturbSingularIndex + 2)), Float.parseFloat(clOptionsList.get(perturbSingularIndex + 3)));
-        }else {
+        } else {
+            SimulationIO.setupDirectories();
             Simulation simulation = new Simulation(bodies, N, dt, clOptionsList);
             simulation.run();
         }
-
-        //java.awt.Toolkit.getDefaultToolkit().beep();
     }
 }
