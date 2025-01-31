@@ -264,12 +264,7 @@ public class Simulation implements Runnable {
             double energyDiff = currentEnergy - this.initialEnergy;
             double energyError = Math.abs(energyDiff / (this.initialEnergy));
             if (energyError > energyErrorBound) {
-                // System.out.println("Simulation terminated after exceeding energy error bound");
-                // System.out.println("Energy error bound: \t" + energyErrorBound);
-                // System.out.println("Energy error: \t" + energyError);
-                // System.out.println("Time reached: \t" + elapsedTime);
-                // System.out.println("Timestep reached: \t" + timestep);
-                // throw new RuntimeException("Energy error bound exceeded");
+                // errorPrint("energy error", energyErrorBound, energyError, elapsedTime, currentTimestep);
                 stopCode = 'E';
                 return true;
             }
@@ -279,11 +274,7 @@ public class Simulation implements Runnable {
             // Check if the distance between the centre of mass and the origin is within the bound
             double distance = this.initialCentreOfMass.norm();
             if (distance > distanceBound) {
-                // System.out.println("Simulation terminated after exceeding distance bound");
-                // System.out.println("Distance bound: \t" + distanceBound);
-                // System.out.println("Distance: \t" + distance);
-                // System.out.println("Time reached: \t" + elapsedTime);
-                // throw new RuntimeException("Distance bound exceeded");
+                // errorPrint("CoM distance", distanceBound, distance, elapsedTime, currentTimestep);
                 stopCode = 'C';
                 return true;
             }
@@ -292,11 +283,7 @@ public class Simulation implements Runnable {
         // Check if the maximum distance between any two bodies is within the bound
         double maxDistance = findMaxDistance();
         if (maxDistance > distanceBound) {
-            // System.out.println("Simulation terminated after exceeding distance bound");
-            // System.out.println("Distance bound: \t" + distanceBound);
-            // System.out.println("Distance: \t" + maxDistance);
-            // System.out.println("Time reached: \t" + elapsedTime);
-            // throw new RuntimeException("Distance bound exceeded");
+            // errorPrint("distance", distanceBound, maxDistance, elapsedTime, currentTimestep);
             stopCode = 'D';
             return true;
         }
@@ -305,11 +292,7 @@ public class Simulation implements Runnable {
         // Check if the timestep size is within the bound
         if (options.get("useVariableTimestep")) {
             if (usedTimestepLength < timestepSizeBound) {
-                // System.out.println("Simulation terminated after exceeding timestep size bound");
-                // System.out.println("Timestep size bound: \t" + timestepSizeBound);
-                // System.out.println("Timestep size: \t" + usedTimestepLength);
-                // System.out.println("Time reached: \t" + elapsedTime);
-                // throw new RuntimeException("Timestep size bound exceeded");
+                // errorPrint("timestep size", timestepSizeBound, usedTimestepLength, elapsedTime, currentTimestep);
                 stopCode = 'V';
                 return true;
             }
@@ -318,7 +301,15 @@ public class Simulation implements Runnable {
         return false;
     } 
 
-    // The following method takes a body and returns an integer array containing the two shape space coordinates
+    @SuppressWarnings("unused")
+    private void errorPrint(String boundType, double bound, double value, double elapsedTime, int timestep) {
+        System.out.println("Simulation terminated after exceeding " + boundType + " bound");
+        System.out.println(boundType + " bound: \t" + bound);
+        System.out.println(boundType + ": \t" + value);
+        System.out.println("Time reached: \t" + elapsedTime);
+        System.out.println("Timestep reached: \t" + timestep);
+    }
+
     private int[] getShapeSpace(Body[] bodies) {
         double r_12 = bodies[0].getPosition().subtract(bodies[1].getPosition()).norm();
         double r_13 = bodies[0].getPosition().subtract(bodies[2].getPosition()).norm();
@@ -327,7 +318,6 @@ public class Simulation implements Runnable {
         double q_1 = r_12 / (r_12 + r_13 + r_23);
         double q_2 = r_23 / (r_12 + r_13 + r_23);
 
-        //The below needs fixed to make use of the entire shape space. Double the coordinates in each direction!
         int x = (int) Math.round(q_1 * shapeSpace.length);
         int y = (int) Math.round(q_2 * shapeSpace[0].length);
         return new int[] {x, y};
