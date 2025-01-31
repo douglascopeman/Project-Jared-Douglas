@@ -276,7 +276,7 @@ public class Perturbations {
         }
     }
 
-    public void runEnergyLayers(){
+    public void runEnergy(){
 
         // Save the perturbation settings
         SimulationIO.write3dPerturbationSettingsToFile(N, delta, energyDelta, halfGridSize, halfGridSizeEnergy);
@@ -359,7 +359,7 @@ public class Perturbations {
             }
             
         }
-        }
+    }
 
     public void perturbSingular(int i, int j, double currentDelta){
         // This method is used to increase the accuracy when a double click action is made on a plot, 
