@@ -26,7 +26,7 @@ class Plotter():
                         }
         self.kwargs = defaultKwargs | kwargs
         
-    def plot(self):
+    def plot(self, save=False):
         self.read_data()
         
         ##### Orbit plot #####
@@ -34,21 +34,22 @@ class Plotter():
         def close_all(something):
             plt.close('all')
         
-        fig_orbits = plt.figure("Orbits")
-        fig_orbits.set_size_inches(7.5, 7.5)
+        fig_orbits = plt.figure("Orbits", figsize=(10, 8))
         fig_orbits.canvas.mpl_connect('close_event', close_all)
         
         if self.kwargs["plot_3D"]: 
             ax_orbits = plt.axes(projection='3d') 
         else: 
             ax_orbits = plt.axes()
+            ax_orbits.set_aspect('equal', adjustable='box')
             
         self.add_orbits(fig_orbits, ax_orbits)
         
         if self.kwargs["plot_centre_of_mass"]:
             self.add_centre_of_mass(fig_orbits, ax_orbits)
             
-        fig_orbits.legend(loc="upper right")
+        # fig_orbits.legend(loc="upper right")
+        plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
              
         #Other plots
         if self.kwargs["plot_energy"]:
@@ -67,9 +68,11 @@ class Plotter():
         if self.kwargs["save_plots"]:
             fig_energy_error.savefig("Python/Outputs/Energy Error.png")
             fig_angular_momentum_error.savefig("Python/Outputs/Angular Momentum Error.png")
-        fig_orbits.savefig("Orbits.png")
-        plt.clf()
-        #plt.show()
+        
+        if save:
+            fig_orbits.savefig("Orbits.png")
+        else:
+            plt.show()
         
         #Animation
         if self.kwargs["animate_orbits"]:
@@ -145,7 +148,7 @@ class Plotter():
                 ax.plot(self.bodies[-1,0,i], self.bodies[-1,1,i], self.bodies[-1,2,i], 'o' ,label="Body " + str(i), color=colors[i])
         else:
             # for i in range(self.n):
-            #     ax.plot(self.bodies[1,0,i], self.bodies[1,1,i], 'o', fillstyle='none', label="Body " + str(i) + "Initial Position", color=colors[i])
+            #     ax.plot(self.bodies[1,0,i], self.bodies[1,1,i], 'o', fillstyle='none', label="Body " + str(i) + "Origin", color=colors[i])
             #     ax.plot(self.bodies[:,0,i], self.bodies[:,1,i], color=colors[i], alpha=0.25)
             #     ax.plot(self.bodies[-1,0,i], self.bodies[-1,1,i], 'o' ,label="Body " + str(i), color=colors[i])
             
@@ -153,7 +156,7 @@ class Plotter():
             #Changed to make most recent orbit on top
             
             for i in range(self.n):
-                ax.plot(self.bodies[1,0,i], self.bodies[1,1,i], 'o', fillstyle='none', label="Body " + str(i+1) + " Initial Position", color=colors[i], markersize=10)
+                ax.plot(self.bodies[1,0,i], self.bodies[1,1,i], 'o', fillstyle='none', label="Body " + str(i+1) + " Origin", color=colors[i], markersize=10)
                 ax.plot(self.bodies[-1,0,i], self.bodies[-1,1,i], 'o' ,label="Body " + str(i+1), color=colors[i], markersize=10)
             for t in range(self.N):
                 for i in range(self.n):
@@ -321,7 +324,7 @@ class Plotter():
             plt.show()
         plt.close()
 
-    def shape_space(self):
+    def shape_space(self, save=False):
         self.read_data()
         
         # Change of co-ordinates
@@ -334,24 +337,49 @@ class Plotter():
         X1 = [LA.norm(R1[i,:])/Z for i in range(self.N)]
         X2 = [LA.norm(R2[i,:])/Z for i in range(self.N)]
 
+        plt.figure(figsize=(10, 8))  # Force the figure to be square
+        plt.title("Simulation Shape Space")
         plt.plot(X1, X2)
-        plt.show()
+        plt.xlim(0, 0.55)
+        plt.ylim(0, 0.55)
+        plt.gca().set_aspect('equal', adjustable='box')
+        if save:
+            plt.savefig("Python/Figures/Shape Space.png")
+            print("Shape space plot saved as 'Python/Figures/Shape Space.png'")
+        else:
+            plt.show()
         
-    def plot_simulation_shape_space(self, filename):
+    def plot_simulation_shape_space(self, filename, save=False):
         data = np.loadtxt(filename, delimiter=",", dtype=int)
         non_zero_indices = np.argwhere(data > 0)
         if non_zero_indices.size > 0:
             max_indices = np.max(non_zero_indices, axis=0)
-            # print(f"Largest first index with nonzero value: {max_indices[0]}")
-            # print(f"Largest second index with nonzero value: {max_indices[1]}")
         else:
             print("No nonzero values found in the data array.")
+            return
+        
+        print(data.shape)
+        plt.figure(figsize=(10, 8))  # Force the figure to be square
         plt.xlim(0, max_indices[0] * 1.1)
         plt.ylim(0, max_indices[1] * 1.1)
+        plt.xticks(np.arange(0, max_indices[0] * 1.1, step=data.shape[0]/10), labels=[0, 0.1, 0.2, 0.3, 0.4, 0.5])
+        plt.yticks(np.arange(0, max_indices[1] * 1.1, step=data.shape[1]/10), labels=[0, 0.1, 0.2, 0.3, 0.4, 0.5])
         plt.imshow(data, cmap='viridis', interpolation='none', origin='lower')
-        plt.colorbar()
+        plt.xlabel(r"$q_1$")
+        plt.ylabel(r"$q_2$")
+        
+        # Create a custom legend
+        import matplotlib.patches as mpatches
+        zero_patch = mpatches.Patch(color=plt.cm.viridis(0), label='Not Traversed')
+        one_patch = mpatches.Patch(color=plt.cm.viridis(255), label='Traversed')
+        plt.legend(handles=[zero_patch, one_patch], loc='center left', bbox_to_anchor=(1, 0.5))
+        
         plt.title("Simulation Shape Space")
-        plt.show()
+        if save:
+            plt.savefig("Python/Figures/Shape Space.png")
+            print("Shape space plot saved as 'Python/Figures/Shape Space.png'")
+        else:
+            plt.show()
 
     def count_orbits(self):
         self.read_data()   
