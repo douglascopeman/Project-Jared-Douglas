@@ -394,7 +394,7 @@ class Plotter():
         lower_bound = first*(0.998)
 
         # Double counting is avoided through waiting for a certain number of timesteps to pass before looking for another orbit
-        # This variable may reducing if orbits are extreemly small or increasing if orbits are extreemly slow
+        # This variable may need reducing if orbits are extremely small or increasing if orbits are extremely slow
         double_count_stopper = 50
 
         orbit_count = 0
