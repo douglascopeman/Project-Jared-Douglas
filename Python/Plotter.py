@@ -346,8 +346,8 @@ class Plotter():
         plt.ylim(0, 0.55)
         plt.gca().set_aspect('equal', adjustable='box')
         if save:
-            plt.savefig("Python/Figures/Shape Space.png")
-            print("Shape space plot saved as 'Python/Figures/Shape Space.png'")
+            plt.savefig("Python/Figures/Shape_Space.png")
+            print("Shape space plot saved as 'Python/Figures/Shape_Space.png'")
         else:
             plt.show()
         
@@ -378,8 +378,8 @@ class Plotter():
         
         plt.title("Simulation Shape Space")
         if save:
-            plt.savefig("Python/Figures/Shape Space.png")
-            print("Shape space plot saved as 'Python/Figures/Shape Space.png'")
+            plt.savefig("Python/Figures/Shape_Space.png")
+            print("Shape space plot saved as 'Python/Figures/Shape_Space.png'")
         else:
             plt.show()
 
