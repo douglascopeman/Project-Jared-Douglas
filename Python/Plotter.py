@@ -70,7 +70,9 @@ class Plotter():
             fig_angular_momentum_error.savefig("Python/Outputs/Angular Momentum Error.png")
         
         if save:
-            fig_orbits.savefig("Orbits.png")
+            fig_orbits.savefig("Python/Figures/Orbits.png")
+            plt.close(fig_orbits)
+            print("Orbits plot saved as 'Python/Figures/Orbits.png'")
         else:
             plt.show()
         
