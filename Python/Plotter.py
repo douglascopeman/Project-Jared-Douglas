@@ -330,18 +330,18 @@ class Plotter():
         self.read_data()
         
         # Change of co-ordinates
-        R1 = self.bodies[:,:2,0] - self.bodies[:,:2,1]
-        R2 = self.bodies[:,:2,1] - self.bodies[:,:2,2]
-        R3 = self.bodies[:,:2,0] - self.bodies[:,:2,2]
+        R1 = [LA.norm(self.bodies[i,:2,0] - self.bodies[i,:2,1]) for i in range(self.N)]
+        R2 = [LA.norm(self.bodies[i,:2,0] - self.bodies[i,:2,2]) for i in range(self.N)]
+        R3 = [LA.norm(self.bodies[i,:2,1] - self.bodies[i,:2,2]) for i in range(self.N)]
         
-        Z = [LA.norm(R1[i,:]) + LA.norm(R2[i,:]) + LA.norm(R3[i,:]) for i in range(self.N)] 
+        Z = [R1[i] + R2[i] + R3[i] for i in range(self.N)] 
 
-        X1 = [LA.norm(R1[i,:])/Z for i in range(self.N)]
-        X2 = [LA.norm(R2[i,:])/Z for i in range(self.N)]
+        X1 = [R1[i]/Z[i] for i in range(self.N)]
+        X2 = [R3[i]/Z[i] for i in range(self.N)]
 
         plt.figure(figsize=(10, 8))  # Force the figure to be square
         plt.title("Simulation Shape Space")
-        plt.plot(X1[0:1000], X2[0:1000], linewidth=0.001)
+        plt.plot(X1, X2)
         plt.xlim(0, 0.55)
         plt.ylim(0, 0.55)
         plt.gca().set_aspect('equal', adjustable='box')
@@ -360,7 +360,6 @@ class Plotter():
             print("No nonzero values found in the data array.")
             return
         
-        print(data.shape)
         plt.figure(figsize=(10, 8))  # Force the figure to be square
         plt.xlim(0, max_indices[0] * 1.1)
         plt.ylim(0, max_indices[1] * 1.1)
