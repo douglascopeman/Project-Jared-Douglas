@@ -341,7 +341,7 @@ class Plotter():
 
         plt.figure(figsize=(10, 8))  # Force the figure to be square
         plt.title("Simulation Shape Space")
-        plt.plot(X1, X2)
+        plt.plot(X1[0:1000], X2[0:1000], linewidth=0.001)
         plt.xlim(0, 0.55)
         plt.ylim(0, 0.55)
         plt.gca().set_aspect('equal', adjustable='box')
@@ -378,8 +378,8 @@ class Plotter():
         
         plt.title("Simulation Shape Space")
         if save:
-            plt.savefig("Python/Figures/Shape_Space.png")
-            print("Shape space plot saved as 'Python/Figures/Shape_Space.png'")
+            plt.savefig("Python/Figures/Shape_Space_Discreet.png")
+            print("Shape space plot saved as 'Python/Figures/Shape_Space_Discreet.png'")
         else:
             plt.show()
 
