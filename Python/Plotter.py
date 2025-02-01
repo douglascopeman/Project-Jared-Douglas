@@ -378,7 +378,7 @@ class Plotter():
         plt.title("Simulation Shape Space")
         if save:
             plt.savefig("Python/Figures/Shape_Space_Discreet.png")
-            print("Shape space plot saved as 'Python/Figures/Shape_Space_Discreet.png'")
+            print("Discretized Shape space plot saved as 'Python/Figures/Shape_Space_Discreet.png'")
         else:
             plt.show()
 
