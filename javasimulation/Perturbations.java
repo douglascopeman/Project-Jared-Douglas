@@ -362,6 +362,11 @@ public class Perturbations {
     }
 
     public void perturbSingular(int i, int j, double currentDelta){
+        //Ideally, this function would take in perturbation coordinates, subdivides the perturbation by a smaller delta that the original used. Then determines the best simulation stability number within the smaller grid and counts the orbits within the total long time as well as the number of timestep per obit. using the latter, we run another simulation with that length to produce the plot.
+
+
+
+
         // This method is used to increase the accuracy when a double click action is made on a plot, 
         // it breaks the pixel into a small perturbation plot
         int p = 4; // This is the grid size of this perturbation plot

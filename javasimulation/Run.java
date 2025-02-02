@@ -34,11 +34,7 @@ public class Run{
             Simulation simulation = new Simulation(bodies, N, dt, clOptionsList);
             simulation.run();
 
-
-
-            // Is the perturbSingular function deprecated?
-
-
+            //TODO: Re-implement this once perturbSingular is implemented
 
             //perturbations.perturbSingular(Integer.parseInt(clOptionsList.get(perturbSingularIndex + 1)), Integer.parseInt(clOptionsList.get(perturbSingularIndex + 2)), Float.parseFloat(clOptionsList.get(perturbSingularIndex + 3)));
         } else {
