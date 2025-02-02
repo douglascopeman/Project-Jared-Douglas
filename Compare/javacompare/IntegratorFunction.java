@@ -1,4 +1,4 @@
-package javasimulation;
+package javacompare;
 
 @FunctionalInterface
 public interface IntegratorFunction {

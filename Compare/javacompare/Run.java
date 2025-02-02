@@ -1,4 +1,4 @@
-package javasimulation;
+package javacompare;
 import java.util.List;
 import java.util.Arrays;
 

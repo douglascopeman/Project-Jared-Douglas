@@ -1,4 +1,4 @@
-package javasimulation;
+package javacompare;
 
 public class Body {
     private double mass;

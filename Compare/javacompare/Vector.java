@@ -1,4 +1,4 @@
-package javasimulation;
+package javacompare;
 
 public class Vector {
 
