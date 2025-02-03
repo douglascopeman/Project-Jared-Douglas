@@ -12,7 +12,7 @@ write-host "Python Done!"
 write-host ""
 Write-Host "Running Java Simulation"
 # $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
-    & $PSScriptRoot\..\JavaCompileAndRun.ps1 figureEight $N $dt
+    & $PSScriptRoot\JavaCompileAndRun.ps1 figureEight $N $dt
 # $stopwatch.Stop()
 # $elapsed = $stopwatch.Elapsed
 write-host "Java Done!"

@@ -1,4 +1,4 @@
-package javasimulation;
+package javacompare;
 
 public class Calculations {
     public static double potentialEnergy(Body[] bodies, double G) {

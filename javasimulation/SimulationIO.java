@@ -78,14 +78,21 @@ public class SimulationIO {
                     int halfGridSizeEnergy = Integer.parseInt(clOptions.get(halfGridSizeEnergyIndex + 1));
                     perturbations.setHalfGridSizeEnergy(halfGridSizeEnergy);
                     break;
+                case "perturbAngularMomentum":
+                    int angularMomentumIndex = clOptions.indexOf("perturbAngularMomentum");
+                    int angularMomentumHalfGridSize = Integer.parseInt(clOptions.get(angularMomentumIndex + 1));
+                    double angularMomentumDelta = Double.parseDouble(clOptions.get(angularMomentumIndex + 2));
+                    perturbations.setAngularMomentumShift(angularMomentumHalfGridSize, angularMomentumDelta);
                 default:
             }
-            if (option.equals("perturbAngularMomentum")){
-                int angularMomentumIndex = clOptions.indexOf("perturbAngularMomentum");
-                double angularMomentumDelta = Double.parseDouble(clOptions.get(angularMomentumIndex + 2));
-                int halfGridSizeAngularMomentum = Integer.parseInt(clOptions.get(angularMomentumIndex + 1));
-                perturbations.setAngularMomentumShift(halfGridSizeAngularMomentum, angularMomentumDelta);
-            }
+
+            // moved into switch statement....................................................................
+            // if (option.equals("perturbAngularMomentum")){
+            //     int angularMomentumIndex = clOptions.indexOf("perturbAngularMomentum");
+            //     double angularMomentumDelta = Double.parseDouble(clOptions.get(angularMomentumIndex + 2));
+            //     int halfGridSizeAngularMomentum = Integer.parseInt(clOptions.get(angularMomentumIndex + 1));
+            //     perturbations.setAngularMomentumShift(halfGridSizeAngularMomentum, angularMomentumDelta);
+            // }
         }
     }
 

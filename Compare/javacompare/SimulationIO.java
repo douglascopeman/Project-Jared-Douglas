@@ -1,4 +1,4 @@
-package javasimulation;
+package javacompare;
 
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
