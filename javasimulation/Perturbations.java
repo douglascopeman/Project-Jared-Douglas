@@ -20,6 +20,7 @@ public class Perturbations {
     private double angularMomentumDelta = 0.01;
     private int halfGridSizeAngularMomentum = 0;
     private int angularMomentumIndex = 0;
+    private int energyIndex = 0;
     private int halfGridSizeEnergy = 1;
 
     private HashMap<String, Boolean> options = new HashMap<String, Boolean>();
@@ -123,6 +124,32 @@ public class Perturbations {
         return perturbedBodies;
     }
 
+    public Body[] perturbEnergy(int k, double energyDelta, int i, int j, double delta){
+        Body[] perturbedBodies = Calculations.copyBodies(bodies);
+        
+        // Perturbs body 0 and adjust body 2 accordingly
+        Vector perturbedPosition = Vector.add(bodies[0].getPosition(), new Vector(i * delta, j * delta, 0));
+
+        perturbedBodies[0].setPosition(perturbedPosition);
+        perturbedBodies[2].setPosition(perturbedPosition.negate());
+
+        // Find the new magnitude of velocity required to preserve the energy
+        // First check that the root of the energy term is real
+        double energyTerm = (1+(k*energyDelta))*(originalEnergy) + 5.0/(2.0 * perturbedBodies[0].getPosition().norm());
+        if (energyTerm < 0) {
+            return null;
+        }
+
+        double newVelocity = Math.sqrt((1.0/3.0) * energyTerm);
+
+        // Finally, preserve the angular momentum by setting the velocity of body 1 to (-2) times that of bodies 0 and 2
+        perturbedBodies[0].setVelocity(bodies[0].getVelocity().normalise().multiply(newVelocity));
+        perturbedBodies[2].setVelocity(perturbedBodies[0].getVelocity());
+        perturbedBodies[1].setVelocity(perturbedBodies[0].getVelocity().multiply(-2.0));
+
+        return perturbedBodies;
+    }
+
     public void shiftEnergy(double shiftEnergy){
         //originalEnergy =(1+shiftEnergy)*originalEnergy;
         double newVelocityMagnitude = Math.sqrt((1.0/3.0) * ((1+shiftEnergy)*originalEnergy + 5.0/(2.0 * bodies[0].getPosition().norm())));
@@ -215,23 +242,20 @@ public class Perturbations {
         Body[] perturbedBodies = bodies;
         if (options.get("perturbPositions")) {
             perturbedBodies = perturbPositions(rowIndex, columnIndex, delta);
-            // If the perturbation results in a negative sqrt, set the results to a failed state
-            if (perturbedBodies == null) {
-                timeMatrix[saveRowIndex][saveColumnIndex] = 0;
-                stopCodeMatrix[saveRowIndex][saveColumnIndex] = 'F';
-                stabilityMatrix[saveRowIndex][saveColumnIndex] = (int) Math.pow(Simulation.getShapeSpaceSize(), 2);
-                return;
-            }
         } else if (options.get("perturbVelocities")) {
             perturbedBodies = perturbVelocities(rowIndex, columnIndex, delta);
         } else if (options.get("perturbAngularMomentum")) {
             perturbedBodies = perturbAngularMomentum(this.angularMomentumIndex, angularMomentumDelta, rowIndex, columnIndex, delta);
-            if (perturbedBodies == null) {
-                timeMatrix[saveRowIndex][saveColumnIndex] = 0;
-                stopCodeMatrix[saveRowIndex][saveColumnIndex] = 'F';
-                stabilityMatrix[saveRowIndex][saveColumnIndex] = (int) Math.pow(Simulation.getShapeSpaceSize(), 2);
-                return;
-            }
+        } else if (options.get("perturbEnergy")) {
+            perturbedBodies = perturbEnergy(this.energyIndex, energyDelta, rowIndex, columnIndex, delta);
+        }
+
+        // If the perturbation results in a negative sqrt, set the results to a failed state
+        if (perturbedBodies == null) {
+            timeMatrix[saveRowIndex][saveColumnIndex] = 0;
+            stopCodeMatrix[saveRowIndex][saveColumnIndex] = 'F';
+            stabilityMatrix[saveRowIndex][saveColumnIndex] = (int) Math.pow(Simulation.getShapeSpaceSize(), 2);
+            return;
         }
 
         
@@ -281,28 +305,11 @@ public class Perturbations {
         // Save the perturbation settings
         SimulationIO.write3dPerturbationSettingsToFile(N, delta, energyDelta, halfGridSize, halfGridSizeEnergy);
 
-        // Keeping the original bodies and energy to revert back to at the start of each child perturbation
-        double energyCopy = originalEnergy;
-        Body[] originalBodies = Calculations.copyBodies(bodies);
-
         // The loop for the parent perturbation
         for(int k = -halfGridSizeEnergy; k <= halfGridSizeEnergy; k++){
             ExecutorService executor = Executors.newFixedThreadPool(10);
 
-            // Ensuring the bodies and energy is set back to the original before proceeding
-            System.out.println(k);
-            this.bodies = Calculations.copyBodies(originalBodies);
-            this.originalEnergy = energyCopy;
-            
-            // We return matrices filled with "F" for failed to initialize for choices of energy that will result in negative sqrt
-            if((1+(k*energyDelta))*originalEnergy + 5.0/(2.0 * bodies[0].getPosition().norm()) < 0){
-                Arrays.fill(timeMatrix, 0);
-                Arrays.fill(stopCodeMatrix, "F");
-                return;
-            } else{
-                // Performing the energy shift
-                shiftEnergy(k*energyDelta);
-            }
+            this.energyIndex = k;
             
             // Iterate over the grid of perturbations
             for (int i = -halfGridSize; i <= halfGridSize; i++) {
@@ -319,10 +326,13 @@ public class Perturbations {
             } catch (InterruptedException e) {
                 System.err.println("Error in executor.awaitTermination");
             }
-
+        
             // Saving the child perturbation csv's with the relevant energy stamp
-            SimulationIO.saveMatrix("timeMatrix"+k, timeMatrix);
-            SimulationIO.saveMatrix("stopCodeMatrix"+k, stopCodeMatrix);
+            SimulationIO.saveMatrix("timeMatrix"+(k*energyDelta), timeMatrix);
+            SimulationIO.saveMatrix("stopCodeMatrix"+(k*energyDelta), stopCodeMatrix);
+            if (options.get("calculateShapeSpace")) {
+                SimulationIO.saveMatrix("stabilityMatrix"+(k*energyDelta), stabilityMatrix);
+            }
         }
     }
 
