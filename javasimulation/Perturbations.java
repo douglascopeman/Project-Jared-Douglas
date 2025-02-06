@@ -374,27 +374,56 @@ public class Perturbations {
     public void perturbSingular(int i, int j, double currentDelta){
         //Ideally, this function would take in perturbation coordinates, subdivides the perturbation by a smaller delta that the original used. Then determines the best simulation stability number within the smaller grid and counts the orbits within the total long time as well as the number of timestep per obit. using the latter, we run another simulation with that length to produce the plot.
 
-
-
-
         // This method is used to increase the accuracy when a double click action is made on a plot, 
         // it breaks the pixel into a small perturbation plot
-        int p = 4; // This is the grid size of this perturbation plot
+        final int p = 3; // This is the grid size of this perturbation plot
+
+        options.put("findOrbitLength", true);
+
         double previousStabilityNumber = 0;
-        Simulation bestSimulation = new Simulation(bodies, N, dt);
+
+        // The variables which will save the co ordinates of the best simulation
+        int optimalX = 0;
+        int optimalY = 0;
+        int optimalOrbitLength = 1;
+        int totalTimesteps = 1;
         
-        for (int k = (i*p)-(p/2); k <= (i*p)+(p/2); k++){
-            for (int l = (j*p)-(p/2); l <= (j*p)+(p/2); l++){
-                System.out.println(k);
-                System.out.println(l);
+
+        
+        
+        for (int k = (i*p)-(p-1)/2; k <= (i*p)+(p-1)/2; k++){
+            for (int l = (j*p)-((p-1)/2); l <= (j*p)+((p-1)/2); l++){
                 Body [] perturbedBodies = perturbPositions(k,l, currentDelta / p);
                 Simulation simulation = new Simulation(perturbedBodies, N, dt, options);
+                simulation.setIntegratorFunction(simulationIntegrator);
                 simulation.run();
                 if (simulation.getShapeSpaceStabilityNumber() > previousStabilityNumber){
-                    simulation.writeSimulationToFiles();     
+                    optimalX = k;
+                    optimalY = l;
+                    optimalOrbitLength = simulation.getOrbitLength();
+                    totalTimesteps = simulation.getCurrentTimestep();
                 }
             }
         }
+
+        Body [] perturbedBodies = perturbPositions(optimalX,optimalY, currentDelta / p);
+        options.replace("perturbPositions", false);
+
+        if (optimalOrbitLength != 1) {
+            System.out.println("An orbit is " + optimalOrbitLength + " steps");
+            System.out.println("Total number of orbits is " );
+
+            Simulation simulation = new Simulation(perturbedBodies, optimalOrbitLength, dt);
+            simulation.setIntegratorFunction(simulationIntegrator);
+            simulation.run();            
+        } else {
+            System.out.println("No orbit found, running for a 10th of total steps (Total steps = " + totalTimesteps + ")");
+
+            Simulation simulation = new Simulation(perturbedBodies, totalTimesteps, dt);
+            simulation.setIntegratorFunction(simulationIntegrator);
+            simulation.run();   
+        }
+
         
 
     }

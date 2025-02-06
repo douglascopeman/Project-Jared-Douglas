@@ -27,7 +27,7 @@ public class Simulation implements Runnable {
     private double[] kineticEnergy;
     private Vector[] angularMomentum;
     private Vector[] linearMomentum;
-    private double orbitLength;
+    private int orbitLength = 1;
     private int currentTimestep = 0;
     private char stopCode = 'X';
     private Vector initialCentreOfMass;
@@ -85,6 +85,10 @@ public class Simulation implements Runnable {
 
     public static int getShapeSpaceSize() {
         return shapeSpaceSize;
+    }
+
+    public int getOrbitLength() {
+        return orbitLength;
     }
 
     public char getStopCode() {
@@ -188,7 +192,7 @@ public class Simulation implements Runnable {
                 break;
             }
 
-            if (options.get("findOrbitLength") && (this.currentTimestep > 10) && (orbitLength != 0.0)) {
+            if (options.get("findOrbitLength") && (this.currentTimestep > 10) && (orbitLength == 1)) {
                 findOrbitLength();
             }
 
@@ -235,15 +239,16 @@ public class Simulation implements Runnable {
         for (int p = 0; p < n; p++) {
             Vector diff = bodies[p].getPosition().subtract(bodies[p].getInitialPosition());
             double distance = diff.norm();
-            if (distance > 0.1) {
+            if (distance > 0.02) {
                 hasMadeFullOrbit = false;
                 break;
             }
         }
         if (hasMadeFullOrbit) {
-            orbitLength = elapsedTime;
+            orbitLength = currentTimestep;
         }
     }
+
 
     private double findMaxDistance() {
         double maxDistance = 0;

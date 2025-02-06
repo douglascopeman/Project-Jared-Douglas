@@ -84,6 +84,9 @@ public class SimulationIO {
                     int angularMomentumHalfGridSize = Integer.parseInt(clOptions.get(angularMomentumIndex + 1));
                     double angularMomentumDelta = Double.parseDouble(clOptions.get(angularMomentumIndex + 2));
                     perturbations.setAngularMomentumShift(angularMomentumHalfGridSize, angularMomentumDelta);
+                    break;
+                case "perturbSingular":
+                    perturbationsOptions.replace("perturbPositions",true);
                 default:
             }
         }
