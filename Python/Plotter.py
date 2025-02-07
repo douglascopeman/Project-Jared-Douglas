@@ -10,7 +10,7 @@ class Plotter():
     def __init__(self, outputDirectory, **kwargs):
         self.outputDirectory = outputDirectory
         defaultKwargs = {
-                        "plot_3D":True,
+                        "plot_3D":False,
                         "plot_centre_of_mass":False,
                         "plot_energy":False,
                         "plot_energy_error":False,
@@ -21,9 +21,10 @@ class Plotter():
                         "animate_fps":30,
                         "run_fast":False,
                         "x_label":"Time",
-                        "save_plots":False,
+                        "save_extra_plots":False,
                         "is_orbit_duration":False,
-                        "plot_fast":False
+                        "plot_fast":False,
+                        "close_all":True
                         }
         self.kwargs = defaultKwargs | kwargs
         
@@ -32,11 +33,12 @@ class Plotter():
         
         ##### Orbit plot #####
         
-        def close_all(something):
+        def close_all(event):
             plt.close('all')
         
         fig_orbits = plt.figure("Orbits", figsize=(10, 8))
-        fig_orbits.canvas.mpl_connect('close_event', close_all)
+        if self.kwargs["close_all"]:
+            fig_orbits.canvas.mpl_connect('close_event', close_all)
         
         if self.kwargs["plot_3D"]: 
             ax_orbits = plt.axes(projection='3d') 
@@ -66,13 +68,12 @@ class Plotter():
             fig_linear_momentum_error = self.plot_linear_momentum_error()
             fig_linear_momentum_error.canvas.mpl_connect('close_event', close_all)
     
-        if self.kwargs["save_plots"]:
+        if self.kwargs["save_extra_plots"]:
             fig_energy_error.savefig("Python/Outputs/Energy Error.png")
             fig_angular_momentum_error.savefig("Python/Outputs/Angular Momentum Error.png")
         
         if save:
             fig_orbits.savefig("Python/Figures/Orbits.png")
-            plt.close(fig_orbits)
             print("Orbits plot saved as 'Python/Figures/Orbits.png'")
         else:
             plt.show()

@@ -11,7 +11,7 @@ plotter = Plotter.Plotter("javasimulation\\Outputs",
                           plot_linear_momentum_error=False, 
                           plot_3D=False,
                           x_label="Time",
-                          save_plots=False
+                          save_extra_plots=False
                           )
 
 plotter.plot(save=True)

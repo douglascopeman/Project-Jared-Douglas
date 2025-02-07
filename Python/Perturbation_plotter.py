@@ -107,7 +107,8 @@ class Perturbation_plotter():
     def plot_stability(self, filename, save=False, save_dbl_click=False):
         self.read_stability(filename)
         
-        fig, ax = plt.subplots()
+        fig = plt.figure("stability")
+        ax = plt.axes()
         
         df = pd.DataFrame(self.stability_matrix.T, columns=self.axis_labels, index=-self.axis_labels)
         
@@ -128,25 +129,20 @@ class Perturbation_plotter():
 
         def onclick(event):
             global ix, iy
-            ix, iy = event.xdata-self.p, -event.ydata+self.p
+            if event.inaxes != ax: return
+            
+            ix, iy = np.floor(event.xdata-self.p), np.ceil(-event.ydata+self.p)
             if event.dblclick:
                 print (f'x = {ix}, y = {iy}')
                 coords.append((ix, iy))
-                command = '.\\JavaCompileAndRun.ps1 figureEight 16000 0.01 --integrator "yoshida" --perturbSingular ' + str(int(np.floor(ix))) + ' ' + str(int(np.floor(iy))) + ' ' + str(self.delta) + ' --calculateEnergies --calculateCentreOfMass --useVariableTimestep --calculateShapeSpace --checkStopConditions'
+                command = '.\\JavaCompileAndRun.ps1 figureEight 16000 0.01 --integrator "yoshida" --perturbSingular ' + str(int(ix)) + ' ' + str(int(iy)) + ' ' + str(self.delta) + ' --calculateEnergies --calculateCentreOfMass --useVariableTimestep --calculateShapeSpace --checkStopConditions'
                 completed = subprocess.Popen(["powershell.exe",command], stdout=sys.stdout)
                 print(completed.communicate())
                 
                 plotter = Plotter.Plotter("javasimulation\\Outputs", 
-                          run_fast=True, 
-                          plot_centre_of_mass=False, 
-                          plot_energy=False, 
-                          plot_energy_error=False, 
-                          plot_angular_momentum_error = False, 
-                          plot_linear_momentum_error=False, 
-                          plot_3D=False,
-                          x_label="Time",
-                          save_plots=False,
-                          plot_fast=True
+                          run_fast=True,
+                          plot_fast=True,
+                          close_all=False
                           )
 
                 plotter.plot(save=save_dbl_click)
