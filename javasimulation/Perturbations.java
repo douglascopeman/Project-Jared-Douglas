@@ -5,9 +5,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Arrays; 
-
-
 
 public class Perturbations {
     private Body[] bodies;
@@ -434,9 +431,6 @@ public class Perturbations {
             simulation.setIntegratorFunction(simulationIntegrator);
             simulation.run();   
         }
-
-        
-
     }
     
 }
