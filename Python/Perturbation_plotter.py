@@ -132,7 +132,7 @@ class Perturbation_plotter():
             if event.dblclick:
                 print (f'x = {ix}, y = {iy}')
                 coords.append((ix, iy))
-                command = '.\\JavaCompileAndRun.ps1 figureEight 16000 0.01 --integrator "yoshida" --perturbSingular ' + str(int(np.floor(ix))) + ' ' + str(int(np.floor(iy))) + ' ' + str(self.delta) + ' --calculateEnergies --calculateCentreOfMass --useVariableTimestep'
+                command = '.\\JavaCompileAndRun.ps1 figureEight 16000 0.01 --integrator "yoshida" --perturbSingular ' + str(int(np.floor(ix))) + ' ' + str(int(np.floor(iy))) + ' ' + str(self.delta) + ' --calculateEnergies --calculateCentreOfMass --useVariableTimestep --calculateShapeSpace --checkStopConditions'
                 completed = subprocess.Popen(["powershell.exe",command], stdout=sys.stdout)
                 print(completed.communicate())
                 

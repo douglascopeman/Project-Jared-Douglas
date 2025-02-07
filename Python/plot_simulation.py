@@ -15,7 +15,7 @@ plotter = Plotter.Plotter("javasimulation\\Outputs",
                           )
 
 plotter.plot(save=True)
-plotter.shape_space(save=True)
+# plotter.shape_space(save=True)
 # plotter.plot_simulation_shape_space("javasimulation\\Outputs\\shapeSpaceMatrix.csv", save=False)
 # plotter.count_orbits()
 

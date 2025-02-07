@@ -386,22 +386,26 @@ public class Perturbations {
         int optimalX = 0;
         int optimalY = 0;
         int optimalOrbitLength = 1;
-        int totalTimesteps = 1;
+        int optimalTotalTimesteps = 1;
         
 
         
-        
+        // Performing mini perturbation of singular pixel
         for (int k = (i*p)-(p-1)/2; k <= (i*p)+(p-1)/2; k++){
             for (int l = (j*p)-((p-1)/2); l <= (j*p)+((p-1)/2); l++){
+                System.out.println(k + " , " + l);
                 Body [] perturbedBodies = perturbPositions(k,l, currentDelta / p);
                 Simulation simulation = new Simulation(perturbedBodies, N, dt, options);
                 simulation.setIntegratorFunction(simulationIntegrator);
                 simulation.run();
+
+                System.out.println(simulation.getStopCode());
+
                 if (simulation.getShapeSpaceStabilityNumber() > previousStabilityNumber){
                     optimalX = k;
                     optimalY = l;
                     optimalOrbitLength = simulation.getOrbitLength();
-                    totalTimesteps = simulation.getCurrentTimestep();
+                    optimalTotalTimesteps = simulation.getCurrentTimestep();
                 }
             }
         }
@@ -411,15 +415,15 @@ public class Perturbations {
 
         if (optimalOrbitLength != 1) {
             System.out.println("An orbit is " + optimalOrbitLength + " steps");
-            System.out.println("Total number of orbits is " );
+            System.out.println("Total number of orbits is " + (optimalOrbitLength / optimalTotalTimesteps) );
 
-            Simulation simulation = new Simulation(perturbedBodies, optimalOrbitLength, dt);
+            Simulation simulation = new Simulation(perturbedBodies, optimalOrbitLength, dt, options);
             simulation.setIntegratorFunction(simulationIntegrator);
             simulation.run();            
         } else {
-            System.out.println("No orbit found, running for a 10th of total steps (Total steps = " + totalTimesteps + ")");
+            System.out.println("No orbit found, running for a 10th of total steps (Total steps = " + optimalTotalTimesteps + ")");
 
-            Simulation simulation = new Simulation(perturbedBodies, totalTimesteps, dt);
+            Simulation simulation = new Simulation(perturbedBodies, optimalTotalTimesteps/100, dt, options);
             simulation.setIntegratorFunction(simulationIntegrator);
             simulation.run();   
         }
