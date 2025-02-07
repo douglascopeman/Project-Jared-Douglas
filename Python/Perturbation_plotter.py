@@ -137,7 +137,8 @@ class Perturbation_plotter():
             
             ix, iy = np.floor(event.xdata-self.p), np.ceil(-event.ydata+self.p)
             if event.dblclick or (event.button == 3):
-                print (f'x = {ix}, y = {iy}')
+                deltaScale = np.ceil(np.abs(np.log10(self.delta)))
+                print (f'delta x = {ix * self.delta:.{int(deltaScale) + 1}f}, delta y = {iy * self.delta:.{int(deltaScale) + 1}f}')
                 coords.append((ix, iy))
                 command = '.\\JavaCompileAndRun.ps1 figureEight 16000 0.01 --integrator "yoshida" --perturbSingular ' + str(int(ix)) + ' ' + str(int(iy)) + ' ' + str(self.delta) + ' --calculateEnergies --calculateCentreOfMass --useVariableTimestep --calculateShapeSpace --checkStopConditions'
                 completed = subprocess.Popen(["powershell.exe",command], stdout=sys.stdout)
