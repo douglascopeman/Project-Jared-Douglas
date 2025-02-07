@@ -145,7 +145,8 @@ class Perturbation_plotter():
                           plot_linear_momentum_error=False, 
                           plot_3D=False,
                           x_label="Time",
-                          save_plots=False
+                          save_plots=False,
+                          plot_fast=True
                           )
 
                 plotter.plot(save=save_dbl_click)
