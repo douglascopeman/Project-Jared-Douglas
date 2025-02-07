@@ -112,10 +112,14 @@ class Perturbation_plotter():
         
         df = pd.DataFrame(self.stability_matrix.T, columns=self.axis_labels, index=-self.axis_labels)
         
+        not_stable = df[df == 0]
+        
         # Replace all zero values with the largest number in the dataframe as they are not stable
         df.replace(0, df.max().max() + 1, inplace=True)
         
         sns.heatmap(df, cmap="rocket", annot=False, fmt="s", square=True, cbar=False, xticklabels=self.skip_no_labels, yticklabels=self.skip_no_labels)
+        
+        sns.heatmap(not_stable, cmap="Greys", annot=False, fmt="s", square=True, cbar=False, xticklabels=self.skip_no_labels, yticklabels=self.skip_no_labels)
         
         norm = plt.Normalize(vmin=self.stability_matrix.min(), vmax=self.stability_matrix.max())
         sm = plt.cm.ScalarMappable(cmap="rocket", norm=norm)
@@ -132,7 +136,7 @@ class Perturbation_plotter():
             if event.inaxes != ax: return
             
             ix, iy = np.floor(event.xdata-self.p), np.ceil(-event.ydata+self.p)
-            if event.dblclick:
+            if event.dblclick or (event.button == 3):
                 print (f'x = {ix}, y = {iy}')
                 coords.append((ix, iy))
                 command = '.\\JavaCompileAndRun.ps1 figureEight 16000 0.01 --integrator "yoshida" --perturbSingular ' + str(int(ix)) + ' ' + str(int(iy)) + ' ' + str(self.delta) + ' --calculateEnergies --calculateCentreOfMass --useVariableTimestep --calculateShapeSpace --checkStopConditions'
