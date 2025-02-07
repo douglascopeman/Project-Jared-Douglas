@@ -28,16 +28,14 @@ public class Run{
             SimulationIO.setupDirectories();
             int perturbSingularIndex = clOptionsList.indexOf("--perturbSingular");
             Perturbations perturbations = new Perturbations(bodies, N, dt, clOptionsList);
-            // int i_shift = Integer.parseInt(clOptionsList.get(perturbSingularIndex + 1));
-            // int j_shift = Integer.parseInt(clOptionsList.get(perturbSingularIndex + 2));
-            // float delta = Float.parseFloat(clOptionsList.get(perturbSingularIndex + 3));
+            int i_shift = Integer.parseInt(clOptionsList.get(perturbSingularIndex + 1));
+            int j_shift = Integer.parseInt(clOptionsList.get(perturbSingularIndex + 2));
+            float delta = Float.parseFloat(clOptionsList.get(perturbSingularIndex + 3));
             // bodies = perturbations.perturbPositions(i_shift, j_shift, delta);
             //Simulation simulation = new Simulation(bodies, N, dt, clOptionsList);
             //simulation.run();
 
-            //TODO: Re-implement this once perturbSingular is implemented
-
-            perturbations.perturbSingular(Integer.parseInt(clOptionsList.get(perturbSingularIndex + 1)), Integer.parseInt(clOptionsList.get(perturbSingularIndex + 2)), Float.parseFloat(clOptionsList.get(perturbSingularIndex + 3)));
+            perturbations.perturbSingular(i_shift, j_shift, delta);
         } else {
             SimulationIO.setupDirectories();
             Simulation simulation = new Simulation(bodies, N, dt, clOptionsList);

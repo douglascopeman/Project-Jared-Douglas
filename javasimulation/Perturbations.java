@@ -387,14 +387,21 @@ public class Perturbations {
         int optimalY = 0;
         int optimalOrbitLength = 1;
         int optimalTotalTimesteps = 1;
-        
+
+        //find the new simulation conditions
+        int newHalfGridSize = (p-1)/2;
+        int iShiftStart = (i*p)-newHalfGridSize;
+        int iShiftEnd = (i*p)+newHalfGridSize;
+        int jShiftStart = (j*p)-newHalfGridSize;
+        int jShiftEnd = (j*p)+newHalfGridSize;
+        double newDelta = currentDelta / p;
 
         
         // Performing mini perturbation of singular pixel
-        for (int k = (i*p)-(p-1)/2; k <= (i*p)+(p-1)/2; k++){
-            for (int l = (j*p)-((p-1)/2); l <= (j*p)+((p-1)/2); l++){
+        for (int k = iShiftStart; k <= iShiftEnd; k++){
+            for (int l = jShiftStart; l <= jShiftEnd; l++){
                 System.out.println(k + " , " + l);
-                Body [] perturbedBodies = perturbPositions(k,l, currentDelta / p);
+                Body [] perturbedBodies = perturbPositions(k,l, newDelta);
                 Simulation simulation = new Simulation(perturbedBodies, N, dt, options);
                 simulation.setIntegratorFunction(simulationIntegrator);
                 simulation.run();
@@ -410,7 +417,7 @@ public class Perturbations {
             }
         }
 
-        Body [] perturbedBodies = perturbPositions(optimalX,optimalY, currentDelta / p);
+        Body [] perturbedBodies = perturbPositions(optimalX,optimalY, newDelta);
         options.replace("perturbPositions", false);
 
         if (optimalOrbitLength != 1) {
