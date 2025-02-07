@@ -366,7 +366,7 @@ public class Perturbations {
         // it breaks the pixel into a small perturbation plot
         int p = 4; // This is the grid size of this perturbation plot
         double previousStabilityNumber = 0;
-        Simulation bestSimulation = new Simulation(bodies, N, dt);
+        // Simulation bestSimulation = new Simulation(bodies, N, dt);
         
         for (int k = (i*p)-(p/2); k <= (i*p)+(p/2); k++){
             for (int l = (j*p)-(p/2); l <= (j*p)+(p/2); l++){
