@@ -23,6 +23,7 @@ class Plotter():
                         "x_label":"Time",
                         "save_plots":False,
                         "is_orbit_duration":False,
+                        "plot_fast":False
                         }
         self.kwargs = defaultKwargs | kwargs
         
@@ -43,7 +44,7 @@ class Plotter():
             ax_orbits = plt.axes()
             ax_orbits.set_aspect('equal', adjustable='box')
             
-        self.add_orbits(fig_orbits, ax_orbits)
+        self.add_orbits(fig_orbits, ax_orbits, fast=self.kwargs["plot_fast"])
         
         if self.kwargs["plot_centre_of_mass"]:
             self.add_centre_of_mass(fig_orbits, ax_orbits)
@@ -138,7 +139,7 @@ class Plotter():
                                   np.max(bodies[:,0:3,:], axis=(0,1)))) * 1.1
         return max_range
   
-    def add_orbits(self, fig, ax):
+    def add_orbits(self, fig, ax, fast=False):
         colors = plt.cm.hsv(np.linspace(0.1, 1, self.n))
         max_range = self.determine_max_range(self.bodies)
         ax.set_xlim(-max_range, max_range)
@@ -149,20 +150,19 @@ class Plotter():
                 ax.plot(self.bodies[:,0,i], self.bodies[:,1,i], self.bodies[:,2,i], color=colors[i], alpha=0.25)
                 ax.plot(self.bodies[-1,0,i], self.bodies[-1,1,i], self.bodies[-1,2,i], 'o' ,label="Body " + str(i), color=colors[i])
         else:
-            # for i in range(self.n):
-            #     ax.plot(self.bodies[1,0,i], self.bodies[1,1,i], 'o', fillstyle='none', label="Body " + str(i) + "Origin", color=colors[i])
-            #     ax.plot(self.bodies[:,0,i], self.bodies[:,1,i], color=colors[i], alpha=0.25)
-            #     ax.plot(self.bodies[-1,0,i], self.bodies[-1,1,i], 'o' ,label="Body " + str(i), color=colors[i])
-            
-            
-            #Changed to make most recent orbit on top
-            
-            for i in range(self.n):
-                ax.plot(self.bodies[1,0,i], self.bodies[1,1,i], 'o', fillstyle='none', label="Body " + str(i+1) + " Origin", color=colors[i], markersize=10)
-                ax.plot(self.bodies[-1,0,i], self.bodies[-1,1,i], 'o' ,label="Body " + str(i+1), color=colors[i], markersize=10)
-            for t in range(self.N):
+            if fast:
                 for i in range(self.n):
-                    ax.plot(self.bodies[t,0,i], self.bodies[t,1,i], ".", color=colors[i], markersize=1)
+                    ax.plot(self.bodies[1,0,i], self.bodies[1,1,i], 'o', fillstyle='none', label="Body " + str(i) + "Origin", color=colors[i])
+                    ax.plot(self.bodies[:,0,i], self.bodies[:,1,i], color=colors[i], alpha=0.25)
+                    ax.plot(self.bodies[-1,0,i], self.bodies[-1,1,i], 'o' ,label="Body " + str(i), color=colors[i])
+            else:
+            # Ensures that the most recent orbit path is on top
+                for i in range(self.n):
+                    ax.plot(self.bodies[1,0,i], self.bodies[1,1,i], 'o', fillstyle='none', label="Body " + str(i+1) + " Origin", color=colors[i], markersize=10)
+                    ax.plot(self.bodies[-1,0,i], self.bodies[-1,1,i], 'o' ,label="Body " + str(i+1), color=colors[i], markersize=10)
+                for t in range(self.N):
+                    for i in range(self.n):
+                        ax.plot(self.bodies[t,0,i], self.bodies[t,1,i], ".", color=colors[i], markersize=1)
     
     def add_centre_of_mass(self, fig, ax): 
         if ax.name == '3d':
