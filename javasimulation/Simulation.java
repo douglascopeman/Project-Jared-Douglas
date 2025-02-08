@@ -250,7 +250,7 @@ public class Simulation implements Runnable {
             }
         }
         if (hasMadeFullOrbit) {
-            System.out.println("success");
+            // System.out.println("success");
             orbitLength = currentTimestep;
         }
     }

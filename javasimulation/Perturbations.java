@@ -4,6 +4,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Arrays;
 
 public class Perturbations {
     private Body[] bodies;
@@ -390,8 +391,13 @@ public class Perturbations {
         // instantiate matrices to keep track of the stability numbers and the start/stop of threads (printed out for progress visualisation)
         int[][] stabilityMatrix = new int[p][p];
         char[][] startStopMatrix = new char[p][p];
+        int[][] totalTimestepMatrix = new int[p][p];
+        int[][] orbitLengthMatrix = new int[p][p];
+        //set default 'waiting' state for all threads
+        Arrays.stream(startStopMatrix).forEach(row -> Arrays.fill(row, '-'));
 
-        System.out.println("Threads started/stopped: ");
+        options.put("findOrbitLength", true);
+        
         // Performing mini perturbation of singular pixel using threads
         for (int k = iShiftStart; k <= iShiftEnd; k++) {
             for (int l = jShiftStart; l <= jShiftEnd; l++) {
@@ -412,7 +418,12 @@ public class Perturbations {
                     } catch (Exception e) {
                     } finally{
                         // set the thread to stopped
-                        startStopMatrix[rowIndex - iShiftStart][columnIndex - jShiftStart] = '*';
+                        int firstIndex = rowIndex - iShiftStart;
+                        int secondIndex = columnIndex - jShiftStart;
+
+                        startStopMatrix[firstIndex][secondIndex] = '*';
+                        totalTimestepMatrix[firstIndex][secondIndex] = simulation.getCurrentTimestep();
+                        orbitLengthMatrix[firstIndex][secondIndex] = simulation.getOrbitLength();
                     }
                     // save the stability number to the stability matrix
                     int localStabilityNumber = simulation.getShapeSpaceStabilityNumber();
@@ -422,32 +433,7 @@ public class Perturbations {
                 });
             }
         }
-        // print out the start/stop matrix to show the progress of the threads
-        // when all threads are marked as stopped, the simulation is complete
-        boolean allThreadsCompleted = false;
-        while(!allThreadsCompleted) {
-            allThreadsCompleted = true;
-            for (int m = 0; m < p; m++) {
-                for (int n = 0; n < p; n++) {
-                    System.out.print(startStopMatrix[m][n] + " ");
-                    if (startStopMatrix[m][n] != '*') {
-                        allThreadsCompleted = false;
-                    }
-                }
-                System.out.println();
-            }
-            // wait for a second before updating the progress
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-            //magic string to move the cursor up p lines
-            System.out.print("\033[" + p + "A");
-        }
-        // Move the cursor down p lines
-        System.out.print("\033[" + p + "B");
-        System.out.println("All threads completed");
+        threadMatrixPrintout(startStopMatrix, p);
 
         // shutdown the executor and wait for all threads to finish
         executor.shutdown();
@@ -482,23 +468,19 @@ public class Perturbations {
             }
         }
 
+        // from the minimum stability number, find the optimal simulation
         optimalX = iShiftStart + minRowIndex;
         optimalY = jShiftStart + minColumnIndex;
         double newDeltaScale = Math.ceil(Math.abs(Math.log10(newDelta)));
 
+        // print the optimal perturbation
         System.out.println("Optimal delta X: " + String.format("%." + ((int)newDeltaScale + 1) + "f", optimalX * newDelta) + " Optimal delta Y: " + String.format("%." + ((int)newDeltaScale + 1 ) + "f", optimalY * newDelta));
 
-        // Finally, re-run the simulation with the optimal perturbation
-        options.put("findOrbitLength", true);
+        // save the optimal simulation conditions for the final display simulation
+        optimalOrbitLength = orbitLengthMatrix[minRowIndex][minColumnIndex];
+        optimalTotalTimesteps = totalTimestepMatrix[minRowIndex][minColumnIndex];
+
         Body[] perturbedBodies = perturbPositions(optimalX, optimalY, newDelta);
-        Simulation simulation = new Simulation(perturbedBodies, N, dt, options);
-        simulation.setIntegratorFunction(simulationIntegrator);
-        simulation.run();
-
-        optimalOrbitLength = simulation.getOrbitLength();
-        optimalTotalTimesteps = simulation.getCurrentTimestep();
-
-        perturbedBodies = perturbPositions(optimalX, optimalY, newDelta);
         options.replace("perturbPositions", false);
 
         // If an orbit is found, run the simulation for the optimal orbit length,
@@ -507,16 +489,47 @@ public class Perturbations {
             System.out.println("An orbit is " + optimalOrbitLength + " steps");
             System.out.println("Total number of orbits is " + (optimalTotalTimesteps / (double) optimalOrbitLength) );
 
-            simulation = new Simulation(perturbedBodies, optimalOrbitLength, dt, options);
+            Simulation simulation = new Simulation(perturbedBodies, optimalOrbitLength, dt, options);
             simulation.setIntegratorFunction(simulationIntegrator);
             simulation.run();            
         } else {
             System.out.println("No orbit found, running for a 100th of total steps (Total steps = " + optimalTotalTimesteps + ")");
 
-            simulation = new Simulation(perturbedBodies, optimalTotalTimesteps/100, dt, options);
+            Simulation simulation = new Simulation(perturbedBodies, optimalTotalTimesteps/100, dt, options);
             simulation.setIntegratorFunction(simulationIntegrator);
             simulation.run();   
         }
+    }
+
+    private void threadMatrixPrintout(char[][] startStopMatrix, int p){
+        // print out the start/stop matrix to show the progress of the threads
+        // when all threads are marked as stopped, the simulation is complete
+        System.out.println("Threads started (#) / stopped (*) / waiting (-): ");
+
+        boolean allThreadsCompleted = false;
+        while(!allThreadsCompleted) {
+            allThreadsCompleted = true;
+            for (int m = 0; m < p; m++) {
+                for (int n = 0; n < p; n++) {
+                    System.out.print(startStopMatrix[m][n] + " ");
+                    if (startStopMatrix[m][n] != '*') {
+                        allThreadsCompleted = false;
+                    }
+                }
+                System.out.println();
+            }
+            // wait for a second before updating the progress
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            //magic string to move the cursor up p lines
+            System.out.print("\033[" + p + "A");
+        }
+        // Move the cursor down p lines
+        System.out.print("\033[" + p + "B");
+        System.out.println("All threads completed");
     }
 
     public void perturbSingularThreadless(int i, int j, double currentDelta){
