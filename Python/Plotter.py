@@ -153,13 +153,13 @@ class Plotter():
         else:
             if fast:
                 for i in range(self.n):
-                    ax.plot(self.bodies[1,0,i], self.bodies[1,1,i], 'o', fillstyle='none', label="Body " + str(i) + "Origin", color=colors[i])
+                    ax.plot(self.bodies[0,0,i], self.bodies[0,1,i], 'o', fillstyle='none', label="Body " + str(i) + "Origin", color=colors[i])
                     ax.plot(self.bodies[:,0,i], self.bodies[:,1,i], color=colors[i], alpha=0.25)
                     ax.plot(self.bodies[-1,0,i], self.bodies[-1,1,i], 'o' ,label="Body " + str(i), color=colors[i])
             else:
             # Ensures that the most recent orbit path is on top
                 for i in range(self.n):
-                    ax.plot(self.bodies[1,0,i], self.bodies[1,1,i], 'o', fillstyle='none', label="Body " + str(i+1) + " Origin", color=colors[i], markersize=10)
+                    ax.plot(self.bodies[0,0,i], self.bodies[0,1,i], 'o', fillstyle='none', label="Body " + str(i+1) + " Origin", color=colors[i], markersize=10)
                     ax.plot(self.bodies[-1,0,i], self.bodies[-1,1,i], 'o' ,label="Body " + str(i+1), color=colors[i], markersize=10)
                 for t in range(self.N):
                     for i in range(self.n):
