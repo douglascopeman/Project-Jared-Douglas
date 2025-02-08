@@ -511,7 +511,7 @@ public class Perturbations {
             simulation.setIntegratorFunction(simulationIntegrator);
             simulation.run();            
         } else {
-            System.out.println("No orbit found, running for a 10th of total steps (Total steps = " + optimalTotalTimesteps + ")");
+            System.out.println("No orbit found, running for a 100th of total steps (Total steps = " + optimalTotalTimesteps + ")");
 
             simulation = new Simulation(perturbedBodies, optimalTotalTimesteps/100, dt, options);
             simulation.setIntegratorFunction(simulationIntegrator);

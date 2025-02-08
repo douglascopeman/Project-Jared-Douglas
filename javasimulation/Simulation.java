@@ -151,6 +151,11 @@ public class Simulation implements Runnable {
             simulation = new double[N][6][n];
         }
 
+        // To correctly track orbits we update the initial Position of bodies
+        for (int b = 0; b < n; b++) {
+            bodies[b].setInitialPosition();
+        }
+
 
         // ----- Main Time Loop ----- \\
         while (true) {
@@ -192,7 +197,7 @@ public class Simulation implements Runnable {
                 break;
             }
 
-            if (options.get("findOrbitLength") && (this.currentTimestep > 10) && (orbitLength == 1)) {
+            if (options.get("findOrbitLength") && (this.currentTimestep > 100) && (orbitLength == 1)) {
                 findOrbitLength();
             }
 
@@ -239,12 +244,13 @@ public class Simulation implements Runnable {
         for (int p = 0; p < n; p++) {
             Vector diff = bodies[p].getPosition().subtract(bodies[p].getInitialPosition());
             double distance = diff.norm();
-            if (distance > 0.03) {
+            if (distance > 0.02) {
                 hasMadeFullOrbit = false;
                 break;
             }
         }
         if (hasMadeFullOrbit) {
+            System.out.println("success");
             orbitLength = currentTimestep;
         }
     }
