@@ -493,9 +493,13 @@ public class Perturbations {
             simulation.setIntegratorFunction(simulationIntegrator);
             simulation.run();            
         } else {
-            System.out.println("No orbit found, running for a 100th of total steps (Total steps = " + optimalTotalTimesteps + ")");
+            double fractionalRunDenom = 1.0;
 
-            Simulation simulation = new Simulation(perturbedBodies, optimalTotalTimesteps/100, dt, options);
+            System.out.println("No orbit found, running for 1/" + (int) fractionalRunDenom + " of total steps (Total steps = " + optimalTotalTimesteps + ")");
+
+            int fractionalRunTimesteps = optimalTotalTimesteps / (int) fractionalRunDenom;
+
+            Simulation simulation = new Simulation(perturbedBodies, fractionalRunTimesteps, dt, options);
             simulation.setIntegratorFunction(simulationIntegrator);
             simulation.run();   
         }
