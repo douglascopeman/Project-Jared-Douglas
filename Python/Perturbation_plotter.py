@@ -239,7 +239,7 @@ class Perturbation_plotter():
         #plt.show()
         
     @dispatch(str, str, str)
-    def plot_stop_codes_gradient(self, time_filename, stop_filename, stability_filename):
+    def plot_stop_codes_gradient(self, time_filename, stop_filename, stability_filename, save=False):
         self.read_time(time_filename)
         self.read_stop_codes(stop_filename)
         self.read_stability(stability_filename)
@@ -316,13 +316,42 @@ class Perturbation_plotter():
             if (bars_made != len(categories) - 2): 
                 cbar_time.set_ticks([])
             bars_made += 1
+            
+        # Section Used to Regsiter Double Click events and produce associated orbit
+        coords = []
+
+        def onclick(event):
+            global ix, iy
+            if event.inaxes != ax: return
+            
+            ix, iy = np.floor(event.xdata-self.p), np.ceil(-event.ydata+self.p)
+            if event.dblclick or (event.button == 3):
+                deltaScale = np.ceil(np.abs(np.log10(self.delta)))
+                print (f'delta x = {ix * self.delta:.{int(deltaScale) + 1}f}, delta y = {iy * self.delta:.{int(deltaScale) + 1}f}')
+                coords.append((ix, iy))
+                command = '.\\JavaCompileAndRun.ps1 figureEight 16000 0.01 --integrator "yoshida" --perturbSingular ' + str(int(ix)) + ' ' + str(int(iy)) + ' ' + str(self.delta) + ' --calculateEnergies --calculateCentreOfMass --useVariableTimestep --calculateShapeSpace --checkStopConditions'
+                completed = subprocess.Popen(["powershell.exe",command], stdout=sys.stdout)
+                print(completed.communicate())
+                
+                plotter = Plotter.Plotter("javasimulation\\Outputs", 
+                          run_fast=True,
+                          plot_fast=True,
+                          close_all=False
+                          )
+
+                plotter.plot(save=False)
+
+            return coords
+        cid = fig.canvas.mpl_connect('button_press_event', onclick)
 
         ax.xaxis.set_tick_params(rotation=90)
         ax.yaxis.set_tick_params(rotation=0)
         ax.set_ylabel(r"$\Delta y$")
         ax.set_xlabel(r"$\Delta x$")
-        plt.savefig("plotStopCodeStabGrad.png", format="png", dpi=1000, bbox_inches='tight', pad_inches=0.2)     
-        #plt.show()
+        if save:
+            plt.savefig("plotStopCodeStabGrad.png", format="png", dpi=1000, bbox_inches='tight', pad_inches=0.2)     
+        else:
+            plt.show()
 
     def count_stop_matrix(self, stop_filename):
         self.read_stop_codes(stop_filename)
