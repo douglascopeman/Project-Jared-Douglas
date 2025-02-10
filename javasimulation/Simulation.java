@@ -244,7 +244,7 @@ public class Simulation implements Runnable {
         for (int p = 0; p < n; p++) {
             Vector diff = bodies[p].getPosition().subtract(bodies[p].getInitialPosition());
             double distance = diff.norm();
-            if (distance > 0.02) {
+            if (distance > 0.01) {
                 hasMadeFullOrbit = false;
                 break;
             }
