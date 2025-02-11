@@ -34,6 +34,7 @@ public class Simulation implements Runnable {
     private double initialEnergy;
 
     private boolean isPerturbed = false;
+    private boolean memorylessRun = false;
 
     public Simulation(Body[] bodies, int N, double dt) {
         this.bodies = bodies;
@@ -84,6 +85,10 @@ public class Simulation implements Runnable {
             }
         }
         return stabilityNumber;
+    }
+
+    public void setMemorylessRun() {
+        memorylessRun = true;
     }
 
     public static int getShapeSpaceSize() {
@@ -153,7 +158,7 @@ public class Simulation implements Runnable {
 
     public void run(){
 
-        if (!this.isPerturbed){
+        if (!this.isPerturbed || memorylessRun){
             simulation = new double[N][6][n];
         }
 
@@ -167,7 +172,7 @@ public class Simulation implements Runnable {
         while (true) {
 
             // If we are not running memoryless for pertubation 
-            if (!this.isPerturbed){
+            if (!this.isPerturbed || memorylessRun){
                 
                 // Record all optional calculations
                 doOptionalCalculations(this.currentTimestep);

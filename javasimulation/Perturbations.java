@@ -455,12 +455,12 @@ public class Perturbations {
 
         // find the optimal simulation
         int minStabilityNumber = Integer.MAX_VALUE;
-        int minRowIndex = -1;
-        int minColumnIndex = -1;
+        int minRowIndex = 1;
+        int minColumnIndex = 1;
 
         for (int m = 0; m < p; m++) {
             for (int n = 0; n < p; n++) {
-                if (stabilityMatrix[m][n] < minStabilityNumber) {
+                if (stabilityMatrix[m][n] < minStabilityNumber && stabilityMatrix[m][n] > 0) {
                     minStabilityNumber = stabilityMatrix[m][n];
                     minRowIndex = m;
                     minColumnIndex = n;
@@ -481,6 +481,7 @@ public class Perturbations {
         optimalTotalTimesteps = totalTimestepMatrix[minRowIndex][minColumnIndex];
 
         Body[] perturbedBodies = perturbPositions(optimalX, optimalY, newDelta);
+
         options.replace("perturbPositions", false);
 
         // If an orbit is found, run the simulation for the optimal orbit length,
@@ -493,11 +494,20 @@ public class Perturbations {
             simulation.setIntegratorFunction(simulationIntegrator);
             simulation.run();            
         } else {
-            double fractionalRunDenom = 1.0;
+            double fractionalRunDenom = 10.0;    // The fraction of the orbit that the location data will be saved
+            boolean isSaveEndFraction = true;   // When true the end fraction of the simulation is displayed not the start fraction, this is particularly useful for terminated simulations
 
             System.out.println("No orbit found, running for 1/" + (int) fractionalRunDenom + " of total steps (Total steps = " + optimalTotalTimesteps + ")");
 
             int fractionalRunTimesteps = optimalTotalTimesteps / (int) fractionalRunDenom;
+
+            // See the last fraction of the orbit instead of the first fraction
+            if (fractionalRunDenom != 1.0 && isSaveEndFraction){
+                Simulation simulationFirstFraction = new Simulation(perturbedBodies, optimalTotalTimesteps - fractionalRunTimesteps-1, dt, options);
+                simulationFirstFraction.setMemorylessRun();
+                simulationFirstFraction.setIntegratorFunction(simulationIntegrator);
+                simulationFirstFraction.run();
+            }
 
             Simulation simulation = new Simulation(perturbedBodies, fractionalRunTimesteps, dt, options);
             simulation.setIntegratorFunction(simulationIntegrator);
