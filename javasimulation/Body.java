@@ -4,12 +4,14 @@ public class Body {
     private double mass;
     private Vector position;
     private Vector initialPosition;
+    private Vector initialVelocity;
     private Vector velocity;
     private Vector acceleration;
 
     public Body(Vector position, Vector velocity, double mass) {
         this.position = position;
         this.initialPosition = position;
+        this.initialVelocity = velocity;
         this.velocity = velocity;
         this.mass = mass;
     }
@@ -39,8 +41,16 @@ public class Body {
         return initialPosition;
     }
 
+    public Vector getInitialVelocity() {
+        return initialVelocity;
+    }
+
     public void setInitialPosition() {
         this.initialPosition = getPosition();
+    }
+
+    public void setInitialVelocity() {
+        this.initialVelocity = getVelocity();
     }
 
     public Vector getVelocity() {
