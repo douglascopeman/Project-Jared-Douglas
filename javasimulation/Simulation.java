@@ -72,6 +72,9 @@ public class Simulation implements Runnable {
     // #region Getters and Setters
 
     public int getShapeSpaceStabilityNumber() {
+        if (stopCode != 'X') {
+            return 0;
+        }
         int stabilityNumber = 0;
         for (int[] row : shapeSpace) {
             for (int value : row) {
@@ -88,6 +91,9 @@ public class Simulation implements Runnable {
     }
 
     public int getOrbitLength() {
+        if (stopCode != 'X') {
+            return 1;
+        }
         return orbitLength;
     }
 
