@@ -75,6 +75,7 @@ class Plotter():
         if save:
             fig_orbits.savefig("Python/Figures/Orbits.png")
             print("Orbits plot saved as 'Python/Figures/Orbits.png'")
+            plt.close()
         else:
             plt.show()
         
