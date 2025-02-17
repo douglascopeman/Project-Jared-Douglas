@@ -167,83 +167,20 @@ class Perturbation_plotter():
 
     # TODO: The following two functions could use a lot of cleanup for duplicate code
 
-    @dispatch(str, str)
-    def plot_stop_codes_gradient(self, time_filename, stop_filename):
+    @dispatch(str, str, save=bool)
+    def plot_stop_codes_gradient(self, time_filename, stop_filename, save=False):
         self.read_time(time_filename)
-        self.read_stop_codes(stop_filename)
-
-        # Set up the plot
-        fig, ax = plt.subplots()
-        fig.set_size_inches(8, 6)
-        ax.set_title("Category Heatmap")
+        faux_stability = 'ingore_this'
+        self.plot_stop_codes_gradient(time_filename, stop_filename, faux_stability, save=save)
         
-        # Create a dataframe from the matrix
-        df_stop = pd.DataFrame(self.stop_code_matrix.T, columns=self.axis_labels, index=-self.axis_labels)
-        df_time = pd.DataFrame(self.time_matrix.T, columns=self.axis_labels, index=-self.axis_labels)
-
-        # Get unique categories
-        categories = sorted(df_stop.stack().unique().tolist())
-        category_map = {cat: str(i) for i, cat in enumerate(categories)}
-        df_stop = df_stop.replace(category_map).astype(int)
-        
-        #normalise the two numeric matrices
-        norm_time = LogNorm(vmin=self.time_matrix.min()+1, vmax=self.time_matrix.max())
-        
-        for i in range(len(categories) - 1):
-            if i == 0: 
-                cmap_time = sns.color_palette("mako", as_cmap=True)
-            elif i == 1: 
-                cmap_time = sns.color_palette("rocket", as_cmap=True)
-            else:
-                cmap_time = sns.color_palette(self.color_map_blends[i], as_cmap=True)
-            
-            df_time_mask = df_time.where(df_stop == i)
-            heatmap = sns.heatmap(df_time_mask, cmap=cmap_time, norm=norm_time, fmt="s", cbar=False, ax=ax, square=True, xticklabels=self.skip_no_labels, yticklabels=self.skip_no_labels)
-            
-        
-        divider = make_axes_locatable(ax)
-
-        # Time colorbars
-        #then iterate through all categories other than completion and create a colorbar for each
-        bars_made = 0
-        colors_used = 0
-        for i in range(len(categories)):
-            if (categories[i] == "X"): continue
-            #set the colourmap correctly
-            if colors_used == 0:
-                cmap_time = sns.color_palette("mako", as_cmap=True)
-            elif colors_used == 1:
-                cmap_time = sns.color_palette("rocket", as_cmap=True)
-            else:
-                cmap_time = sns.color_palette(self.color_map_blends[colors_used], as_cmap=True)
-            sm_time = plt.cm.ScalarMappable(cmap=cmap_time, norm=norm_time)
-            colors_used += 1
-            sm_time.set_array([])
-            #create the colorbar and place it in the right space
-            #if the colorbar is the first, leave space for the stability colorbar ticks
-            cax_time = divider.append_axes("right", size="5%", pad= 0.75 if (bars_made == 0) else 0.1)
-            cbar_time = plt.colorbar(sm_time, cax=cax_time, orientation="vertical")
-            cbar_time.ax.set_title(categories[i], pad=10)
-            #if the colorbar is the first, we also label it
-            if (bars_made == 0):
-                cbar_time.set_label("Time Number", labelpad=1, rotation=90)
-                cbar_time.ax.yaxis.set_label_position('left')
-            #if the colorbar is not the last, remove the ticks
-            if (bars_made != len(categories) - 2): 
-                cbar_time.set_ticks([])
-            bars_made += 1
-
-        plt.xlabel(r"$\Delta x$")
-        plt.ylabel(r"$\Delta y$")
-
-        plt.savefig("plotStopCodeGrad.png", format="png", dpi=1000, bbox_inches='tight', pad_inches=0.2)
-        #plt.show()
-        
-    @dispatch(str, str, str)
+    @dispatch(str, str, str, save=bool)
     def plot_stop_codes_gradient(self, time_filename, stop_filename, stability_filename, save=False):
         self.read_time(time_filename)
         self.read_stop_codes(stop_filename)
-        self.read_stability(stability_filename)
+        if stability_filename == 'ingore_this':
+            self.stability_matrix = np.zeros((self.plot_size, self.plot_size), dtype=int)
+        else:
+            self.read_stability(stability_filename)
 
         # Set up the plot
         fig, ax = plt.subplots()
@@ -264,8 +201,9 @@ class Perturbation_plotter():
         norm_time = LogNorm(vmin=self.time_matrix.min()+1, vmax=self.time_matrix.max())
         norm_stability = plt.Normalize(vmin=self.stability_matrix.min(), vmax=self.stability_matrix.max())
         
-        cmap_stability = sns.color_palette(self.stable_color_blend, as_cmap=True)
-        sns.heatmap(df_stability, cmap=cmap_stability, norm=norm_stability,fmt="s", cbar=False, cbar_kws={"shrink": 0.5}, ax=ax, square=True, xticklabels=self.skip_no_labels, yticklabels=self.skip_no_labels)
+        if stability_filename != 'ingore_this':
+            cmap_stability = sns.color_palette(self.stable_color_blend, as_cmap=True)
+            sns.heatmap(df_stability, cmap=cmap_stability, norm=norm_stability,fmt="s", cbar=False, cbar_kws={"shrink": 0.5}, ax=ax, square=True, xticklabels=self.skip_no_labels, yticklabels=self.skip_no_labels)
 
         for i in range(len(categories) - 1):
             if i == 0:
@@ -278,16 +216,19 @@ class Perturbation_plotter():
             heatmap = sns.heatmap(df_time_mask, cmap=cmap_time, norm=norm_time, fmt="s", cbar=False, ax=ax, square=True, xticklabels=self.skip_no_labels, yticklabels=self.skip_no_labels)
             
         # Stability colorbar
-        sm_stability = plt.cm.ScalarMappable(cmap=cmap_stability, norm=norm_stability)
-        sm_stability.set_array([])
-        divider = make_axes_locatable(ax)
-        cax_stability = divider.append_axes("right", size="5%", pad=0.25)
-        cbar_stability = plt.colorbar(sm_stability, cax=cax_stability, orientation="vertical")
-        cbar_stability.ax.invert_yaxis()
-        cbar_stability.ax.yaxis.set_ticks_position('right')
-        cbar_stability.ax.yaxis.set_label_position('right')
-        cbar_stability.set_label("Stability Number", labelpad=1, rotation=90)
-        cbar_stability.ax.yaxis.set_label_position('left')
+        if stability_filename != 'ingore_this':
+            sm_stability = plt.cm.ScalarMappable(cmap=cmap_stability, norm=norm_stability)
+            sm_stability.set_array([])
+            divider = make_axes_locatable(ax)
+            cax_stability = divider.append_axes("right", size="5%", pad=0.25)
+            cbar_stability = plt.colorbar(sm_stability, cax=cax_stability, orientation="vertical")
+            cbar_stability.ax.invert_yaxis()
+            cbar_stability.ax.yaxis.set_ticks_position('right')
+            cbar_stability.ax.yaxis.set_label_position('right')
+            cbar_stability.set_label("Stability Number", labelpad=1, rotation=90)
+            cbar_stability.ax.yaxis.set_label_position('left')
+        else:
+            divider = make_axes_locatable(ax)
 
         #then iterate through all categories other than completion and create a colorbar for each
         bars_made = 0
