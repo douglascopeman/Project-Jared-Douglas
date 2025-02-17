@@ -178,7 +178,7 @@ class Perturbation_plotter():
         self.read_time(time_filename)
         self.read_stop_codes(stop_filename)
         if stability_filename == 'ingore_this':
-            self.stability_matrix = np.zeros((self.plot_size, self.plot_size), dtype=int)
+            self.stability_matrix = np.ones_like(self.time_matrix)
         else:
             self.read_stability(stability_filename)
 
@@ -201,9 +201,8 @@ class Perturbation_plotter():
         norm_time = LogNorm(vmin=self.time_matrix.min()+1, vmax=self.time_matrix.max())
         norm_stability = plt.Normalize(vmin=self.stability_matrix.min(), vmax=self.stability_matrix.max())
         
-        if stability_filename != 'ingore_this':
-            cmap_stability = sns.color_palette(self.stable_color_blend, as_cmap=True)
-            sns.heatmap(df_stability, cmap=cmap_stability, norm=norm_stability,fmt="s", cbar=False, cbar_kws={"shrink": 0.5}, ax=ax, square=True, xticklabels=self.skip_no_labels, yticklabels=self.skip_no_labels)
+        cmap_stability = sns.color_palette(self.stable_color_blend, as_cmap=True)
+        sns.heatmap(df_stability, cmap=cmap_stability, norm=norm_stability,fmt="s", cbar=False, cbar_kws={"shrink": 0.5}, ax=ax, square=True, xticklabels=self.skip_no_labels, yticklabels=self.skip_no_labels)
 
         for i in range(len(categories) - 1):
             if i == 0:
@@ -291,7 +290,7 @@ class Perturbation_plotter():
         ax.set_ylabel(r"$\Delta y$")
         ax.set_xlabel(r"$\Delta x$")
         if save:
-            plt.savefig("plotStopCodeStabGrad.png", format="png", dpi=1000, bbox_inches='tight', pad_inches=0.2)     
+            plt.savefig("Python/Figures/Gradient_Codes_Plot.png", format="png", dpi=1000, bbox_inches='tight', pad_inches=0.2)     
         else:
             plt.show()
 
