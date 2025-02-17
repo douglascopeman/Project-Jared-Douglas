@@ -150,6 +150,7 @@ class Perturbation_plotter():
                           close_all=False
                           )
 
+                plotter.shape_space(save=True)
                 plotter.plot(save=save_dbl_click)
 
             return coords

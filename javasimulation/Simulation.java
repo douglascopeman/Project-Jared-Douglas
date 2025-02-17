@@ -158,7 +158,7 @@ public class Simulation implements Runnable {
 
     public void run(){
 
-        if (!this.isPerturbed || memorylessRun){
+        if (!this.isPerturbed && !memorylessRun){
             simulation = new double[N][6][n];
         }
 
@@ -173,7 +173,7 @@ public class Simulation implements Runnable {
         while (true) {
 
             // If we are not running memoryless for pertubation 
-            if (!this.isPerturbed || memorylessRun){
+            if (!this.isPerturbed && !memorylessRun){
                 
                 // Record all optional calculations
                 doOptionalCalculations(this.currentTimestep);
@@ -228,7 +228,7 @@ public class Simulation implements Runnable {
 
         }
 
-        if (!options.get("skipSaveToCSV") || !this.isPerturbed)  {
+        if (!options.get("skipSaveToCSV") || !this.isPerturbed && !memorylessRun)  {
             writeSimulationToFiles();       
         }
     }

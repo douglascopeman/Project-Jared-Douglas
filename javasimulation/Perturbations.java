@@ -455,8 +455,8 @@ public class Perturbations {
 
         // find the optimal simulation
         int minStabilityNumber = Integer.MAX_VALUE;
-        int minRowIndex = 1;
-        int minColumnIndex = 1;
+        int minRowIndex = 0;
+        int minColumnIndex = 0;
 
         for (int m = 0; m < p; m++) {
             for (int n = 0; n < p; n++) {
@@ -494,7 +494,7 @@ public class Perturbations {
             simulation.setIntegratorFunction(simulationIntegrator);
             simulation.run();            
         } else {
-            double fractionalRunDenom = 10.0;    // The fraction of the orbit that the location data will be saved
+            double fractionalRunDenom = 100.0;    // The fraction of the orbit that the location data will be saved
             boolean isSaveEndFraction = true;   // When true the end fraction of the simulation is displayed not the start fraction, this is particularly useful for terminated simulations
 
             System.out.println("No orbit found, running for 1/" + (int) fractionalRunDenom + " of total steps (Total steps = " + optimalTotalTimesteps + ")");
@@ -508,7 +508,6 @@ public class Perturbations {
                 simulationFirstFraction.setIntegratorFunction(simulationIntegrator);
                 simulationFirstFraction.run();
             }
-
             Simulation simulation = new Simulation(perturbedBodies, fractionalRunTimesteps, dt, options);
             simulation.setIntegratorFunction(simulationIntegrator);
             simulation.run();   
