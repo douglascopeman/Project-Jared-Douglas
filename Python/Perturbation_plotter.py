@@ -167,14 +167,15 @@ class Perturbation_plotter():
 
     # TODO: The following two functions could use a lot of cleanup for duplicate code
 
-    @dispatch(str, str, save=bool)
+    # @dispatch(str, str, save=bool)
     def plot_stop_codes_gradient(self, time_filename, stop_filename, save=False):
+        save_the_other_one = save
         self.read_time(time_filename)
         faux_stability = 'ingore_this'
-        self.plot_stop_codes_gradient(time_filename, stop_filename, faux_stability, save=save)
+        self.plot_stop_codes_stab_gradient(time_filename, stop_filename, faux_stability, save=save_the_other_one)
         
-    @dispatch(str, str, str, save=bool)
-    def plot_stop_codes_gradient(self, time_filename, stop_filename, stability_filename, save=False):
+    # @dispatch(str, str, str, save=bool)
+    def plot_stop_codes_stab_gradient(self, time_filename, stop_filename, stability_filename, save=False):
         self.read_time(time_filename)
         self.read_stop_codes(stop_filename)
         if stability_filename == 'ingore_this':
@@ -194,8 +195,14 @@ class Perturbation_plotter():
 
         # Get unique categories
         categories = sorted(df_stop.stack().unique().tolist())
+        categories = [cat for cat in categories if cat not in ['F', 'X']] + (['F', 'X'] if 'F' in categories else ['X']) #Move initialisation failure 'F' to the end
+        print('F' in categories)
         category_map = {cat: str(i) for i, cat in enumerate(categories)}
         df_stop = df_stop.replace(category_map).astype(int)
+        
+        # If there are failures to initialise, the stability is set to 100000 as the size of the stability matrix squared. Here, we replace this by 0 to get the scale working correctly in the plot
+        if 'F' in categories: 
+            df_stability[df_stability == 1000000] = 0
         
         #normalise the two numeric matrices
         norm_time = LogNorm(vmin=self.time_matrix.min()+1, vmax=self.time_matrix.max())
@@ -204,6 +211,7 @@ class Perturbation_plotter():
         cmap_stability = sns.color_palette(self.stable_color_blend, as_cmap=True)
         sns.heatmap(df_stability, cmap=cmap_stability, norm=norm_stability,fmt="s", cbar=False, cbar_kws={"shrink": 0.5}, ax=ax, square=True, xticklabels=self.skip_no_labels, yticklabels=self.skip_no_labels)
 
+        colors_used = 0
         for i in range(len(categories) - 1):
             if i == 0:
                 cmap_time = sns.color_palette("mako", as_cmap=True)
@@ -213,6 +221,7 @@ class Perturbation_plotter():
                 cmap_time = sns.color_palette(self.color_map_blends[colors_used], as_cmap=True)
             df_time_mask = df_time.where(df_stop == i)
             heatmap = sns.heatmap(df_time_mask, cmap=cmap_time, norm=norm_time, fmt="s", cbar=False, ax=ax, square=True, xticklabels=self.skip_no_labels, yticklabels=self.skip_no_labels)
+            colors_used += 1
             
         # Stability colorbar
         if stability_filename != 'ingore_this':
@@ -234,6 +243,7 @@ class Perturbation_plotter():
         colors_used = 0
         for i in range(len(categories)):
             if (categories[i] == "X"): continue
+            if (categories[i] == "F"): continue
             #set the colourmap correctly
             if colors_used == 0:
                 cmap_time = sns.color_palette("mako", as_cmap=True)
@@ -254,7 +264,8 @@ class Perturbation_plotter():
                 cbar_time.set_label("Time Number", labelpad=1, rotation=90)
                 cbar_time.ax.yaxis.set_label_position('left')
             #if the colorbar is not the last, remove the ticks
-            if (bars_made != len(categories) - 2): 
+            subtract_num = 2 if 'F' not in categories else 3
+            if (bars_made != len(categories) - subtract_num): 
                 cbar_time.set_ticks([])
             bars_made += 1
             
