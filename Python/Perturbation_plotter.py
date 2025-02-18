@@ -197,7 +197,6 @@ class Perturbation_plotter():
         # Get unique categories
         categories = sorted(df_stop.stack().unique().tolist())
         categories = [cat for cat in categories if cat not in ['F', 'X']] + (['F', 'X'] if 'F' in categories else ['X']) #Move initialisation failure 'F' to the end
-        print('F' in categories)
         category_map = {cat: str(i) for i, cat in enumerate(categories)}
         df_stop = df_stop.replace(category_map).astype(int)
         
