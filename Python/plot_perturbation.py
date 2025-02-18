@@ -14,8 +14,8 @@ import ThreeDimensionalPerturbationPlot
 
 
 pertubation_3dplot = ThreeDimensionalPerturbationPlot.ThreeDimensionalPerturbationPlot("C:\\Users\\Douglas\\OneDrive - University of Edinburgh\\Uni\\Project-Jared-Douglas\\PaperTrail\\Pertubations\\MathsServers\\400x400x400 Angular Momentum 353h")
-pertubation_3dplot.plot_slice([180,190, 200,210, 220,230], dxda=True)
-pertubation_3dplot.plot_slice([180,190, 200,210,220,230], dyda=True)
+#pertubation_3dplot.plot_slice([240,250,260,270], dxda=True)
+pertubation_3dplot.plot_slice([357, 358, 359], is_stability_only=True, save_dbl_click=True)
 
 
 print("Done!")
