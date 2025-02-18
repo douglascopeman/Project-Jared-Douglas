@@ -5,6 +5,7 @@ import numpy as np
 import os
 import Body
 import seaborn as sns
+import matplotlib.colors as mcolors
 import pandas as pd
 from matplotlib.colors import ListedColormap
 from mpl_toolkits.axes_grid1 import make_axes_locatable
@@ -217,6 +218,16 @@ class Perturbation_plotter():
                 cmap_time = sns.color_palette("mako", as_cmap=True)
             elif i == 1:
                 cmap_time = sns.color_palette("rocket", as_cmap=True)
+            elif i == 2:
+                my_greens_colors = [
+                        (0, 0, 0),        # Black (at 0.0)
+                        (0.05, 0.4, 0.05),      # Dark Green (adjust as needed, around 0.25)
+                        (0.25, 0.8, 0.25),  # Brighter Green (adjust, around 0.4)
+                        (0.5, 0.8, 0.3),    # Yellow (adjust, around 0.7)
+                        (0.95, 0.95, 0.95)         # White (at 1.0)
+                    ]
+                # Create the colormap using LinearSegmentedColormap
+                cmap_time = mcolors.LinearSegmentedColormap.from_list("my_greens", my_greens_colors)
             else:
                 cmap_time = sns.color_palette(self.color_map_blends[colors_used], as_cmap=True)
             df_time_mask = df_time.where(df_stop == i)
@@ -249,6 +260,16 @@ class Perturbation_plotter():
                 cmap_time = sns.color_palette("mako", as_cmap=True)
             elif colors_used == 1:
                 cmap_time = sns.color_palette("rocket", as_cmap=True)
+            elif colors_used == 2:
+                my_greens_colors = [
+                        (0, 0, 0),        # Black (at 0.0)
+                        (0.05, 0.4, 0.05),      # Dark Green (adjust as needed, around 0.25)
+                        (0.4, 0.8, 0.4),  # Brighter Green (adjust, around 0.4)
+                        (0.5, 0.8, 0.3),    # Yellow (adjust, around 0.7)
+                        (0.95, 0.95, 0.95)         # White (at 1.0)
+                    ]
+                # Create the colormap using LinearSegmentedColormap
+                cmap_time = mcolors.LinearSegmentedColormap.from_list("my_greens", my_greens_colors)
             else:
                 cmap_time = sns.color_palette(self.color_map_blends[colors_used], as_cmap=True)
             sm_time = plt.cm.ScalarMappable(cmap=cmap_time, norm=norm_time)
