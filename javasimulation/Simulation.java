@@ -257,7 +257,7 @@ public class Simulation implements Runnable {
             Vector diffPos = bodies[p].getPosition().subtract(bodies[p].getInitialPosition());
             Vector diffVel = bodies[p].getVelocity().subtract(bodies[p].getInitialVelocity());
             double diff = diffPos.norm() + diffVel.norm();
-            if (diff > 0.01) {
+            if (diff > 0.02) {
                 hasMadeFullOrbit = false;
                 break;
             }
