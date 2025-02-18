@@ -514,6 +514,168 @@ public class Perturbations {
         }
     }
 
+    // Overloading perturbSingular for the 3D case
+    public void perturbSingular(int m, double currentAngularMomentumDelta, int i, int j, double currentDelta){
+        final int p = this.perturbSingularSubdivide; // This is the grid size of this more granular perturbation plot
+
+        // The variables which will save the co ordinates of the best simulation
+        int optimalX = 0;
+        int optimalY = 0;
+        int optimalAngular = 0;
+        int optimalOrbitLength = 1;
+        int optimalTotalTimesteps = 1;
+
+        //find the new simulation conditions
+        int newHalfGridSize = (p-1)/2;
+        int iShiftStart = (i*p)-newHalfGridSize;
+        int iShiftEnd = (i*p)+newHalfGridSize;
+        int jShiftStart = (j*p)-newHalfGridSize;
+        int jShiftEnd = (j*p)+newHalfGridSize;
+        int mShiftStart = (m*p)-newHalfGridSize;
+        int mShiftEnd = (m*p)+newHalfGridSize;
+        double newDelta = currentDelta / p;
+        double newAngularMomentumDelta = currentAngularMomentumDelta / p;
+
+        int maxThreads = Runtime.getRuntime().availableProcessors();
+        ExecutorService executor = Executors.newFixedThreadPool(maxThreads);
+        // instantiate matrices to keep track of the stability numbers and the start/stop of threads (printed out for progress visualisation)
+        int[][][] stabilityMatrix = new int[p][p][p];
+        char[][][] startStopMatrix = new char[p][p][p];
+        int[][][] totalTimestepMatrix = new int[p][p][p];
+        int[][][] orbitLengthMatrix = new int[p][p][p];
+        //set default 'waiting' state for all threads
+        //Arrays.stream(startStopMatrix).forEach(row -> Arrays.fill(row, '-'));
+
+        options.put("findOrbitLength", true);
+        
+        // Performing mini perturbation of singular pixel using threads
+        for (int k = iShiftStart; k <= iShiftEnd; k++) {
+            for (int l = jShiftStart; l <= jShiftEnd; l++) {
+                for (int n = mShiftStart; n <= mShiftEnd; n++){
+                    final int rowIndex = k;
+                    final int columnIndex = l;
+                    final int angularIndex = n;
+                    // submit a job to the executor with the perturbation of the simulation
+                    executor.submit(() -> {
+                        Body[] perturbedBodies = perturbAngularMomentum(angularIndex, newAngularMomentumDelta, rowIndex, columnIndex, newDelta);
+                        Simulation simulation = new Simulation(perturbedBodies, N, dt, options);
+                        simulation.setIntegratorFunction(simulationIntegrator);
+                        
+                        Thread simThread = new Thread(simulation);
+                        try {
+                            // set the current thread running and wait for it to finish
+                            startStopMatrix[rowIndex - iShiftStart][columnIndex - jShiftStart][angularIndex - mShiftStart] = '#';
+                            simThread.start();
+                            simThread.join();
+                        } catch (Exception e) {
+                        } finally{
+                            // set the thread to stopped
+                            int firstIndex = rowIndex - iShiftStart;
+                            int secondIndex = columnIndex - jShiftStart;
+                            int thirdIndex = angularIndex - mShiftStart;
+
+                            startStopMatrix[firstIndex][secondIndex][thirdIndex] = '*';
+                            totalTimestepMatrix[firstIndex][secondIndex][thirdIndex] = simulation.getCurrentTimestep();
+                            orbitLengthMatrix[firstIndex][secondIndex][thirdIndex] = simulation.getOrbitLength();
+                        }
+                        // save the stability number to the stability matrix
+                        int localStabilityNumber = simulation.getShapeSpaceStabilityNumber();
+                        synchronized (stabilityMatrix) {
+                        stabilityMatrix[rowIndex - iShiftStart][columnIndex - jShiftStart][angularIndex - mShiftStart] = localStabilityNumber;
+                        }
+                    });
+                }
+            }
+        }
+        //threadMatrixPrintout(startStopMatrix, p);
+
+        // shutdown the executor and wait for all threads to finish
+        executor.shutdown();
+        try {
+            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+        } catch (InterruptedException e) {
+            System.err.println("Error in executor.awaitTermination");
+        }
+
+        // Print the stability matrix
+        System.out.println("Stability Matrix:");
+        for (int r = 0; r < p; r++) {
+            for (int n = 0; n < p; n++) {
+                for (int q = 0; q < p; q++){
+                    System.out.print(stabilityMatrix[r][n][q] + " ");
+                }
+                System.out.println(" ");
+            }
+            System.out.println();
+        }
+
+
+        // find the optimal simulation
+        int minStabilityNumber = Integer.MAX_VALUE;
+        int minRowIndex = 0;
+        int minColumnIndex = 0;
+        int minAngularIndex = 0;
+
+        for (int r = 0; r < p; r++) {
+            for (int n = 0; n < p; n++) {
+                for (int q = 0; q < p; q++){
+                    if (stabilityMatrix[r][n][q] < minStabilityNumber && stabilityMatrix[r][n][q] > 0) {
+                        minStabilityNumber = stabilityMatrix[r][n][q];
+                        minRowIndex = r;
+                        minColumnIndex = n;
+                        minAngularIndex = q;
+                    }
+                }
+            }
+        }
+
+        // from the minimum stability number, find the optimal simulation
+        optimalX = iShiftStart + minRowIndex;
+        optimalY = jShiftStart + minColumnIndex;
+        optimalAngular = mShiftStart + minAngularIndex;
+        double newDeltaScale = Math.ceil(Math.abs(Math.log10(newDelta)));
+
+        // print the optimal perturbation
+        System.out.println("Optimal delta X: " + String.format("%." + ((int)newDeltaScale + 1) + "f", optimalX * newDelta) + " Optimal delta Y: " + String.format("%." + ((int)newDeltaScale + 1 ) + "f", optimalY * newDelta));
+
+        // save the optimal simulation conditions for the final display simulation
+        optimalOrbitLength = orbitLengthMatrix[minRowIndex][minColumnIndex][minAngularIndex];
+        optimalTotalTimesteps = totalTimestepMatrix[minRowIndex][minColumnIndex][minAngularIndex];
+
+        Body[] perturbedBodies = perturbAngularMomentum(optimalAngular, newAngularMomentumDelta, optimalX, optimalY, newDelta);
+
+        options.replace("perturbPositions", false);
+
+        // If an orbit is found, run the simulation for the optimal orbit length,
+        // otherwise run for a 10th of the total steps
+        if (optimalOrbitLength != 1) {
+            System.out.println("An orbit is " + optimalOrbitLength + " steps");
+            System.out.println("Total number of orbits is " + (optimalTotalTimesteps / (double) optimalOrbitLength) );
+
+            Simulation simulation = new Simulation(perturbedBodies, optimalOrbitLength, dt, options);
+            simulation.setIntegratorFunction(simulationIntegrator);
+            simulation.run();            
+        } else {
+            double fractionalRunDenom = 100.0;    // The fraction of the orbit that the location data will be saved
+            boolean isSaveEndFraction = true;   // When true the end fraction of the simulation is displayed not the start fraction, this is particularly useful for terminated simulations
+
+            System.out.println("No orbit found, running for 1/" + (int) fractionalRunDenom + " of total steps (Total steps = " + optimalTotalTimesteps + ")");
+
+            int fractionalRunTimesteps = optimalTotalTimesteps / (int) fractionalRunDenom;
+
+            // See the last fraction of the orbit instead of the first fraction
+            if (fractionalRunDenom != 1.0 && isSaveEndFraction){
+                Simulation simulationFirstFraction = new Simulation(perturbedBodies, optimalTotalTimesteps - fractionalRunTimesteps-1, dt, options);
+                simulationFirstFraction.setMemorylessRun();
+                simulationFirstFraction.setIntegratorFunction(simulationIntegrator);
+                simulationFirstFraction.run();
+            }
+            Simulation simulation = new Simulation(perturbedBodies, fractionalRunTimesteps, dt, options);
+            simulation.setIntegratorFunction(simulationIntegrator);
+            simulation.run();   
+        }
+    }
+
     private void threadMatrixPrintout(char[][] startStopMatrix, int p){
         // print out the start/stop matrix to show the progress of the threads
         // when all threads are marked as stopped, the simulation is complete
@@ -614,6 +776,8 @@ public class Perturbations {
             simulation.run();   
         }
     }
+    
+
     
 }
 
