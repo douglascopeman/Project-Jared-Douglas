@@ -159,6 +159,9 @@ class ThreeDimensionalPerturbationPlot():
         fig, ax = plt.subplots()
         fig.set_size_inches(10,8)
         #ax.set_title("Category Heatmap")
+
+        # Ensure all values less than 1 show up as 0
+        df_time[df_time < 1] = 1
         
         # Get unique categories
         categories = sorted(df_stop.stack().unique().tolist())
@@ -170,7 +173,7 @@ class ThreeDimensionalPerturbationPlot():
             category_map = {"X":1}
         
         #normalise the two numeric matrices
-        norm_time = LogNorm(vmin=self.time_matrix.min()+1, vmax=self.time_matrix.max())
+        norm_time = LogNorm(vmin=1, vmax=17000)
         norm_stability = plt.Normalize(vmin=self.stability_matrix.min(), vmax=self.stability_matrix.max())
         
         # Adjusting the colour pallet if we are plotting only the stability points
@@ -185,15 +188,17 @@ class ThreeDimensionalPerturbationPlot():
             not_stable = df_stability[df_stability == 0]
             sns.heatmap(not_stable, cmap="Greys", annot=False, fmt="s", square=True, cbar=False, xticklabels=self.skip_no_labels, yticklabels=self.skip_no_labels)
 
+        count = len(categories) -1
+        if category_map.get("X") == None:
+            count += 1
 
-
-        for i in range(len(categories) - 1):
+        for i in range(count):
             if i == 0:
                 cmap_time = sns.color_palette("mako", as_cmap=True)
             elif i == 1:
                 cmap_time = sns.color_palette("rocket", as_cmap=True)
             else:
-                cmap_time = sns.color_palette(self.color_map_blends[colors_used], as_cmap=True)
+                cmap_time = sns.color_palette(self.color_map_blends[i], as_cmap=True)
             df_time_mask = df_time.where(df_stop == i)
             heatmap = sns.heatmap(df_time_mask, cmap=cmap_time, norm=norm_time, fmt="s", cbar=False, ax=ax, square=True, xticklabels=self.skip_no_labels, yticklabels=self.skip_no_labels)
             
@@ -272,7 +277,7 @@ class ThreeDimensionalPerturbationPlot():
 
             return coords
         cid = fig.canvas.mpl_connect('button_press_event', onclick)
-        plt.show()
+        #plt.show()
 
         return plt
 
@@ -322,4 +327,4 @@ class ThreeDimensionalPerturbationPlot():
                 df_stability = pd.DataFrame(self.stability_matrix[:,:],columns=axis_labels, index=-axis_labels)
                 
                 plot = self.plot_stop_codes_gradient(df_time, df_stop, df_stability, is_stability_only)
-                #plot.savefig("Python/Figures/dxdySlice" + str(np.round(slice*self.delta_axis2,4)) + ".png", format="png", dpi=300, bbox_inches='tight', pad_inches=0.2)     
+                plot.savefig("Python/Figures/dxdySlice" + str(np.round(slice*self.delta_axis2,4)) + ".png", format="png", dpi=300, bbox_inches='tight', pad_inches=0.2)     
