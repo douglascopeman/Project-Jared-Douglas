@@ -21,11 +21,11 @@ public class OrbitExamples {
         new Body(new Vector(-1, 0, 0), new Vector(0, -0.1, 0))
     };
 
-    private static double a = Math.sqrt(5.0/4.0);
+    private static double v = Math.sqrt(5.0/4.0);
     public static Body[] eulerThree = {
-        new Body(new Vector(1, 0, 0), new Vector(0, a, 0)),
+        new Body(new Vector(1, 0, 0), new Vector(0, v, 0)),
         new Body(new Vector(), new Vector()),
-        new Body(new Vector(-1, 0, 0), new Vector(0, -a, 0))
+        new Body(new Vector(-1, 0, 0), new Vector(0, -v, 0))
     };
 
 
