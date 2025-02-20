@@ -87,6 +87,8 @@ public class SimulationIO {
                     break;
                 case "perturbSingular":
                     perturbationsOptions.replace("perturbPositions",true);
+                case "perturbSingularAngular":
+                    perturbationsOptions.replace("perturbPositions",true);
                 default:
             }
         }

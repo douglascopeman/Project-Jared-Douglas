@@ -36,6 +36,20 @@ public class Run{
             //simulation.run();
 
             perturbations.perturbSingular(i_shift, j_shift, delta);
+        } else if (clOptionsList.contains("--perturbSingularAngular")){
+            SimulationIO.setupDirectories();
+            int perturbSingularIndex = clOptionsList.indexOf("--perturbSingularAngular");
+            Perturbations perturbations = new Perturbations(bodies, N, dt, clOptionsList);
+            int m_shift = Integer.parseInt(clOptionsList.get(perturbSingularIndex + 1));
+            float angularDelta = Float.parseFloat(clOptionsList.get(perturbSingularIndex + 2));
+            int i_shift = Integer.parseInt(clOptionsList.get(perturbSingularIndex + 3));
+            int j_shift = Integer.parseInt(clOptionsList.get(perturbSingularIndex + 4));
+            float delta = Float.parseFloat(clOptionsList.get(perturbSingularIndex + 5));
+            // bodies = perturbations.perturbPositions(i_shift, j_shift, delta);
+            //Simulation simulation = new Simulation(bodies, N, dt, clOptionsList);
+            //simulation.run();
+
+            perturbations.perturbSingular(m_shift, angularDelta, i_shift, j_shift, delta);
         } else {
             SimulationIO.setupDirectories();
             Simulation simulation = new Simulation(bodies, N, dt, clOptionsList);

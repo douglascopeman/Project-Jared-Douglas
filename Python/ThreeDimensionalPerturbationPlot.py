@@ -10,17 +10,19 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib.colors import ListedColormap
 import matplotlib.animation as animation
 from matplotlib.colors import LogNorm, Normalize
+import subprocess, sys
+import Plotter
 
 
 class ThreeDimensionalPerturbationPlot():
 
     def __init__(self, output_directory, is_energy = False):
         self.output_directory = output_directory
+        self.is_energy = is_energy
 
-        self.read_data(is_energy) 
+        self.read_settings()
 
-    def read_data(self, is_energy):
-
+    def read_settings(self):
         # Reading the settings file
         with open(os.path.join(self.output_directory, "3dperturbationSettings.csv"), 'r') as f:
             data = np.loadtxt(f, delimiter=',')
@@ -30,21 +32,24 @@ class ThreeDimensionalPerturbationPlot():
             self.p_axis1 = int(data[3])
             self.p_axis2 = int(data[4])
             self.plot_size_axis1 = 2*self.p_axis1 + 1
-            if is_energy:
+            if self.is_energy:
                 self.plot_size_axis2 = 2*self.p_axis2 +1
             else:
                 self.plot_size_axis2 = self.p_axis2+1
             # Axis 1 will be the dimension of the matrix in each csv file and axis 2
             # will be the number of csv files
 
-            self.color_map_blends = ["blend:#300,#E00", "blend:#003,#00E", "blend:#030,#0E0", "blend:#330,#CC0", "blend:#033,#0CC", "blend:#303,#C0C"]
-            self.stable_color_blend = "blend:#FFF,#000" #Scale going other way as big numbers are less stable vs big time being better above
+        self.color_map_blends = ["blend:#300,#E00", "blend:#003,#00E", "blend:#030,#0E0", "blend:#330,#CC0", "blend:#033,#0CC", "blend:#303,#C0C"]
+        self.stable_color_blend = "blend:#FFF,#000" #Scale going other way as big numbers are less stable vs big time being better above
 
 
-            # Initialising the matrix variables
-            self.time_matrix = np.zeros((self.plot_size_axis1, self.plot_size_axis1, self.plot_size_axis2), dtype=int)
-            self.stop_code_matrix = np.zeros((self.plot_size_axis1, self.plot_size_axis1, self.plot_size_axis2), dtype=str)
-            self.stability_matrix = np.zeros((self.plot_size_axis1, self.plot_size_axis1, self.plot_size_axis2), dtype=int)
+
+
+    def read_data(self, is_energy):
+        # Initialising the matrix variables
+        self.time_matrix = np.zeros((self.plot_size_axis1, self.plot_size_axis1, self.plot_size_axis2), dtype=int)
+        self.stop_code_matrix = np.zeros((self.plot_size_axis1, self.plot_size_axis1, self.plot_size_axis2), dtype=str)
+        self.stability_matrix = np.zeros((self.plot_size_axis1, self.plot_size_axis1, self.plot_size_axis2), dtype=int)
 
         
         if is_energy:
@@ -73,10 +78,33 @@ class ThreeDimensionalPerturbationPlot():
                     data = np.loadtxt(f, delimiter=",", dtype=str)
                     self.stability_matrix[:,:,i] = data.T
 
-    def animate(self):
+    def read_data_dxdy_slice(self):
+        '''
+        To avoid reading in the full cube when trying to plot dxdy slices we read in only that slice
+        '''
+        # Initialising the matrix variables
+        self.time_matrix = np.zeros((self.plot_size_axis1, self.plot_size_axis1), dtype=int)
+        self.stop_code_matrix = np.zeros((self.plot_size_axis1, self.plot_size_axis1), dtype=str)
+        self.stability_matrix = np.zeros((self.plot_size_axis1, self.plot_size_axis1), dtype=int)
+
+
+        with open(os.path.join(self.output_directory, "timeMatrix" + str(self.slice*self.delta_axis2) + ".csv"), 'r') as f:
+            data = np.loadtxt(f, delimiter=",", dtype=int)
+            self.time_matrix[:,:] = data.T
+        # Reading the stopCodeMatrix
+        with open(os.path.join(self.output_directory, "stopCodeMatrix" + str(self.slice*self.delta_axis2) + ".csv"), 'r') as f:
+            data = np.loadtxt(f, delimiter=",", dtype=str)
+            self.stop_code_matrix[:,:] = data.T
+        # Reading the stabilityMatrix
+        with open(os.path.join(self.output_directory, "stabilityMatrix" + str(self.slice*self.delta_axis2) + ".csv"), 'r') as f:
+            data = np.loadtxt(f, delimiter=",", dtype=str)
+            self.stability_matrix[:,:] = data.T
+
+    def animate(self, is_energy=False):
         '''
         Creates an animation with each frame a different energy/angular momentum shift
         '''
+        self.read_data(is_energy) 
 
         fig, ax = plt.subplots(figsize=(10, 8))
 
@@ -102,8 +130,8 @@ class ThreeDimensionalPerturbationPlot():
         ani.save('heatmap_animation.mp4', writer=writervideo)
 
     
-    def scatter_plot(self, stop_code):
-        print(self.delta_axis2)
+    def scatter_plot(self, stop_code, is_energy=False):
+        self.read_data(is_energy)
 
         x = []
         y = []
@@ -126,31 +154,51 @@ class ThreeDimensionalPerturbationPlot():
         plt.show()
 
 
-    def plot_stop_codes_gradient(self, df_time,df_stop, df_stability, x_label = r"$\Delta x$", y_label = r"$\Delta y$"):
+    def plot_stop_codes_gradient(self, df_time,df_stop, df_stability, is_stability_only, x_label = r"$\Delta x$", y_label = r"$\Delta y$"):
         # Set up the plot
         fig, ax = plt.subplots()
         fig.set_size_inches(10,8)
         #ax.set_title("Category Heatmap")
+
+        # Ensure all values less than 1 show up as 0
+        df_time[df_time < 1] = 1
         
         # Get unique categories
         categories = sorted(df_stop.stack().unique().tolist())
         category_map = {cat: str(i) for i, cat in enumerate(categories)}
         df_stop = df_stop.replace(category_map).astype(int)
+
+        if is_stability_only:
+            categories = ["X"]
+            category_map = {"X":1}
         
         #normalise the two numeric matrices
-        norm_time = LogNorm(vmin=self.time_matrix.min()+1, vmax=self.time_matrix.max())
+        norm_time = LogNorm(vmin=1, vmax=17000)
         norm_stability = plt.Normalize(vmin=self.stability_matrix.min(), vmax=self.stability_matrix.max())
         
-        cmap_stability = sns.color_palette(self.stable_color_blend, as_cmap=True)
+        # Adjusting the colour pallet if we are plotting only the stability points
+        if is_stability_only:
+            cmap_stability = sns.color_palette("rocket", as_cmap=True)
+        else:
+            cmap_stability = sns.color_palette(self.stable_color_blend, as_cmap=True)
         sns.heatmap(df_stability, cmap=cmap_stability, norm=norm_stability,fmt="s", cbar=False, cbar_kws={"shrink": 0.5}, ax=ax, square=True, xticklabels=self.skip_no_labels, yticklabels=self.skip_no_labels)
 
-        for i in range(len(categories) - 1):
+        # If only the stability is being plotted we ensure the non stable points are plotted white
+        if is_stability_only:
+            not_stable = df_stability[df_stability == 0]
+            sns.heatmap(not_stable, cmap="Greys", annot=False, fmt="s", square=True, cbar=False, xticklabels=self.skip_no_labels, yticklabels=self.skip_no_labels)
+
+        count = len(categories) -1
+        if category_map.get("X") == None:
+            count += 1
+
+        for i in range(count):
             if i == 0:
                 cmap_time = sns.color_palette("mako", as_cmap=True)
             elif i == 1:
                 cmap_time = sns.color_palette("rocket", as_cmap=True)
             else:
-                cmap_time = sns.color_palette(self.color_map_blends[colors_used], as_cmap=True)
+                cmap_time = sns.color_palette(self.color_map_blends[i], as_cmap=True)
             df_time_mask = df_time.where(df_stop == i)
             heatmap = sns.heatmap(df_time_mask, cmap=cmap_time, norm=norm_time, fmt="s", cbar=False, ax=ax, square=True, xticklabels=self.skip_no_labels, yticklabels=self.skip_no_labels)
             
@@ -200,15 +248,49 @@ class ThreeDimensionalPerturbationPlot():
 
         ax.set_xlabel(x_label)
         ax.set_ylabel(y_label)
+
+        # Section Used to Regsiter Double Click events and produce associated orbit
+        coords = []
+
+        def onclick(event):
+            global ix, iy
+            if event.inaxes != ax: return
+            
+            ix, iy = np.floor(event.xdata-self.p_axis1), np.ceil(-event.ydata+self.p_axis1)
+            if event.dblclick or (event.button == 3):
+                deltaScale = np.ceil(np.abs(np.log10(self.delta_axis1)))
+                print (f'delta x = {ix * self.delta_axis1:.{int(deltaScale) + 1}f}, delta y = {iy * self.delta_axis1:.{int(deltaScale) + 1}f}')
+                coords.append((ix, iy))
+                print(ix, iy)
+                command = '.\\JavaCompileAndRun.ps1 figureEight 16000 0.01 --integrator "yoshida" --perturbSingularAngular ' + str(self.slice) + ' ' + str(self.delta_axis2) + ' ' + str(int(ix)) + ' ' + str(int(iy)) + ' ' + str(self.delta_axis1) + ' --calculateEnergies --calculateCentreOfMass --useVariableTimestep --calculateShapeSpace --checkStopConditions'
+                completed = subprocess.Popen(["powershell.exe",command], stdout=sys.stdout)
+                print(completed.communicate())
+                
+                plotter = Plotter.Plotter("javasimulation\\Outputs", 
+                        run_fast=True,
+                        plot_fast=True,
+                        close_all=False
+                        )
+
+                plotter.shape_space(save=True)
+                plotter.plot(save=True)
+
+            return coords
+        cid = fig.canvas.mpl_connect('button_press_event', onclick)
+        #plt.show()
+
         return plt
 
 
-    def  plot_slice(self, slices, dxda = False, dyda = False):
+    def  plot_slice(self, slices, dxda = False, dyda = False, is_stability_only=False, save_dbl_click = False, is_energy=False):
         '''
         Takes an array of integers (slices) and by default returns slices in angular momentum of the dxdy plane.
         Opptionally slices can be taken in delta y of the dxda plane, similarly slices can be taken in delta x of 
         the dyda of the plane.
-        '''     
+        '''  
+
+        if dxda or dyda:
+            self.read_data(is_energy)   
         
 
         fig, ax = plt.subplots(figsize=(10, 8))
@@ -221,24 +303,28 @@ class ThreeDimensionalPerturbationPlot():
         axis_labels_angular = np.round(np.linspace(-self.p_axis2*self.delta_axis2,0, self.plot_size_axis2),2)
 
         for slice in slices:
+            self.slice = slice
             if dxda:
                 df_time = pd.DataFrame(np.flip(self.time_matrix[slice,:,:].T), columns=axis_labels, index=-axis_labels_angular)   
                 df_stop = pd.DataFrame(np.flip(self.stop_code_matrix[slice,:,:].T),columns=axis_labels, index=-axis_labels_angular)
                 df_stability = pd.DataFrame(np.flip(self.stability_matrix[slice,:,:].T),columns=axis_labels, index=-axis_labels_angular)
                 
-                plot = self.plot_stop_codes_gradient(df_time, df_stop, df_stability, x_label=r"$\Delta x$", y_label=r"$\Delta L$")
+                plot = self.plot_stop_codes_gradient(df_time, df_stop, df_stability, is_stability_only, x_label=r"$\Delta x$", y_label=r"$\Delta L$")
                 plot.savefig("Python/Figures/dxdaSlice" + str(np.round(slice*self.delta_axis1,4)) + ".png", format="png", dpi=300, bbox_inches='tight', pad_inches=0.2)     
             elif dyda:
                 df_time = pd.DataFrame(np.flip(self.time_matrix[:,slice,:].T), columns=axis_labels, index=-axis_labels_angular)   
                 df_stop = pd.DataFrame(np.flip(self.stop_code_matrix[:,slice,:].T),columns=axis_labels, index=-axis_labels_angular)
                 df_stability = pd.DataFrame(np.flip(self.stability_matrix[:,slice,:].T),columns=axis_labels, index=-axis_labels_angular)
                 
-                plot = self.plot_stop_codes_gradient(df_time, df_stop, df_stability, x_label=r"$\Delta y$", y_label=r"$\Delta L$")
+                plot = self.plot_stop_codes_gradient(df_time, df_stop, df_stability, is_stability_only, x_label=r"$\Delta y$", y_label=r"$\Delta L$")
                 plot.savefig("Python/Figures/dydaSlice" + str(np.round(slice*self.delta_axis1,4)) + ".png", format="png", dpi=300, bbox_inches='tight', pad_inches=0.2)     
             else:
-                df_time = pd.DataFrame(self.time_matrix[:,:,slice], columns=axis_labels, index=-axis_labels)   
-                df_stop = pd.DataFrame(self.stop_code_matrix[:,:,slice],columns=axis_labels, index=-axis_labels)
-                df_stability = pd.DataFrame(self.stability_matrix[:,:,slice],columns=axis_labels, index=-axis_labels)
+                # Read in the data only for that slice, this only works for the dxdy slices
+                self.read_data_dxdy_slice()
+
+                df_time = pd.DataFrame(self.time_matrix[:,:], columns=axis_labels, index=-axis_labels)   
+                df_stop = pd.DataFrame(self.stop_code_matrix[:,:],columns=axis_labels, index=-axis_labels)
+                df_stability = pd.DataFrame(self.stability_matrix[:,:],columns=axis_labels, index=-axis_labels)
                 
-                plot = self.plot_stop_codes_gradient(df_time, df_stop, df_stability)
+                plot = self.plot_stop_codes_gradient(df_time, df_stop, df_stability, is_stability_only)
                 plot.savefig("Python/Figures/dxdySlice" + str(np.round(slice*self.delta_axis2,4)) + ".png", format="png", dpi=300, bbox_inches='tight', pad_inches=0.2)     
