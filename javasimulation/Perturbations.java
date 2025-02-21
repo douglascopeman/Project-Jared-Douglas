@@ -19,7 +19,7 @@ public class Perturbations {
     private int angularMomentumIndex = 0;
     private int energyIndex = 0;
     private int halfGridSizeEnergy = 1;
-    private int perturbSingularSubdivide = 3; //must be odd!
+    private int perturbSingularSubdivide = 81; //must be odd!
 
     private HashMap<String, Boolean> options = new HashMap<String, Boolean>();
     private IntegratorFunction simulationIntegrator;
