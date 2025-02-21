@@ -577,6 +577,7 @@ public class Perturbations {
                             startStopMatrix[firstIndex][secondIndex][thirdIndex] = '*';
                             totalTimestepMatrix[firstIndex][secondIndex][thirdIndex] = simulation.getCurrentTimestep();
                             orbitLengthMatrix[firstIndex][secondIndex][thirdIndex] = simulation.getOrbitLength();
+
                         }
                         // save the stability number to the stability matrix
                         int localStabilityNumber = simulation.getShapeSpaceStabilityNumber();
@@ -595,18 +596,6 @@ public class Perturbations {
             executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
         } catch (InterruptedException e) {
             System.err.println("Error in executor.awaitTermination");
-        }
-
-        // Print the stability matrix
-        System.out.println("Stability Matrix:");
-        for (int r = 0; r < p; r++) {
-            for (int n = 0; n < p; n++) {
-                for (int q = 0; q < p; q++){
-                    System.out.print(stabilityMatrix[r][n][q] + " ");
-                }
-                System.out.println(" ");
-            }
-            System.out.println();
         }
 
 
@@ -657,7 +646,7 @@ public class Perturbations {
             simulation.run();            
         } else {
             double fractionalRunDenom = 100.0;    // The fraction of the orbit that the location data will be saved
-            boolean isSaveEndFraction = true;   // When true the end fraction of the simulation is displayed not the start fraction, this is particularly useful for terminated simulations
+            boolean isSaveEndFraction = false;   // When true the end fraction of the simulation is displayed not the start fraction, this is particularly useful for terminated simulations
 
             System.out.println("No orbit found, running for 1/" + (int) fractionalRunDenom + " of total steps (Total steps = " + optimalTotalTimesteps + ")");
 
@@ -673,6 +662,19 @@ public class Perturbations {
             Simulation simulation = new Simulation(perturbedBodies, fractionalRunTimesteps, dt, options);
             simulation.setIntegratorFunction(simulationIntegrator);
             simulation.run();   
+        }
+
+        //Print the stability matrix
+        //System.out.println("Stability Matrix:");
+        SimulationIO.setupDirectories();
+        for (int r = 0; r < p; r++) {
+            int[][] stabilityMatrixWriter = new int[p][p];
+            for (int n = 0; n < p; n++) {
+                for (int q = 0; q < p; q++){
+                    stabilityMatrixWriter[n][q] = stabilityMatrix[n][q][r];                    
+                }
+            }
+            SimulationIO.saveMatrix("stabilityMatrix"+(r*currentAngularMomentumDelta), stabilityMatrixWriter);
         }
     }
 
