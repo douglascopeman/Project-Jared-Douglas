@@ -99,6 +99,7 @@ class ThreeDimensionalPerturbationPlot():
         with open(os.path.join(self.output_directory, "stabilityMatrix" + str(self.slice*self.delta_axis2) + ".csv"), 'r') as f:
             data = np.loadtxt(f, delimiter=",", dtype=str)
             self.stability_matrix[:,:] = data.T
+            self.stability_matrix[self.stability_matrix >170000] = 0
 
     def animate(self, is_energy=False):
         '''
@@ -154,17 +155,17 @@ class ThreeDimensionalPerturbationPlot():
         plt.show()
 
 
-    def plot_stop_codes_gradient(self, df_time,df_stop, df_stability, is_stability_only, x_label = r"$\Delta x$", y_label = r"$\Delta y$"):
+    def plot_stop_codes_gradient(self, df_time,df_stop, df_stability, categories, is_stability_only, x_label = r"$\Delta x$", y_label = r"$\Delta y$"):
         # Set up the plot
         fig, ax = plt.subplots()
-        fig.set_size_inches(10,8)
+        fig.set_size_inches(12,8)
         #ax.set_title("Category Heatmap")
 
         # Ensure all values less than 1 show up as 0
         df_time[df_time < 1] = 1
         
         # Get unique categories
-        categories = sorted(df_stop.stack().unique().tolist())
+        # categories = sorted(df_stop.stack().unique().tolist())
         category_map = {cat: str(i) for i, cat in enumerate(categories)}
         df_stop = df_stop.replace(category_map).astype(int)
 
@@ -188,60 +189,61 @@ class ThreeDimensionalPerturbationPlot():
             not_stable = df_stability[df_stability == 0]
             sns.heatmap(not_stable, cmap="Greys", annot=False, fmt="s", square=True, cbar=False, xticklabels=self.skip_no_labels, yticklabels=self.skip_no_labels)
 
-        count = len(categories) -1
-        if category_map.get("X") == None:
-            count += 1
-
-        for i in range(count):
-            if i == 0:
+        for key, cat in enumerate(categories):
+            if cat == "X": continue
+            
+            if cat == "D":
                 cmap_time = sns.color_palette("mako", as_cmap=True)
-            elif i == 1:
+            elif cat == "V":
                 cmap_time = sns.color_palette("rocket", as_cmap=True)
+            elif cat == "F":
+                cmap_time = sns.color_palette("blend:#000,#000", as_cmap=True)
             else:
-                cmap_time = sns.color_palette(self.color_map_blends[i], as_cmap=True)
-            df_time_mask = df_time.where(df_stop == i)
+                cmap_time = sns.color_palette(self.color_map_blends[key], as_cmap=True)
+            df_time_mask = df_time.where(df_stop == key)
             heatmap = sns.heatmap(df_time_mask, cmap=cmap_time, norm=norm_time, fmt="s", cbar=False, ax=ax, square=True, xticklabels=self.skip_no_labels, yticklabels=self.skip_no_labels)
             
         # Stability colorbar
-        sm_stability = plt.cm.ScalarMappable(cmap=cmap_stability, norm=norm_stability)
-        sm_stability.set_array([])
-        divider = make_axes_locatable(ax)
-        cax_stability = divider.append_axes("right", size="5%", pad=0.25)
-        cbar_stability = plt.colorbar(sm_stability, cax=cax_stability, orientation="vertical")
-        cbar_stability.ax.invert_yaxis()
-        cbar_stability.ax.yaxis.set_ticks_position('right')
-        cbar_stability.ax.yaxis.set_label_position('right')
-        cbar_stability.set_label("Stability Number", labelpad=1, rotation=90)
-        cbar_stability.ax.yaxis.set_label_position('left')
+        # sm_stability = plt.cm.ScalarMappable(cmap=cmap_stability, norm=norm_stability)
+        # sm_stability.set_array([])
+        # divider = make_axes_locatable(ax)
+        # cax_stability = divider.append_axes("right", size="5%", pad=0.25)
+        # cbar_stability = plt.colorbar(sm_stability, cax=cax_stability, orientation="vertical")
+        # cbar_stability.ax.invert_yaxis()
+        # cbar_stability.ax.yaxis.set_ticks_position('right')
+        # cbar_stability.ax.yaxis.set_label_position('right')
+        # cbar_stability.set_label("Stability Number", labelpad=1, rotation=90)
+        # cbar_stability.ax.yaxis.set_label_position('left')
 
-        #then iterate through all categories other than completion and create a colorbar for each
-        bars_made = 0
-        colors_used = 0
-        for i in range(len(categories)):
-            if (categories[i] == "X"): continue
-            #set the colourmap correctly
-            if colors_used == 0:
-                cmap_time = sns.color_palette("mako", as_cmap=True)
-            elif colors_used == 1:
-                cmap_time = sns.color_palette("rocket", as_cmap=True)
-            else:
-                cmap_time = sns.color_palette(self.color_map_blends[colors_used], as_cmap=True)
-            sm_time = plt.cm.ScalarMappable(cmap=cmap_time, norm=norm_time)
-            colors_used += 1
-            sm_time.set_array([])
-            #create the colorbar and place it in the right space
-            #if the colorbar is the first, leave space for the stability colorbar ticks
-            cax_time = divider.append_axes("right", size="5%", pad= 0.75 if (bars_made == 0) else 0.1)
-            cbar_time = plt.colorbar(sm_time, cax=cax_time, orientation="vertical")
-            cbar_time.ax.set_title(categories[i], pad=10)
-            #if the colorbar is the first, we also label it
-            if (bars_made == 0):
-                cbar_time.set_label("Time Number", labelpad=1, rotation=90)
-                cbar_time.ax.yaxis.set_label_position('left')
-            #if the colorbar is not the last, remove the ticks
-            if (bars_made != len(categories) - 2): 
-                cbar_time.set_ticks([])
-            bars_made += 1
+        # #then iterate through all categories other than completion and create a colorbar for each
+        # bars_made = 0
+        # colors_used = 0
+        # for i in range(len(categories)):
+        #     if (categories[i] == "X"): continue
+        #     if (categories[i] == "F"): continue
+        #     #set the colourmap correctly
+        #     if colors_used == 0:
+        #         cmap_time = sns.color_palette("mako", as_cmap=True)
+        #     elif colors_used == 1:
+        #         cmap_time = sns.color_palette("rocket", as_cmap=True)
+        #     else:
+        #         cmap_time = sns.color_palette(self.color_map_blends[colors_used], as_cmap=True)
+        #     sm_time = plt.cm.ScalarMappable(cmap=cmap_time, norm=norm_time)
+        #     colors_used += 1
+        #     sm_time.set_array([])
+        #     #create the colorbar and place it in the right space
+        #     #if the colorbar is the first, leave space for the stability colorbar ticks
+        #     cax_time = divider.append_axes("right", size="5%", pad= 0.75 if (bars_made == 0) else 0.1)
+        #     cbar_time = plt.colorbar(sm_time, cax=cax_time, orientation="vertical")
+        #     cbar_time.ax.set_title(categories[i], pad=10)
+        #     #if the colorbar is the first, we also label it
+        #     if (bars_made == 0):
+        #         cbar_time.set_label("Time Number", labelpad=1, rotation=90)
+        #         cbar_time.ax.yaxis.set_label_position('left')
+        #     #if the colorbar is not the last, remove the ticks
+        #     if (bars_made < 2): 
+        #         cbar_time.set_ticks([])
+        #     bars_made += 1
 
         ax.xaxis.set_tick_params(rotation=90)
         ax.yaxis.set_tick_params(rotation=0)
@@ -282,7 +284,7 @@ class ThreeDimensionalPerturbationPlot():
         return plt
 
 
-    def  plot_slice(self, slices, dxda = False, dyda = False, is_stability_only=False, save_dbl_click = False, is_energy=False):
+    def  plot_slice(self, slices, dxda = False, dyda = False, is_stability_only=False, save_dbl_click = False, is_energy=False, categories = ["D", "V", "E", "F", "X"]):
         '''
         Takes an array of integers (slices) and by default returns slices in angular momentum of the dxdy plane.
         Opptionally slices can be taken in delta y of the dxda plane, similarly slices can be taken in delta x of 
@@ -309,14 +311,14 @@ class ThreeDimensionalPerturbationPlot():
                 df_stop = pd.DataFrame(np.flip(self.stop_code_matrix[slice,:,:].T),columns=axis_labels, index=-axis_labels_angular)
                 df_stability = pd.DataFrame(np.flip(self.stability_matrix[slice,:,:].T),columns=axis_labels, index=-axis_labels_angular)
                 
-                plot = self.plot_stop_codes_gradient(df_time, df_stop, df_stability, is_stability_only, x_label=r"$\Delta x$", y_label=r"$\Delta L$")
+                plot = self.plot_stop_codes_gradient(df_time, df_stop, df_stability, is_stability_only, categories, x_label=r"$\Delta x$", y_label=r"$\Delta L$")
                 plot.savefig("Python/Figures/dxdaSlice" + str(np.round(slice*self.delta_axis1,4)) + ".png", format="png", dpi=300, bbox_inches='tight', pad_inches=0.2)     
             elif dyda:
                 df_time = pd.DataFrame(np.flip(self.time_matrix[:,slice,:].T), columns=axis_labels, index=-axis_labels_angular)   
                 df_stop = pd.DataFrame(np.flip(self.stop_code_matrix[:,slice,:].T),columns=axis_labels, index=-axis_labels_angular)
                 df_stability = pd.DataFrame(np.flip(self.stability_matrix[:,slice,:].T),columns=axis_labels, index=-axis_labels_angular)
                 
-                plot = self.plot_stop_codes_gradient(df_time, df_stop, df_stability, is_stability_only, x_label=r"$\Delta y$", y_label=r"$\Delta L$")
+                plot = self.plot_stop_codes_gradient(df_time, df_stop, df_stability, is_stability_only, categories, x_label=r"$\Delta y$", y_label=r"$\Delta L$")
                 plot.savefig("Python/Figures/dydaSlice" + str(np.round(slice*self.delta_axis1,4)) + ".png", format="png", dpi=300, bbox_inches='tight', pad_inches=0.2)     
             else:
                 # Read in the data only for that slice, this only works for the dxdy slices
@@ -326,5 +328,5 @@ class ThreeDimensionalPerturbationPlot():
                 df_stop = pd.DataFrame(self.stop_code_matrix[:,:],columns=axis_labels, index=-axis_labels)
                 df_stability = pd.DataFrame(self.stability_matrix[:,:],columns=axis_labels, index=-axis_labels)
                 
-                plot = self.plot_stop_codes_gradient(df_time, df_stop, df_stability, is_stability_only)
+                plot = self.plot_stop_codes_gradient(df_time, df_stop, df_stability, is_stability_only, categories)
                 plot.savefig("Python/Figures/dxdySlice" + str(np.round(slice*self.delta_axis2,4)) + ".png", format="png", dpi=300, bbox_inches='tight', pad_inches=0.2)     
