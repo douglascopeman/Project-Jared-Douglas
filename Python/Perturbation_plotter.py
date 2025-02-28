@@ -169,14 +169,14 @@ class Perturbation_plotter():
     # TODO: The following two functions could use a lot of cleanup for duplicate code
 
     # @dispatch(str, str, save=bool)
-    def plot_stop_codes_gradient(self, time_filename, stop_filename, save=False):
+    def plot_stop_codes_gradient(self, time_filename, stop_filename, save=False, categories_ = None):
         save_the_other_one = save
         self.read_time(time_filename)
         faux_stability = 'ingore_this'
-        self.plot_stop_codes_stab_gradient(time_filename, stop_filename, faux_stability, save=save_the_other_one)
+        self.plot_stop_codes_stab_gradient(time_filename, stop_filename, faux_stability, save=save_the_other_one, categories = categories_)
         
     # @dispatch(str, str, str, save=bool)
-    def plot_stop_codes_stab_gradient(self, time_filename, stop_filename, stability_filename, save=False):
+    def plot_stop_codes_stab_gradient(self, time_filename, stop_filename, stability_filename, save=False, categories = None):
         self.read_time(time_filename)
         self.read_stop_codes(stop_filename)
         if stability_filename == 'ingore_this':
@@ -195,8 +195,9 @@ class Perturbation_plotter():
         df_stability = pd.DataFrame(self.stability_matrix.T, columns=self.axis_labels, index=-self.axis_labels)
 
         # Get unique categories
-        categories = sorted(df_stop.stack().unique().tolist())
-        categories = [cat for cat in categories if cat not in ['F', 'X']] + (['F', 'X'] if 'F' in categories else ['X']) #Move initialisation failure 'F' to the end
+        if categories == None:
+            categories = sorted(df_stop.stack().unique().tolist())
+            categories = [cat for cat in categories if cat not in ['F', 'X']] + (['F', 'X'] if 'F' in categories else ['X']) #Move initialisation failure 'F' to the end
         category_map = {cat: str(i) for i, cat in enumerate(categories)}
         df_stop = df_stop.replace(category_map).astype(int)
         
