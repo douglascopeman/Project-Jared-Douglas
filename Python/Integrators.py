@@ -93,6 +93,9 @@ def higher_order_helper(c, d, bodies, dt):
     return bodies
 
 def yoshida(bodies, dt, G=1, variable_dt = False):
+
+    if variable_dt is True:
+        dt = get_variable_dt(bodies, dt)
     # Initialising constants
     Cs = np.zeros(4)
     Ds = np.zeros(4)
