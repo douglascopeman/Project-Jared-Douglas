@@ -52,7 +52,8 @@ public class Calculations {
     public static Vector angularMomentum(Body[] bodies) {
         Vector L = new Vector();
         for (int p = 0; p < bodies.length; p++) {
-            L.add(bodies[p].calculateAngularMomentum());
+            L = L.add(bodies[p].calculateAngularMomentum());
+            System.out.println("L: " + L);
         }
         return L;
     }
@@ -60,7 +61,7 @@ public class Calculations {
     public static Vector linearMomentum(Body[] bodies) {
         Vector P = new Vector();
         for (int p = 0; p < bodies.length; p++) {
-            P.add(bodies[p].calculateLinearMomentum());
+            P = P.add(bodies[p].calculateLinearMomentum());
         }
         
         return P;
