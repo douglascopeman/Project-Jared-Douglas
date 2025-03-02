@@ -53,7 +53,6 @@ public class Calculations {
         Vector L = new Vector();
         for (int p = 0; p < bodies.length; p++) {
             L = L.add(bodies[p].calculateAngularMomentum());
-            System.out.println("L: " + L);
         }
         return L;
     }
@@ -63,7 +62,6 @@ public class Calculations {
         for (int p = 0; p < bodies.length; p++) {
             P = P.add(bodies[p].calculateLinearMomentum());
         }
-        
         return P;
     }
 
