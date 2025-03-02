@@ -57,20 +57,30 @@ class Plotter():
         #Other plots
         if self.kwargs["plot_energy"]:
             fig_energy = self.plot_energy()
-            fig_energy.canvas.mpl_connect('close_event', close_all)
+            if self.kwargs["close_all"]:
+                fig_energy.canvas.mpl_connect('close_event', close_all)
         if self.kwargs["plot_energy_error"]:
             fig_energy_error = self.plot_energy_error()
-            fig_energy_error.canvas.mpl_connect('close_event', close_all)
+            if self.kwargs["close_all"]:
+                fig_energy_error.canvas.mpl_connect('close_event', close_all)
         if self.kwargs["plot_angular_momentum_error"]:
             fig_angular_momentum_error = self.plot_angular_momentum_error()
-            fig_angular_momentum_error.canvas.mpl_connect('close_event', close_all)
+            if self.kwargs["close_all"]:
+                fig_angular_momentum_error.canvas.mpl_connect('close_event', close_all)
         if self.kwargs["plot_linear_momentum_error"]:
             fig_linear_momentum_error = self.plot_linear_momentum_error()
-            fig_linear_momentum_error.canvas.mpl_connect('close_event', close_all)
+            if self.kwargs["close_all"]:
+                fig_linear_momentum_error.canvas.mpl_connect('close_event', close_all)
     
         if self.kwargs["save_extra_plots"]:
-            fig_energy_error.savefig("Python/Outputs/Energy Error.png")
-            fig_angular_momentum_error.savefig("Python/Outputs/Angular Momentum Error.png")
+            if 'fig_energy' in locals():
+                fig_energy.savefig("Python/Figures/Energy.png")
+            if 'fig_energy_error' in locals():
+                fig_energy_error.savefig("Python/Figures/Energy Error.png")
+            if 'fig_angular_momentum_error' in locals():
+                fig_angular_momentum_error.savefig("Python/Figures/Angular Momentum Error.png")
+            if 'fig_linear_momentum_error' in locals():
+                fig_linear_momentum_error.savefig("Python/Figures/Linear Momentum Error.png")
         
         if save:
             fig_orbits.savefig("Python/Figures/Orbits.png")
