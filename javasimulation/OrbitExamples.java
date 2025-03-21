@@ -21,6 +21,11 @@ public class OrbitExamples {
         new Body(new Vector(-1, 0, 0), new Vector(0, -0.1, 0))
     };
 
+    public static Body[] longEllipticalMoving = {
+        new Body(new Vector(1, 0, 0), new Vector(0, 0.1, 1)), 
+        new Body(new Vector(-1, 0, 0), new Vector(0, -0.1, 1))
+    };
+
     public static Body[] parabolic = {
         new Body(new Vector(1, 1, 0), new Vector(-0.3, -0.6, 0)), 
         new Body(new Vector(-1, -1, 0), new Vector(0.3, 0.6, 0))
@@ -89,6 +94,7 @@ public class OrbitExamples {
         put("circular", OrbitExamples.circular);
         put("elliptical", elliptical);
         put("longElliptical", longElliptical);
+        put("longEllipticalMoving", longEllipticalMoving);
         put("parabolic", parabolic);
         put("hyperbolic", hyperbolic);
         put("eulerThree", eulerThree);
